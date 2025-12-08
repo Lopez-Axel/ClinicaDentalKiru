@@ -158,7 +158,7 @@ export default {
         fecha_expiracion: '',
         imagen: '',
         estado: 'activo',
-        userId: 101
+        userId: 1
       }
     }
 
@@ -174,19 +174,16 @@ export default {
       try {
         const payload = {
           titulo: formData.value.titulo,
-          descripcion: formData.value.descripcion,
-          categoria: formData.value.categoria,
-          fecha_publicacion: new Date(formData.value.fecha_publicacion).toISOString(),
-          fecha_expiracion: formData.value.fecha_expiracion
-            ? new Date(formData.value.fecha_expiracion).toISOString()
-            : null,
-          imagen: formData.value.imagen || null,
+          descripcion: formData.value.descripcion || null,
+          categoria: formData.value.categoria || null,
+          fecha_publicacion: formData.value.fecha_publicacion, // solo "YYYY-MM-DD"
+          fecha_expiracion: formData.value.fecha_expiracion || null, // "YYYY-MM-DD" o null
+          imagen: formData.value.imagen || null, // si no tienes URL, envía null
           estado: formData.value.estado,
           userId: Number(formData.value.userId)
         }
 
-        console.log('CREAR ANUNCIO - payload:', payload) // <-- agrega esto para debug
-
+        console.log('CREAR ANUNCIO - payload:', payload)
         await anuncioStore.agregarAnuncio(payload)
         closeDialog()
       } catch (error) {

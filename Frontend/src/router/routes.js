@@ -200,6 +200,15 @@ const routes = [
     }
   },
 
+  {
+    path: '/auth/callback',
+    name: 'AuthCallback',
+    component: () => import('pages/Auth/AuthCallback.vue'),
+    meta: { 
+      requiresAuth: false,
+      redirectIfAuthenticated: true // Redirigir al dashboard si ya está logueado
+    }
+  },
   // ============================================
   // RUTAS PRIVADAS (DashboardLayout)
   // ============================================

@@ -1,7 +1,6 @@
 <template>
   <div class="login-page flex flex-center">
     <q-card class="login-card row no-wrap animated zoomIn">
-      <!-- Formulario de Login -->
       <div class="col-12 col-md-6 login-form-section">
         <div class="row items-center justify-center q-mb-lg animated fadeInDown">
           <q-img 
@@ -18,20 +17,18 @@
 
         <q-form @submit="onSubmit" class="column q-gutter-md animated fadeInUp" style="animation-delay: 0.3s">
           <q-input 
-            v-model="email" 
-            label="Correo Electrónico" 
+            v-model="username" 
+            label="Usuario" 
             outlined
             autofocus
-            type="email"
             :rules="[
-              val => !!val || 'El correo es requerido',
-              val => isValidEmail(val) || 'Correo inválido'
+              val => !!val || 'El usuario es requerido'
             ]"
             lazy-rules
             class="form-input"
           >
             <template v-slot:prepend>
-              <q-icon name="email" color="primary" />
+              <q-icon name="person" color="primary" />
             </template>
           </q-input>
 
@@ -41,8 +38,7 @@
             outlined
             :type="showPassword ? 'text' : 'password'"
             :rules="[
-              val => !!val || 'La contraseña es requerida',
-              val => val.length >= 6 || 'Mínimo 6 caracteres'
+              val => !!val || 'La contraseña es requerida'
             ]"
             lazy-rules
             class="form-input"
@@ -90,6 +86,25 @@
             no-caps
           />
 
+          <q-separator class="q-my-md">
+            <span class="text-grey-7 text-caption">O continúa con</span>
+          </q-separator>
+
+          <q-btn 
+            outline
+            label="Iniciar sesión con Google" 
+            color="red-6"
+            @click="loginWithGoogle"
+            :disable="isLoading"
+            no-caps
+            class="google-btn"
+            size="md"
+          >
+            <template v-slot:prepend>
+              <q-icon name="mdi-google" />
+            </template>
+          </q-btn>
+
           <q-btn 
             flat 
             label="CANCELAR" 
@@ -98,44 +113,14 @@
             :disable="isLoading"
             no-caps
             class="secondary-btn"
-            
           />
         </q-form>
-
-        <!-- Credenciales de prueba (solo desarrollo) -->
-        <transition name="fade">
-          <div v-if="isDevelopment" class="q-mt-lg">
-            <q-separator class="q-mb-md" />
-            <div class="text-caption text-grey-7 q-mb-sm">
-              <q-icon name="info" size="xs" /> Credenciales de prueba:
-            </div>
-            <div class="test-credentials">
-              <q-chip 
-                v-for="(cred, index) in mockCredentials" 
-                :key="cred.email"
-                clickable
-                @click="fillCredentials(cred)"
-                :color="getRoleColor(cred.role)"
-                text-color="white"
-                size="sm"
-                class="q-ma-xs animated bounceIn"
-                :style="{ animationDelay: `${index * 0.1}s` }"
-              >
-                <q-avatar :color="getRoleColor(cred.role)" text-color="white">
-                  {{ cred.role.charAt(0) }}
-                </q-avatar>
-                {{ cred.role }}
-              </q-chip>
-            </div>
-          </div>
-        </transition>
 
         <div class="q-mt-lg text-center">
           <small class="text-grey">© 2025 KIRU Odontología</small>
         </div>
       </div>
 
-      <!-- Panel decorativo -->
       <div class="col-12 col-md-6 flex flex-center welcome-panel">
         <div class="q-pa-lg text-center welcome-content">
           <div class="welcome-icon q-mb-md animated bounceIn">
@@ -201,58 +186,26 @@ const $q = useQuasar()
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
-const { notifySuccess, notifyError, notifyInfo, showLoading, hideLoading } = useNotifications()
+const { notifySuccess, notifyError, showLoading, hideLoading } = useNotifications()
 
-// Datos del formulario
 const logo = '/KiruIMG/LogoKiru.png'
-const email = ref('')
+const username = ref('')
 const password = ref('')
 const rememberMe = ref(false)
 const showPassword = ref(false)
 
-// Estado de carga
 const isLoading = computed(() => authStore.isLoading)
-const isDevelopment = import.meta.env.DEV
 
-// Credenciales mock para desarrollo
-const mockCredentials = computed(() => authStore.getMockCredentials())
-
-// Validación de email
-const isValidEmail = (email) => {
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailPattern.test(email)
-}
-
-// Obtener color según rol
-const getRoleColor = (role) => {
-  const colors = {
-    ADMIN: 'deep-purple',
-    DENTIST: 'blue',
-    CLIENT: 'teal'
-  }
-  return colors[role] || 'grey'
-}
-
-// Llenar credenciales de prueba
-const fillCredentials = (cred) => {
-  email.value = cred.email
-  password.value = cred.password
-  notifyInfo(`Credenciales de ${cred.role} cargadas`)
-}
-
-// Enviar formulario
 const onSubmit = async () => {
   try {
     showLoading('Iniciando sesión...')
     
-    const result = await authStore.login(email.value, password.value)
+    const result = await authStore.login(username.value, password.value)
     
     hideLoading()
     
     if (result.success) {
-      notifySuccess(`¡Bienvenido ${result.user.name}!`)
-
-      // Redirigir a la ruta guardada o al dashboard
+      notifySuccess(`¡Bienvenido ${result.user.username}!`)
       const redirectTo = route.query.redirect || result.redirectTo
       router.push(redirectTo)
     } else {
@@ -265,12 +218,14 @@ const onSubmit = async () => {
   }
 }
 
-// Volver atrás
+const loginWithGoogle = () => {
+  authStore.loginWithGoogle()
+}
+
 const goBack = () => {
   router.push('/')
 }
 
-// Olvidé mi contraseña
 const forgotPassword = () => {
   $q.dialog({
     title: 'Recuperar Contraseña',
@@ -278,8 +233,7 @@ const forgotPassword = () => {
     prompt: {
       model: '',
       type: 'email',
-      label: 'Correo electrónico',
-      isValid: val => isValidEmail(val)
+      label: 'Correo electrónico'
     },
     cancel: {
       flat: true,
@@ -295,7 +249,6 @@ const forgotPassword = () => {
   })
 }
 
-// Mostrar información
 const showInfo = () => {
   $q.dialog({
     title: 'Sistema de Gestión KIRU',
@@ -307,7 +260,6 @@ const showInfo = () => {
   })
 }
 
-// Contactar soporte
 const contactSupport = () => {
   $q.dialog({
     title: 'Contactar Soporte',
@@ -336,5 +288,3 @@ const contactSupport = () => {
   })
 }
 </script>
-
-<!-- Los estilos están en app.scss global -->

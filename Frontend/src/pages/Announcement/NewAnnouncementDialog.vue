@@ -136,7 +136,7 @@ export default {
       fecha_expiracion: '',
       imagen: '',
       estado: 'activo',
-      userId: 101
+      userId: 1
     })
 
     const categorias = ['Promoción', 'Evento', 'Aviso', 'Noticia']

@@ -13,8 +13,7 @@
       </q-card-section>
 
       <q-card-section class="q-pt-lg">
-        <q-form @submit="createAnuncio" class="q-gutter-md">
-          <!-- Título -->
+        <q-form @submit.prevent="createAnuncio" class="q-gutter-md">
           <q-input
             v-model="formData.titulo"
             label="Título del anuncio *"
@@ -23,7 +22,6 @@
             :rules="[val => !!val || 'El título es requerido']"
           />
 
-          <!-- Categoría -->
           <q-select
             v-model="formData.categoria"
             :options="categorias"
@@ -33,7 +31,6 @@
             :rules="[val => !!val || 'La categoría es requerida']"
           />
 
-          <!-- Descripción -->
           <q-input
             v-model="formData.descripcion"
             label="Descripción *"
@@ -44,7 +41,6 @@
             :rules="[val => !!val || 'La descripción es requerida']"
           />
 
-          <!-- Fechas -->
           <div class="row q-col-gutter-md">
             <div class="col-6">
               <q-input
@@ -66,7 +62,6 @@
             </div>
           </div>
 
-          <!-- Imagen -->
           <q-input
             v-model="formData.imagen"
             label="URL de la imagen"
@@ -75,7 +70,6 @@
             placeholder="https://ejemplo.com/imagen.jpg"
           />
 
-          <!-- Estado -->
           <q-option-group
             v-model="formData.estado"
             :options="estadoOptions"
@@ -84,7 +78,6 @@
             label="Estado del anuncio"
           />
 
-          <!-- Previsualización de imagen -->
           <div v-if="formData.imagen" class="image-preview q-mt-md">
             <div class="text-caption text-weight-bold q-mb-xs">Vista previa:</div>
             <q-img
@@ -95,7 +88,6 @@
             />
           </div>
 
-          <!-- Acciones -->
           <q-card-actions align="right" class="q-pt-md">
             <q-btn label="Cancelar" color="grey" @click="closeDialog" no-caps />
             <q-btn 
@@ -104,7 +96,8 @@
               color="primary" 
               unelevated 
               no-caps
-              :disable="!isFormValid"
+              :disable="!isFormValid || loading"
+              :loading="loading"
             />
           </q-card-actions>
         </q-form>
@@ -114,23 +107,27 @@
 </template>
 
 <script>
-import { ref, watch, computed } from 'vue'
-import { usePublicarAnuncio } from 'src/stores/publicarAnuncio'
+import { ref, computed, watch } from 'vue'
+import { useAnuncioStore } from 'src/stores/anuncioStore'
 
 export default {
   name: 'NewAnuncioDialog',
-  
+
   props: {
-    modelValue: {
-      type: Boolean,
-      required: true
-    }
+    modelValue: { type: Boolean, required: true }
   },
 
-  emits: ['update:modelValue', 'anuncio-created'],
+  emits: ['update:modelValue'],
 
   setup(props, { emit }) {
-    const showDialog = ref(false)
+    const anuncioStore = useAnuncioStore()
+    const loading = ref(false)
+
+    const showDialog = computed({
+      get: () => props.modelValue,
+      set: (value) => emit('update:modelValue', value)
+    })
+
     const formData = ref({
       titulo: '',
       descripcion: '',
@@ -142,25 +139,15 @@ export default {
       userId: 101
     })
 
-    const anuncioStore = usePublicarAnuncio()
-
     const categorias = ['Promoción', 'Evento', 'Aviso', 'Noticia']
     const estadoOptions = [
       { label: 'Activo', value: 'activo' },
       { label: 'Inactivo', value: 'inactivo' }
     ]
 
-    const isFormValid = computed(() => {
-      return formData.value.titulo && formData.value.descripcion && formData.value.categoria
-    })
-
-    const createAnuncio = () => {
-      if (!isFormValid.value) return
-
-      emit('anuncio-created', formData.value)
-      resetForm()
-      closeDialog()
-    }
+    const isFormValid = computed(() =>
+      formData.value.titulo && formData.value.descripcion && formData.value.categoria
+    )
 
     const resetForm = () => {
       formData.value = {
@@ -176,19 +163,43 @@ export default {
     }
 
     const closeDialog = () => {
-      emit('update:modelValue', false)
+      showDialog.value = false
+      resetForm()
     }
 
-    watch(() => props.modelValue, (newVal) => {
-      showDialog.value = newVal
-      if (newVal) {
-        resetForm()
-      }
-    })
+    const createAnuncio = async () => {
+      if (!isFormValid.value) return
 
-    watch(showDialog, (newVal) => {
-      if (newVal !== props.modelValue) {
-        emit('update:modelValue', newVal)
+      loading.value = true
+      try {
+        const payload = {
+          titulo: formData.value.titulo,
+          descripcion: formData.value.descripcion,
+          categoria: formData.value.categoria,
+          fecha_publicacion: new Date(formData.value.fecha_publicacion).toISOString(),
+          fecha_expiracion: formData.value.fecha_expiracion
+            ? new Date(formData.value.fecha_expiracion).toISOString()
+            : null,
+          imagen: formData.value.imagen || null,
+          estado: formData.value.estado,
+          userId: Number(formData.value.userId)
+        }
+
+        console.log('CREAR ANUNCIO - payload:', payload) // <-- agrega esto para debug
+
+        await anuncioStore.agregarAnuncio(payload)
+        closeDialog()
+      } catch (error) {
+        console.error('Error creando anuncio:', error)
+      } finally {
+        loading.value = false
+      }
+    }
+
+    // Watch for dialog opening to reset form
+    watch(() => props.modelValue, (val) => {
+      if (val) {
+        resetForm()
       }
     })
 
@@ -200,9 +211,9 @@ export default {
       anuncioStore,
       isFormValid,
       createAnuncio,
-      closeDialog
+      closeDialog,
+      loading
     }
   }
 }
 </script>
-

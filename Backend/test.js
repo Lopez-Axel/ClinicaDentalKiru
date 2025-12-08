@@ -1,5 +1,5 @@
 // test-db.js
-const { testConnection } = require('../Api/database');
+const { testConnection } = require('../Backend/database');
 
 (async () => {
   console.log('Probando conexión a PostgreSQL...');

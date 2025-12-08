@@ -1,5 +1,5 @@
 // models/pacientes.js
-const { query } = require('../database');
+const { query } = require('../database2');
 
 // CRUD Básico usando async/await
 module.exports = {

@@ -85,7 +85,7 @@
           outlined
           type="search"
           placeholder="Buscar por título, descripción o categoría..."
-          @update:model-value="anuncioStore.rebuildFuse" 
+          @update:model-value="anuncioStore.applySearch" 
           clearable
         >
           <template v-slot:prepend>
@@ -300,9 +300,10 @@
             unelevated
             label="Eliminar Anuncio" 
             color="negative" 
-            @click="anuncioStore.eliminarAnuncio"
+            @click="handleDeleteAnuncio"
             no-caps
             class="announcement-dialog-btn announcement-dialog-delete-btn"
+            :loading="deleting"
           />
         </q-card-actions>
       </q-card>
@@ -311,8 +312,9 @@
 </template>
 
 <script>
-import { onMounted, computed } from 'vue' 
-import { usePublicarAnuncio } from 'src/stores/publicarAnuncio'
+import { onMounted, computed, ref } from 'vue'
+import { useAnuncioStore } from 'src/stores/anuncioStore'
+
 import DetailAnuncioDialog from './DetailAnnouncementDialog.vue'
 import EditAnuncioDialog from './EditAnnouncementDialog.vue'
 import NewAnuncioDialog from './NewAnnouncementDialog.vue'
@@ -371,20 +373,30 @@ const columns = [
 
 export default {
   name: 'AnunciosPage',
-  
+
   components: {
     DetailAnuncioDialog,
     EditAnuncioDialog,
     NewAnuncioDialog
   },
-  
-  setup() {
-    const anuncioStore = usePublicarAnuncio()
 
-    // Computed property para las filas a mostrar
-    const displayedRows = computed(() => {
-      return anuncioStore.searchResults
-    })
+  setup() {
+    const anuncioStore = useAnuncioStore()
+    const deleting = ref(false)
+
+    const displayedRows = computed(() => anuncioStore.searchResults)
+
+    const handleDeleteAnuncio = async () => {
+      deleting.value = true
+      try {
+        await anuncioStore.eliminarAnuncio()
+      } catch (error) {
+        console.error('Error deleting anuncio:', error)
+        // Aquí podrías agregar una notificación de error
+      } finally {
+        deleting.value = false
+      }
+    }
 
     onMounted(() => {
       anuncioStore.initialize()
@@ -393,9 +405,10 @@ export default {
     return {
       anuncioStore,
       columns,
-      displayedRows
+      displayedRows,
+      deleting,
+      handleDeleteAnuncio
     }
   }
 }
 </script>
-

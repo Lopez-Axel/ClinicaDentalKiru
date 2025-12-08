@@ -51,7 +51,7 @@
                   </q-item-section>
                   <q-item-section>
                     <q-item-label caption>Autor</q-item-label>
-                    <q-item-label class="text-weight-bold">{{ anuncioStore.getUserName(anuncioData.userId) }}</q-item-label>
+                    <q-item-label class="text-weight-bold">{{ getUserName(anuncioData.userId) }}</q-item-label>
                   </q-item-section>
                 </q-item>
 
@@ -104,7 +104,7 @@
                   color="primary"
                   icon="edit"
                   label="Editar Anuncio"
-                  @click="editAnuncio"
+                  @click="anuncioStore.openEditDialog(anuncioData)"
                   unelevated
                   no-caps
                   class="q-mr-sm"
@@ -126,55 +126,47 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue'
-import { usePublicarAnuncio } from 'src/stores/publicarAnuncio'
+import { computed } from 'vue'
+import { useAnuncioStore } from 'src/stores/anuncioStore'
 
 export default {
   name: 'DetailAnuncioDialog',
   
   props: {
-    modelValue: {
-      type: Boolean,
-      required: true
-    },
-    anuncioData: {
-      type: Object,
-      default: () => ({})
-    }
+    modelValue: { type: Boolean, required: true },
+    anuncioData: { type: Object, default: () => ({}) }
   },
 
-  emits: ['update:modelValue', 'edit-anuncio'],
+  emits: ['update:modelValue'],
 
   setup(props, { emit }) {
-    const showDialog = ref(false)
-    const anuncioStore = usePublicarAnuncio()
+    const anuncioStore = useAnuncioStore()
+
+    const showDialog = computed({
+      get: () => props.modelValue,
+      set: (value) => emit('update:modelValue', value)
+    })
 
     const closeDialog = () => {
-      emit('update:modelValue', false)
+      showDialog.value = false
     }
 
-    const editAnuncio = () => {
-      emit('edit-anuncio', props.anuncioData)
-      closeDialog()
-    }
-
-    watch(() => props.modelValue, (newVal) => {
-      showDialog.value = newVal
-    })
-
-    watch(showDialog, (newVal) => {
-      if (newVal !== props.modelValue) {
-        emit('update:modelValue', newVal)
+    // Helper function to get user name (fallback if not in store)
+    const getUserName = (userId) => {
+      // Si el store tiene un método getUserName, úsalo
+      if (anuncioStore.getUserName) {
+        return anuncioStore.getUserName(userId)
       }
-    })
+      // Si no, retorna un valor por defecto
+      return `Usuario ${userId}`
+    }
 
-    return {
-      showDialog,
-      anuncioStore,
+    return { 
+      showDialog, 
+      anuncioStore, 
       closeDialog,
-      editAnuncio
+      getUserName
     }
   }
 }
 </script>
-

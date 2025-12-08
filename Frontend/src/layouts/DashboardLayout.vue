@@ -125,26 +125,6 @@
                   </q-item-label>
                 </q-item-section>
               </q-item>
-              <q-separator />
-              <q-item clickable v-ripple @click="goToProfile" class="kiru-profile-item">
-                <q-item-section avatar>
-                  <q-icon name="fa-solid fa-user" class="kiru-profile-icon" />
-                </q-item-section>
-                <q-item-section>Mi Perfil</q-item-section>
-                <q-item-section side>
-                  <q-icon name="fa-solid fa-chevron-right" size="12px" class="text-grey-5" />
-                </q-item-section>
-              </q-item>
-              <q-item clickable v-ripple @click="goToSettings" class="kiru-profile-item">
-                <q-item-section avatar>
-                  <q-icon name="fa-solid fa-cog" class="kiru-profile-icon" />
-                </q-item-section>
-                <q-item-section>Configuración</q-item-section>
-                <q-item-section side>
-                  <q-icon name="fa-solid fa-chevron-right" size="12px" class="text-grey-5" />
-                </q-item-section>
-              </q-item>
-              <q-separator />
               <q-item clickable v-ripple @click="handleLogout" class="kiru-logout-item">
                 <q-item-section avatar>
                   <q-icon name="fa-solid fa-right-from-bracket" class="kiru-logout-icon" />
@@ -385,26 +365,6 @@ const getRoleLabel = (role) => {
     CLIENT: 'Cliente'
   }
   return labels[role] || role
-}
-
-// Navegar al perfil
-const goToProfile = () => {
-  $q.notify({
-    message: 'Función de perfil en desarrollo',
-    color: 'info',
-    position: 'top',
-    icon: 'fa-solid fa-user'
-  })
-}
-
-// Navegar a configuración
-const goToSettings = () => {
-  $q.notify({
-    message: 'Función de configuración en desarrollo',
-    color: 'info',
-    position: 'top',
-    icon: 'fa-solid fa-cog'
-  })
 }
 
 // Ir al sitio público

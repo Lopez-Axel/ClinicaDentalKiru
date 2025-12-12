@@ -29,8 +29,8 @@
               <h3 class="credential-full-name">{{ getFullName().toUpperCase() }}</h3>
               <div class="credential-badge-inline">
                 <q-badge
-                  :class="['credential-state-badge', getStateClass(dentistData?.state)]"
-                  :label="formatState(dentistData?.state)"
+                  :class="['credential-state-badge', getStateClass(dentistData?.estado)]"
+                  :label="formatState(dentistData?.estado)"
                 />
               </div>
             </div>
@@ -38,13 +38,13 @@
             <div class="credential-photo-container">
               <q-avatar
                 size="140px"
-                :color="dentistData?.img ? 'transparent' : getAvatarColor(dentistData?.name)"
-                :text-color="dentistData?.img ? 'transparent' : 'white'"
+                :color="dentistData?.imagen ? 'transparent' : getAvatarColor(dentistData?.nombre)"
+                :text-color="dentistData?.imagen ? 'transparent' : 'white'"
                 class="credential-avatar"
               >
                 <img
-                  v-if="dentistData?.img && !imageErrored"
-                  :src="dentistData.img"
+                  v-if="dentistData?.imagen && !imageErrored"
+                  :src="getImageUrl(dentistData.imagen)"
                   :alt="getFullName()"
                   @error="handleImageError"
                 />
@@ -64,16 +64,16 @@
           </div>
           <div class="credential-specialties">
             <q-chip
-              v-for="specId in (dentistData?.speciality || [])"
-              :key="specId"
+              v-for="especialidad in (dentistData?.especialidades || [])"
+              :key="especialidad.id"
               class="specialty-chip"
               icon="fa-solid fa-check-circle"
-              color="primary"
+              :color="especialidad.estado === 'activo' ? 'primary' : 'grey'"
               text-color="white"
             >
-              {{ getSpecialtyName(specId) }}
+              {{ especialidad.nombre }}
             </q-chip>
-            <div v-if="!dentistData?.speciality || dentistData.speciality.length === 0" class="no-specialties">
+            <div v-if="!dentistData?.especialidades || dentistData.especialidades.length === 0" class="no-specialties">
               <i class="fa-solid fa-info-circle"></i>
               <span>Sin especialidades asignadas</span>
             </div>
@@ -92,22 +92,22 @@
           <div class="credential-info-grid">
             <div class="info-item">
               <div class="info-label">Primer Nombre</div>
-              <div class="info-value">{{ dentistData?.name || 'N/A' }}</div>
+              <div class="info-value">{{ dentistData?.nombre || 'N/A' }}</div>
             </div>
 
-            <div class="info-item" v-if="dentistData?.second_name">
+            <div class="info-item" v-if="dentistData?.segundo_nombre">
               <div class="info-label">Segundo Nombre</div>
-              <div class="info-value">{{ dentistData?.second_name }}</div>
+              <div class="info-value">{{ dentistData?.segundo_nombre }}</div>
             </div>
 
             <div class="info-item">
               <div class="info-label">Apellido Paterno</div>
-              <div class="info-value">{{ dentistData?.father_last_name || 'N/A' }}</div>
+              <div class="info-value">{{ dentistData?.apellido_paterno || 'N/A' }}</div>
             </div>
 
-            <div class="info-item" v-if="dentistData?.mother_last_name">
+            <div class="info-item" v-if="dentistData?.apellido_materno">
               <div class="info-label">Apellido Materno</div>
-              <div class="info-value">{{ dentistData?.mother_last_name }}</div>
+              <div class="info-value">{{ dentistData?.apellido_materno }}</div>
             </div>
           </div>
         </div>
@@ -121,7 +121,7 @@
             <span>Acceso al Sistema</span>
           </div>
           
-          <div class="credential-system-user">
+          <div class="credential-system-user" v-if="dentistData?.userId">
             <q-chip
               class="system-user-chip"
               icon="fa-solid fa-key"
@@ -129,7 +129,18 @@
               text-color="white"
               size="md"
             >
-              Usuario ID: {{ dentistData?.userId || 'No asignado' }}
+              Usuario ID: {{ dentistData.userId }}
+            </q-chip>
+          </div>
+          <div v-else class="credential-system-user">
+            <q-chip
+              class="system-user-chip"
+              icon="fa-solid fa-info-circle"
+              color="grey"
+              text-color="white"
+              size="md"
+            >
+              No tiene usuario asignado
             </q-chip>
           </div>
         </div>
@@ -162,7 +173,6 @@
 
 <script>
 import { computed, ref } from 'vue'
-import especialidades from 'src/data/especialidades.json'
 
 export default {
   name: 'DetailDentistDialog',
@@ -184,11 +194,12 @@ export default {
     })
 
     const imageErrored = ref(false)
-    const specialtiesMap = ref({})
 
-    especialidades.especialidades.forEach(spec => {
-      specialtiesMap.value[spec.id] = spec.name
-    })
+    const getImageUrl = (imagen) => {
+      if (!imagen) return ''
+      if (imagen.startsWith('http')) return imagen
+      return `http://localhost:5050${imagen}`
+    }
 
     const getAvatarColor = (name) => {
       if (!name) return '#9e9e9e'
@@ -210,18 +221,14 @@ export default {
 
     const getFullName = () => {
       if (!props.dentistData) return ''
-      return `${props.dentistData.name || ''} ${props.dentistData.second_name || ''} ${props.dentistData.father_last_name || ''} ${props.dentistData.mother_last_name || ''}`.trim()
+      return `${props.dentistData.nombre || ''} ${props.dentistData.segundo_nombre || ''} ${props.dentistData.apellido_paterno || ''} ${props.dentistData.apellido_materno || ''}`.trim()
     }
 
     const getInitials = () => {
       if (!props.dentistData) return '?'
-      const firstName = props.dentistData.name?.charAt(0) || ''
-      const lastName = props.dentistData.father_last_name?.charAt(0) || ''
+      const firstName = props.dentistData.nombre?.charAt(0) || ''
+      const lastName = props.dentistData.apellido_paterno?.charAt(0) || ''
       return (firstName + lastName).toUpperCase() || '?'
-    }
-
-    const getSpecialtyName = (id) => {
-      return specialtiesMap.value[id] || `Especialidad ${id}`
     }
 
     const handleImageError = () => {
@@ -231,6 +238,8 @@ export default {
     const formatState = (state) => {
       const s = String(state || '').toLowerCase()
       const states = {
+        activo: 'Activo',
+        inactivo: 'Inactivo',
         active: 'Activo',
         inactive: 'Inactivo',
         pending: 'Pendiente'
@@ -241,6 +250,8 @@ export default {
     const getStateClass = (state) => {
       const s = String(state || '').toLowerCase()
       const classes = {
+        activo: 'state-active',
+        inactivo: 'state-inactive',
         active: 'state-active',
         inactive: 'state-inactive',
         pending: 'state-pending'
@@ -264,7 +275,7 @@ export default {
       getAvatarColor,
       editDentist,
       getFullName,
-      getSpecialtyName
+      getImageUrl
     }
   }
 }

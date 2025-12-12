@@ -12,7 +12,7 @@
             round
             dense
             icon="fa-solid fa-times"
-            v-close-popup
+            @click="closeDialog"
             class="close-btn"
           />
         </div>
@@ -21,31 +21,23 @@
       <q-separator />
 
       <q-card-section class="dialog-content">
-        <div class="speciality-header">
+        <div v-if="specialityData" class="speciality-header">
           <div class="header-icon">
             <i class="fa-solid fa-tooth"></i>
           </div>
           <div class="header-info">
-            <h3 class="speciality-name">{{ specialityData?.name }}</h3>
-            <p class="speciality-id">ID: {{ specialityData?.id ?? 'No disponible' }}</p>
+            <h3 class="speciality-name">{{ specialityData.nombre }}</h3>
+            <p class="speciality-id">ID: {{ specialityData.id }}</p>
           </div>
         </div>
-        
-        <div class="user-details">
-          <div class="detail-row">
-            <div class="detail-label">
-              <i class="fa-solid fa-id-badge"></i>
-              <span>ID de Especialidad</span>
-            </div>
-            <div class="detail-value">{{ specialityData?.id ?? 'No disponible' }}</div>
-          </div>
 
+        <div v-if="specialityData" class="user-details">
           <div class="detail-row">
             <div class="detail-label">
               <i class="fa-solid fa-tag"></i>
               <span>Nombre de la Especialidad</span>
             </div>
-            <div class="detail-value">{{ specialityData?.name ?? 'No disponible' }}</div>
+            <div class="detail-value">{{ specialityData.nombre }}</div>
           </div>
 
           <div class="detail-row">
@@ -53,9 +45,7 @@
               <i class="fa-solid fa-align-left"></i>
               <span>Descripción</span>
             </div>
-            <div class="detail-value description-text">
-              {{ specialityData?.description ?? 'No disponible' }}
-            </div>
+            <div class="detail-value description-text">{{ specialityData.descripcion }}</div>
           </div>
 
           <div class="detail-row">
@@ -65,13 +55,17 @@
             </div>
             <div class="detail-value">
               <q-badge 
-                :color="specialityData?.state === 'active' ? 'positive' : 'negative'"
+                :color="specialityData.estado === 'activo' ? 'positive' : 'negative'"
                 class="status-badge"
               >
-                {{ specialityData?.state === 'active' ? 'Activa' : 'Inactiva' }}
+                {{ specialityData.estado === 'activo' ? 'Activa' : 'Inactiva' }}
               </q-badge>
             </div>
           </div>
+        </div>
+
+        <div v-else>
+          <p>No se encontró información de la especialidad.</p>
         </div>
       </q-card-section>
 
@@ -81,7 +75,7 @@
         <q-btn
           flat
           label="Cerrar"
-          v-close-popup
+          @click="closeDialog"
           class="secondary-btn"
         />
         <q-btn
@@ -89,6 +83,7 @@
           label="Editar Especialidad"
           icon="fa-solid fa-edit"
           @click="editSpeciality"
+          :disable="!specialityData"
           class="primary-btn"
         />
       </q-card-actions>
@@ -108,7 +103,7 @@ export default {
     },
     specialityData: {
       type: Object,
-      default: () => null
+      default: null
     }
   },
   emits: ['update:modelValue', 'edit-speciality'],
@@ -118,16 +113,22 @@ export default {
       set: (value) => emit('update:modelValue', value)
     })
 
-    const editSpeciality = () => {
-      emit('edit-speciality', props.specialityData)
+    const closeDialog = () => {
       showDialog.value = false
+    }
+
+    const editSpeciality = () => {
+      if (props.specialityData) {
+        emit('edit-speciality', props.specialityData)
+        closeDialog()
+      }
     }
 
     return {
       showDialog,
+      closeDialog,
       editSpeciality
     }
   }
 }
 </script>
-

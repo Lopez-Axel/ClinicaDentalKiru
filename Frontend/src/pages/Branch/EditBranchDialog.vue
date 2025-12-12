@@ -101,7 +101,7 @@
 
                 <div v-if="form.imagen && !newImageFile" style="margin-bottom: 10px;">
                   <div style="display: flex; align-items: center; gap: 10px;">
-                    <img :src="form.imagen" alt="Preview" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;" />
+                    <img :src="imagePath" alt="Preview" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;" />
                     <q-btn
                       flat
                       dense
@@ -125,9 +125,6 @@
                 >
                   <template v-slot:prepend>
                     <i class="fa-solid fa-camera"></i>
-                  </template>
-                  <template v-slot:hint>
-                    Se guardará en /public/icons/
                   </template>
                 </q-file>
 
@@ -221,6 +218,7 @@
             @click="closeDialog"
             class="secondary-btn"
             no-caps
+            :disabled="loading"
           />
           <q-btn
             type="submit"
@@ -239,6 +237,7 @@
 
 <script>
 import { ref, computed, watch } from 'vue'
+import { useSucursalStore } from 'src/stores/sucursalStore' // Ajusta la ruta según tu estructura
 
 export default {
   name: 'EditBranchDialog',
@@ -246,11 +245,13 @@ export default {
     modelValue: Boolean,
     branchData: Object
   },
-  emits: ['update:modelValue', 'branch-updated', 'close'],
+  emits: ['update:modelValue', 'close'],
   setup(props, { emit }) {
+    const sucursalStore = useSucursalStore()
     const loading = ref(false)
     const newImageFile = ref(null)
     const imagePreview = ref(null)
+    const error = ref(null)
 
     const form = ref({
       id: null,
@@ -264,14 +265,26 @@ export default {
       activo: true
     })
 
+    // Computed para obtener la imagen con la ruta completa
+    const imagePath = computed(() => {
+      if (!form.value.imagen) return ''
+      return sucursalStore.getImagePath(form.value.imagen)
+    })
+
     const showDialog = computed({
       get: () => props.modelValue,
       set: (value) => emit('update:modelValue', value)
     })
 
     const initializeForm = () => {
+      error.value = null
       if (props.branchData) {
-        form.value = { ...props.branchData }
+        form.value = {
+          ...props.branchData,
+          activo: props.branchData.activo === 1 // convierte 1 a true, 0 a false
+        }
+        newImageFile.value = null
+        imagePreview.value = null
       }
     }
 
@@ -296,38 +309,67 @@ export default {
     }
 
     const saveBranch = async () => {
+      if (loading.value) return
+      
       loading.value = true
+      error.value = null
 
       try {
-        // Simular procesamiento (puedes quitar esto si no es necesario)
-        await new Promise(resolve => setTimeout(resolve, 500))
+        const dataToUpdate = {
+          nombre: form.value.nombre,
+          ubicacion: form.value.ubicacion,
+          direccion: form.value.direccion,
+          descripcion: form.value.descripcion,
+          latitud: form.value.latitud,
+          longitud: form.value.longitud,
+          activo: form.value.activo ? 1 : 0,
+          // Solo enviar imagen si se eliminó la existente o se seleccionó nueva
+          imagen: form.value.imagen || null
+        }
+
+        // Usar el store para actualizar
+        const updatedBranch = await sucursalStore.actualizar(
+          form.value.id,
+          dataToUpdate,
+          newImageFile.value
+        )
+
+        if (updatedBranch) {
+          // Cerrar el diálogo después de actualizar
+          closeDialog()
+          // Limpiar estados
+          newImageFile.value = null
+          imagePreview.value = null
+        } else {
+          throw new Error('No se pudo actualizar la sucursal')
+        }
         
-        // Emitir el evento de actualización
-        emit('branch-updated', form.value)
+      } catch (err) {
+        console.error('Error actualizando sucursal:', err)
+        error.value = err.message || 'Error al actualizar la sucursal'
         
-        // IMPORTANTE: Reiniciar el estado de loading
-        loading.value = false
+        // Mostrar mensaje de error (puedes usar Quasar Notify aquí)
+        // this.$q.notify({
+        //   type: 'negative',
+        //   message: error.value
+        // })
         
-        // También limpiar el archivo de imagen seleccionado
-        newImageFile.value = null
-        imagePreview.value = null
-        
-      } catch (error) {
-        console.error('Error guardando sucursal:', error)
+      } finally {
         loading.value = false
       }
     }
 
-    // Watcher para cuando se cierra el diálogo, reiniciar estados
+    // Reiniciar estados cuando se cierra el diálogo
     watch(showDialog, (newValue) => {
       if (!newValue) {
-        // Cuando se cierra el diálogo, reiniciar todo
         loading.value = false
         newImageFile.value = null
         imagePreview.value = null
+        error.value = null
       }
     })
 
+    // Inicializar el formulario cuando cambia branchData
     watch(() => props.branchData, initializeForm, { immediate: true })
 
     return {
@@ -336,6 +378,8 @@ export default {
       loading,
       newImageFile,
       imagePreview,
+      imagePath,
+      error,
       closeDialog,
       saveBranch,
       handleImageSelect,
@@ -344,3 +388,147 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.edit-dialog {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.dialog-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 24px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.close-btn {
+  color: white;
+  font-size: 1.25rem;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.dialog-content {
+  flex: 1;
+  padding: 24px;
+  background: #f8f9fa;
+}
+
+.edit-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-header {
+  margin: 0 0 16px 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #34495e;
+}
+
+.required {
+  color: #e74c3c;
+  margin-left: 2px;
+}
+
+.form-input {
+  width: 100%;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.map-preview {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-container-small {
+  width: 100%;
+  height: 100%;
+}
+
+.map-placeholder-small {
+  text-align: center;
+  color: #7f8c8d;
+}
+
+.map-placeholder-small i {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  color: #bdc3c7;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  background: white;
+}
+
+.secondary-btn {
+  color: #6c757d;
+  background: #f8f9fa;
+  padding: 8px 24px;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 24px;
+}
+
+.primary-btn:hover {
+  opacity: 0.9;
+}
+</style>

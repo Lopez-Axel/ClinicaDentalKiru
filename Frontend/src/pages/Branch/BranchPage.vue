@@ -138,7 +138,7 @@
             <div class="branch-card-image-container">
               <img
                 v-if="branch.imagen"
-                :src="branch.imagen"
+                :src="`http://localhost:5050${branch.imagen}`"
                 :alt="branch.nombre"
                 class="branch-card-image"
                 @error="sucursalStore.handleImageError"
@@ -238,13 +238,18 @@
     <EditBranchDialog
       v-model="sucursalStore.showEditDialog"
       :branch-data="sucursalStore.selectedBranch"
-      @branch-updated="sucursalStore.actualizarSucursal"
+      @branch-updated="async ({ id, data, file }) => {
+        const updated = await sucursalStore.actualizar(id, data, file)
+        sucursalStore.closeEditDialog()          // cerrar el diálogo
+        sucursalStore.setSelectedBranch(updated) // opcional, mantener la sucursal seleccionada
+      }"
       @close="sucursalStore.closeEditDialog"
     />
 
+
     <NewBranchDialog
       v-model="sucursalStore.showNewDialog"
-      @branch-created="sucursalStore.agregarSucursal"
+      @branch-created="({ data, file }) => sucursalStore.crear(data, file)"
       @close="sucursalStore.closeNewDialog"
     />
 
@@ -280,7 +285,7 @@
             unelevated
             label="Eliminar Sucursal" 
             color="negative" 
-            @click="sucursalStore.eliminarSucursal"
+            @click="sucursalStore.eliminar(sucursalStore.selectedBranch.id)"
             no-caps
             class="branch-dialog-btn branch-dialog-delete-btn"
           />
@@ -290,49 +295,28 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { onMounted, computed } from 'vue'
-import { usePublicarSucursal } from 'src/stores/publicarSucursal'
+import { useSucursalStore } from 'src/stores/sucursalStore'
 import DetailBranchDialog from './DetailBranchDialog.vue'
 import EditBranchDialog from './EditBranchDialog.vue'
 import NewBranchDialog from './NewBranchDialog.vue'
 
-export default {
-  name: 'BranchesPage',
+// Inicializamos el store
+const sucursalStore = useSucursalStore()
 
-  components: {
-    DetailBranchDialog,
-    EditBranchDialog,
-    NewBranchDialog
-  },
+// Contadores activos e inactivos usando computed
+const activeBranchesCount = computed(() => sucursalStore.sucursalesActivas.length)
+const inactiveBranchesCount = computed(() => sucursalStore.sucursalesInactivas.length)
 
-  setup() {
-    const sucursalStore = usePublicarSucursal()
-
-    const activeBranchesCount = computed(() => {
-      return sucursalStore.filteredBranches.filter(branch => branch.activo).length
-    })
-
-    const inactiveBranchesCount = computed(() => {
-      return sucursalStore.filteredBranches.filter(branch => !branch.activo).length
-    })
-
-    const truncateText = (text, maxLength) => {
-      if (!text) return ''
-      return text.length <= maxLength ? text : text.substring(0, maxLength) + '...'
-    }
-
-    onMounted(() => {
-      sucursalStore.cargarSucursales()
-    })
-
-    return {
-      sucursalStore,
-      activeBranchesCount,
-      inactiveBranchesCount,
-      truncateText
-    }
-  }
+// Función de truncar texto (para las cards)
+const truncateText = (text, maxLength) => {
+  if (!text) return ''
+  return text.length <= maxLength ? text : text.substring(0, maxLength) + '...'
 }
-</script>
 
+// Cargar las sucursales al montar la página
+onMounted(() => {
+  sucursalStore.listar()
+})
+</script>

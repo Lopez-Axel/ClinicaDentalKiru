@@ -31,48 +31,15 @@
 
     <!-- Stats Section -->
     <div class="dentist-stats-section">
-      <div class="dentist-stat-card">
-        <div class="dentist-stat-icon-container active">
-          <i class="fa-solid fa-user-doctor"></i>
+      <div class="dentist-stat-card" v-for="stat in stats" :key="stat.label">
+        <div :class="['dentist-stat-icon-container', stat.type]">
+          <i :class="stat.icon"></i>
         </div>
         <div class="dentist-stat-content">
-          <div class="dentist-stat-value">{{ activeDentistsCount }}</div>
-          <div class="dentist-stat-label">Dentistas Activos</div>
+          <div class="dentist-stat-value">{{ stat.value }}</div>
+          <div class="dentist-stat-label">{{ stat.label }}</div>
         </div>
-        <div class="dentist-stat-glow active"></div>
-      </div>
-      
-      <div class="dentist-stat-card">
-        <div class="dentist-stat-icon-container inactive">
-          <i class="fa-solid fa-user-slash"></i>
-        </div>
-        <div class="dentist-stat-content">
-          <div class="dentist-stat-value">{{ inactiveDentistsCount }}</div>
-          <div class="dentist-stat-label">Dentistas Inactivos</div>
-        </div>
-        <div class="dentist-stat-glow inactive"></div>
-      </div>
-      
-      <div class="dentist-stat-card">
-        <div class="dentist-stat-icon-container admin">
-          <i class="fa-solid fa-graduation-cap"></i>
-        </div>
-        <div class="dentist-stat-content">
-          <div class="dentist-stat-value">{{ totalSpecialties }}</div>
-          <div class="dentist-stat-label">Especialidades Totales</div>
-        </div>
-        <div class="dentist-stat-glow admin"></div>
-      </div>
-      
-      <div class="dentist-stat-card">
-        <div class="dentist-stat-icon-container total">
-          <i class="fa-solid fa-users"></i>
-        </div>
-        <div class="dentist-stat-content">
-          <div class="dentist-stat-value">{{ filteredRows.length }}</div>
-          <div class="dentist-stat-label">Total de Dentistas</div>
-        </div>
-        <div class="dentist-stat-glow total"></div>
+        <div :class="['dentist-stat-glow', stat.type]"></div>
       </div>
     </div>
 
@@ -95,8 +62,24 @@
       </div>
     </div>
 
-    <!-- Table Section -->
-    <div class="dentist-table-container">
+    <!-- Loading, Error & Table -->
+    <div v-if="store.cargando && store.dentistasCompletos.length === 0" class="dentist-loading-container">
+      <div class="dentist-loading-content">
+        <q-spinner-gears size="50px" color="primary" />
+        <h4 class="dentist-loading-text">Cargando dentistas...</h4>
+      </div>
+    </div>
+
+    <div v-else-if="store.error" class="dentist-error-container">
+      <div class="dentist-error-content">
+        <i class="fa-solid fa-exclamation-triangle dentist-error-icon"></i>
+        <h4 class="dentist-error-title">Error al cargar datos</h4>
+        <p class="dentist-error-message">{{ store.error }}</p>
+        <q-btn color="primary" @click="loadDentistas" icon="fa-solid fa-refresh" label="Reintentar" />
+      </div>
+    </div>
+
+    <div v-else class="dentist-table-container">
       <div class="dentist-table-header">
         <div class="dentist-table-title-section">
           <h3 class="dentist-table-title">Lista de Dentistas</h3>
@@ -107,6 +90,17 @@
             <i class="fa-solid fa-list-check"></i>
             {{ filteredRows.length }} dentista{{ filteredRows.length !== 1 ? 's' : '' }}
           </span>
+          <q-btn 
+            flat 
+            round 
+            icon="fa-solid fa-sync-alt" 
+            @click="loadDentistas"
+            :loading="store.cargando"
+            class="dentist-refresh-btn"
+            size="sm"
+          >
+            <q-tooltip>Actualizar lista</q-tooltip>
+          </q-btn>
         </div>
       </div>
 
@@ -119,6 +113,7 @@
         :rows-per-page-options="[5, 10, 15, 20, 0]"
         :pagination="{ rowsPerPage: 10 }"
         separator="cell"
+        :loading="store.cargando"
       >
         <template v-slot:no-data>
           <div class="dentist-no-data-container">
@@ -132,115 +127,87 @@
           </div>
         </template>
 
-        <template v-slot:body-cell-img="props">
+        <template v-slot:body-cell-imagen="props">
           <q-td :props="props">
-            <div class="dentist-avatar-container">
-              <div class="dentist-avatar-wrapper">
-                <q-avatar 
-                  size="56px"
-                  class="dentist-user-avatar"
-                  :color="props.row.img ? 'transparent' : getAvatarColor(props.row.name)"
-                  :text-color="props.row.img ? 'transparent' : 'white'"
-                >
-                  <img 
-                    v-if="props.row.img" 
-                    :src="props.row.img" 
-                    :alt="getFullName(props.row)"
-                    @error="handleImageError"
-                  />
-                  <span v-else class="dentist-avatar-initials">{{ getInitials(props.row) }}</span>
-                </q-avatar>
-                <div class="dentist-avatar-status" :class="getStateClass(props.row.state)"></div>
-              </div>
-            </div>
+            <q-avatar 
+              size="56px"
+              :color="props.row.imagen ? 'transparent' : getAvatarColor(props.row.nombre)"
+            >
+              <img 
+                v-if="props.row.imagen" 
+                :src="getImageUrl(props.row.imagen)" 
+                :alt="getFullName(props.row)"
+                @error="handleImageError"
+              />
+              <span v-else>{{ getInitials(props.row) }}</span>
+            </q-avatar>
           </q-td>
         </template>
 
-        <template v-slot:body-cell-fullName="props">
+        <template v-slot:body-cell-nombre="props">
           <q-td :props="props">
-            <div class="dentist-user-info">
-              <span class="dentist-user-name">{{ getFullName(props.row) }}</span>
-              <span class="dentist-user-email" v-if="props.row.email">{{ props.row.email }}</span>
-            </div>
+            <div>{{ getFullName(props.row) }}</div>
           </q-td>
         </template>
 
-        <template v-slot:body-cell-speciality="props">
-          <q-td :props="props">
-            <div class="dentist-specialties-container">
-              <q-chip
-                v-for="specId in props.row.speciality"
-                :key="specId"
-                dense
-                class="dentist-type-chip dentist-type-user"
-                size="sm"
-              >
-                <i class="fa-solid fa-tooth" style="margin-right: 6px;"></i>
-                {{ getSpecialtyName(specId) }}
-              </q-chip>
-            </div>
-          </q-td>
-        </template>
-
-        <template v-slot:body-cell-userId="props">
+        <template v-slot:body-cell-especialidades="props">
           <q-td :props="props">
             <q-chip
+              v-for="esp in props.row.especialidades || []"
+              :key="esp.id"
               dense
-              icon="fa-solid fa-id-card"
-              class="dentist-type-chip dentist-type-moderator"
+              size="sm"
+              :color="esp.estado === 'activo' ? 'primary' : 'grey'"
+              text-color="white"
             >
-              ID: {{ props.row.userId }}
+              {{ esp.nombre }}
             </q-chip>
+            <span v-if="!(props.row.especialidades && props.row.especialidades.length)">Sin especialidades</span>
           </q-td>
         </template>
 
-        <template v-slot:body-cell-state="props">
+        <template v-slot:body-cell-estado="props">
           <q-td :props="props">
-            <q-badge
-              :class="['dentist-state-badge', getStateClass(props.row.state)]"
-              :label="formatState(props.row.state)"
-            />
+            <q-badge :label="formatState(props.row.estado)" :class="getStateClass(props.row.estado)" />
           </q-td>
         </template>
 
-        <template v-slot:body-cell-actions="props">
+        <!-- MODIFICADO: Solo 3 botones -->
+        <template v-slot:body-cell-acciones="props">
           <q-td :props="props">
-            <div class="dentist-action-buttons">
-              <q-btn
-                class="dentist-action-btn dentist-view-btn"
-                flat
-                dense
-                round
-                icon="fa-solid fa-eye"
+            <div class="dentist-actions-container">
+              <q-btn 
+                flat 
+                dense 
+                round 
+                icon="fa-solid fa-eye" 
+                @click="viewDentist(props.row)" 
+                color="grey-7"
                 size="sm"
-                @click="viewDentist(props.row)"
-                color="grey-8"
               >
                 <q-tooltip>Ver detalles</q-tooltip>
               </q-btn>
               
-              <q-btn
-                class="dentist-action-btn dentist-edit-btn"
-                flat
-                dense
-                round
-                icon="fa-solid fa-edit"
-                size="sm"
-                @click="editDentist(props.row)"
+              <q-btn 
+                flat 
+                dense 
+                round 
+                icon="fa-solid fa-edit" 
+                @click="editDentist(props.row)" 
                 color="primary"
+                size="sm"
               >
                 <q-tooltip>Editar dentista</q-tooltip>
               </q-btn>
               
-              <q-btn
-                class="dentist-action-btn dentist-delete-btn"
-                flat
-                dense
-                round
-                icon="fa-solid fa-trash"
-                size="sm"
-                @click="confirmDeleteDentist(props.row)"
+              <q-btn 
+                flat 
+                dense 
+                round 
+                icon="fa-solid fa-trash" 
+                @click="confirmDeleteDentist(props.row)" 
                 color="negative"
+                size="sm"
               >
                 <q-tooltip>Eliminar dentista</q-tooltip>
               </q-btn>
@@ -251,59 +218,43 @@
     </div>
 
     <!-- Dialogs -->
-    <DetailDentistDialog
-      v-model="showDetailDialog"
-      :dentist-data="selectedDentist"
-      @edit-dentist="editDentist"
-    />
-
-    <EditDentistDialog
-      v-model="showEditDialog"
-      :dentist-data="selectedDentist"
-      @dentist-updated="handleDentistUpdate"
-    />
-
-    <NewDentistDialog
-      v-model="showNewDialog"
-      @dentist-created="handleDentistCreate"
-    />
-
-    <!-- Delete Confirmation Dialog -->
+    <DetailDentistDialog v-model="showDetailDialog" :dentist-data="selectedDentist" @edit-dentist="editDentist" />
+    <EditDentistDialog v-model="showEditDialog" :dentist-data="selectedDentist" @dentist-updated="handleDentistUpdate" />
+    <NewDentistDialog v-model="showNewDialog" @dentist-created="handleDentistCreate" />
+    
+    <!-- AGREGADO: Diálogo de confirmación para eliminar -->
     <q-dialog v-model="showDeleteDialog" persistent>
-      <q-card class="dentist-confirm-dialog">
-        <q-card-section class="dentist-dialog-header">
-          <div class="dentist-dialog-icon-container">
-            <i class="fa-solid fa-exclamation-triangle dentist-dialog-icon"></i>
+      <q-card class="dentist-delete-dialog" style="min-width: 350px">
+        <q-card-section class="row items-center q-pb-none">
+          <q-avatar icon="fa-solid fa-trash-can" color="negative" text-color="white" />
+          <span class="q-ml-sm text-h6">Confirmar eliminación</span>
+        </q-card-section>
+
+        <q-card-section>
+          <div class="text-body1">
+            ¿Estás seguro de que deseas eliminar al dentista 
+            <strong>{{ selectedDentist ? getFullName(selectedDentist) : '' }}</strong>?
           </div>
-          <h3 class="dentist-dialog-title">Confirmar Eliminación</h3>
+          <div class="text-caption text-grey q-mt-sm">
+            Esta acción no se puede deshacer. Se eliminarán todas las especialidades asociadas.
+          </div>
         </q-card-section>
 
-        <q-card-section class="q-pt-none">
-          <p class="dentist-dialog-text">
-            ¿Está seguro que desea eliminar al dentista <strong>{{ getFullName(selectedDentist) }}</strong>?
-          </p>
-          <p class="dentist-dialog-subtext">
-            Esta acción no se puede deshacer y el dentista perderá acceso al sistema.
-          </p>
-        </q-card-section>
-
-        <q-card-actions class="dentist-dialog-actions">
+        <q-card-actions align="right" class="q-pa-md">
           <q-btn 
             flat 
             label="Cancelar" 
-            color="grey-7" 
+            color="grey" 
             v-close-popup 
-            no-caps
-            class="dentist-dialog-btn"
+            :disable="store.cargando"
           />
           <q-btn 
-            unelevated
-            label="Eliminar Dentista" 
+            flat 
+            label="Eliminar" 
             color="negative" 
-            @click="deleteDentist"
-            v-close-popup 
-            no-caps
-            class="dentist-dialog-btn dentist-dialog-delete-btn"
+            @click="deleteDentist" 
+            :loading="store.cargando"
+            icon="fa-solid fa-trash-can"
           />
         </q-card-actions>
       </q-card>
@@ -313,282 +264,266 @@
 
 <script>
 import { ref, onMounted, watch, computed } from 'vue'
-import dentistas from 'src/data/dentistas.json'
-import especialidades from 'src/data/especialidades.json'
+import { useQuasar } from 'quasar' // AGREGADO: Para notificaciones
+import { useDentistaGestionStore } from 'src/stores/dentistaGestionStore'
 import Fuse from 'fuse.js'
 import DetailDentistDialog from './DetailDentistDialog.vue'
 import EditDentistDialog from './EditDentistDialog.vue'
 import NewDentistDialog from './NewDentistDialog.vue'
 
+// MODIFICADO: Ajustar ancho de columna acciones
 const columns = [
-  {
-    name: 'img',
-    required: true,
-    label: 'Foto',
-    align: 'center',
-    field: 'img',
-    sortable: false,
-    style: 'width: 80px'
-  },
-  {
-    name: 'fullName',
-    required: true,
-    label: 'Nombre Completo',
-    align: 'left',
-    field: row => `${row.name} ${row.father_last_name}`,
-    sortable: true
-  },
-  {
-    name: 'speciality',
-    label: 'Especialidades',
-    field: 'speciality',
-    sortable: false,
-    align: 'left',
-    style: 'min-width: 250px'
-  },
-  {
-    name: 'userId',
-    label: 'Usuario Asignado',
-    field: 'userId',
-    sortable: true,
-    align: 'center',
-    style: 'width: 160px'
-  },
-  {
-    name: 'state',
-    label: 'Estado',
-    field: 'state',
-    sortable: true,
-    align: 'center',
-    style: 'width: 130px'
-  },
-  {
-    name: 'actions',
-    label: 'Acciones',
-    field: 'actions',
-    align: 'center',
-    sortable: false,
-    style: 'width: 150px'
-  }
+  { name: 'imagen', label: 'Foto', align: 'center', field: 'imagen', sortable: false, style: 'width: 80px' },
+  { name: 'nombre', label: 'Nombre Completo', align: 'left', field: row => getFullName(row), sortable: true },
+  { name: 'especialidades', label: 'Especialidades', field: 'especialidades', sortable: false, align: 'left', style: 'min-width: 300px' },
+  { name: 'estado', label: 'Estado', field: 'estado', sortable: true, align: 'center', style: 'width: 130px' },
+  { name: 'acciones', label: 'Acciones', field: 'acciones', align: 'center', sortable: false, style: 'width: 150px' } // MODIFICADO: 150px para 3 botones
 ]
 
 const FUSE_OPTIONS = {
-  keys: ['name', 'second_name', 'father_last_name', 'mother_last_name'],
+  keys: ['nombre', 'segundo_nombre', 'apellido_paterno', 'apellido_materno'],
   threshold: 0.3,
   includeScore: true,
   minMatchCharLength: 1
 }
 
-const STATE_TRANSLATIONS = {
-  active: 'Activo',
-  inactive: 'Inactivo',
-  pending: 'Pendiente'
+const STATE_TRANSLATIONS = { activo: 'Activo', inactivo: 'Inactivo' }
+const STATE_CLASSES = { activo: 'dentist-state-active', inactivo: 'dentist-state-inactive' }
+
+const getFullName = (dentist) => {
+  if (!dentist) return ''
+  return [dentist.nombre, dentist.segundo_nombre, dentist.apellido_paterno, dentist.apellido_materno].filter(Boolean).join(' ')
 }
 
-const STATE_CLASSES = {
-  active: 'dentist-state-active',
-  inactive: 'dentist-state-inactive',
-  pending: 'dentist-state-pending'
+const getInitials = (dentist) => {
+  if (!dentist) return '?'
+  const first = dentist.nombre?.charAt(0) || ''
+  const last = dentist.apellido_paterno?.charAt(0) || ''
+  return (first + last).toUpperCase() || '?'
 }
 
 export default {
   name: 'DentistPage',
   
-  components: {
-    DetailDentistDialog,
-    EditDentistDialog,
-    NewDentistDialog
-  },
+  components: { DetailDentistDialog, EditDentistDialog, NewDentistDialog },
   
   setup() {
+    const $q = useQuasar() // AGREGADO: Para notificaciones
+    const store = useDentistaGestionStore()
     const search = ref('')
-    const rows = ref([])
     const filteredRows = ref([])
     const selectedDentist = ref(null)
+    
+    // Inicializar filteredRows con los datos disponibles
+    const initializeFilteredRows = () => {
+      if (store.dentistasCompletos && store.dentistasCompletos.length > 0) {
+        filteredRows.value = store.dentistasCompletos.filter(d => d.estado !== 'eliminado')
+      } else {
+        filteredRows.value = []
+      }
+    }
+    
     const showDetailDialog = ref(false)
     const showEditDialog = ref(false)
     const showNewDialog = ref(false)
     const showDeleteDialog = ref(false)
-    const specialtiesMap = ref({})
     let fuse = null
 
-    const activeDentistsCount = computed(() => 
-      filteredRows.value.filter(d => d.state === 'active').length
-    )
+    const activeDentistsCount = computed(() => store.dentistasCompletos.filter(d => d.estado === 'activo').length)
+    const inactiveDentistsCount = computed(() => store.dentistasCompletos.filter(d => d.estado === 'inactivo').length)
+    const totalSpecialties = computed(() => store.dentistasCompletos.reduce((acc, d) => acc + (d.especialidades?.length || 0), 0))
+    const rows = computed(() => store.dentistasCompletos || [])
 
-    const inactiveDentistsCount = computed(() => 
-      filteredRows.value.filter(d => d.state === 'inactive').length
-    )
-
-    const totalSpecialties = computed(() => {
-      const uniqueSpecs = new Set()
-      filteredRows.value.forEach(d => {
-        d.speciality?.forEach(s => uniqueSpecs.add(s))
-      })
-      return uniqueSpecs.size
-    })
+    const stats = computed(() => [
+      {
+        label: 'Dentistas Activos',
+        value: activeDentistsCount.value,
+        icon: 'fa-solid fa-user-doctor',
+        type: 'active'
+      },
+      {
+        label: 'Dentistas Inactivos',
+        value: inactiveDentistsCount.value,
+        icon: 'fa-solid fa-user-slash',
+        type: 'inactive'
+      },
+      {
+        label: 'Total Especialidades',
+        value: totalSpecialties.value,
+        icon: 'fa-solid fa-graduation-cap',
+        type: 'specialties'
+      },
+      {
+        label: 'Total Dentistas',
+        value: store.dentistasCompletos.length,
+        icon: 'fa-solid fa-users',
+        type: 'total'
+      }
+    ])
 
     const getAvatarColor = (name) => {
       if (!name) return '#9e9e9e'
-      
-      const colors = [
-        '#f44336', '#e91e63', '#9c27b0', '#673ab7',
-        '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4',
-        '#009688', '#4caf50', '#8bc34a', '#cddc39',
-        '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'
-      ]
-      
+      const colors = ['#f44336','#e91e63','#9c27b0','#673ab7','#3f51b5','#2196f3','#03a9f4','#00bcd4','#009688','#4caf50','#8bc34a','#cddc39','#ffeb3b','#ffc107','#ff9800','#ff5722']
       let hash = 0
-      for (let i = 0; i < name.length; i++) {
-        hash = name.charCodeAt(i) + ((hash << 5) - hash)
-      }
-      
+      for (let i=0; i<name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
       return colors[Math.abs(hash) % colors.length]
-    }
-
-    const getFullName = (dentist) => {
-      if (!dentist) return ''
-      return `${dentist.name || ''} ${dentist.second_name || ''} ${dentist.father_last_name || ''} ${dentist.mother_last_name || ''}`.trim()
-    }
-
-    const getInitials = (dentist) => {
-      if (!dentist) return '?'
-      const firstName = dentist.name?.charAt(0) || ''
-      const lastName = dentist.father_last_name?.charAt(0) || ''
-      return (firstName + lastName).toUpperCase() || '?'
-    }
-
-    const getSpecialtyName = (id) => {
-      return specialtiesMap.value[id] || `Especialidad ${id}`
     }
 
     const handleImageError = (event) => {
       event.target.style.display = 'none'
+      const avatar = event.target.closest('.q-avatar')
+      if (avatar) {
+        const name = selectedDentist.value?.nombre || ''
+        avatar.style.backgroundColor = getAvatarColor(name)
+      }
     }
 
+    const getImageUrl = (imagen) => {
+      if (!imagen) return ''
+      // Si ya es una URL completa, retornarla
+      if (imagen.startsWith('http')) return imagen
+      // Si empieza con /uploads, agregar el dominio
+      if (imagen.startsWith('/uploads')) return `http://localhost:5050${imagen}`
+      // Si es solo el nombre del archivo, construir la ruta completa
+      return `http://localhost:5050/uploads/${imagen}`
+    }
+    
     const formatState = (state) => STATE_TRANSLATIONS[state] || state
     const getStateClass = (state) => STATE_CLASSES[state] || 'dentist-state-default'
 
     const rebuildFuse = () => {
-      const collection = rows.value.filter(d => d.state !== 'deleted')
-      
-      if (fuse && typeof fuse.setCollection === 'function') {
-        fuse.setCollection(collection)
-      } else {
-        fuse = new Fuse(collection, FUSE_OPTIONS)
-      }
+      const collection = rows.value.filter(d => d.estado !== 'eliminado')
+      fuse ? fuse.setCollection(collection) : fuse = new Fuse(collection, FUSE_OPTIONS)
     }
 
     const filterRows = () => {
-      if (!search.value?.trim()) {
-        filteredRows.value = rows.value.filter(d => d.state !== 'deleted')
-        return
+      if (!search.value?.trim()) { 
+        filteredRows.value = rows.value.filter(d => d.estado !== 'eliminado')
+        return 
       }
-
-      const results = fuse.search(search.value.trim())
-      filteredRows.value = results.map(result => result.item)
-    }
-
-    const loadDentists = () => {
-      rows.value = dentistas.dentistas.map(d => ({ 
-        ...d, 
-        id: Number(d.id) 
-      }))
-      
-      filteredRows.value = rows.value.filter(d => d.state !== 'deleted')
-      fuse = new Fuse(filteredRows.value, FUSE_OPTIONS)
-    }
-
-    const loadSpecialties = () => {
-      especialidades.especialidades.forEach(spec => {
-        specialtiesMap.value[spec.id] = spec.name
-      })
-    }
-
-    const handleDentistCreate = (newDentist) => {
-      const dentistToAdd = {
-        name: newDentist.name || '',
-        second_name: newDentist.second_name || '',
-        father_last_name: newDentist.father_last_name || '',
-        mother_last_name: newDentist.mother_last_name || '',
-        speciality: newDentist.speciality || [],
-        userId: newDentist.userId || null,
-        img: newDentist.img || null,
-        state: newDentist.state || 'active'
+      if (fuse) {
+        filteredRows.value = fuse.search(search.value.trim()).map(r => r.item)
+      } else {
+        filteredRows.value = rows.value.filter(d => d.estado !== 'eliminado')
       }
-
-      const numericIds = rows.value
-        .map(d => Number(d.id))
-        .filter(n => !Number.isNaN(n))
-      
-      const maxId = numericIds.length ? Math.max(...numericIds) : 0
-      dentistToAdd.id = maxId + 1
-
-      rows.value.push(dentistToAdd)
-      rebuildFuse()
-      filterRows()
     }
 
-    const handleDentistUpdate = (updatedDentist) => {
-      const index = rows.value.findIndex(
-        d => Number(d.id) === Number(updatedDentist.id)
-      )
-      
-      if (index > -1) {
-        rows.value[index] = { 
-          ...updatedDentist, 
-          id: Number(updatedDentist.id) 
+    const loadDentistas = async () => {
+      try {
+        await store.cargarDentistasCompletos()
+        rebuildFuse()
+        filterRows()
+        // Asegurar que filteredRows tenga datos
+        if (filteredRows.value.length === 0 && store.dentistasCompletos.length > 0) {
+          initializeFilteredRows()
         }
-        rebuildFuse()
-        filterRows()
+      } catch (err) { 
+        console.error('Error cargando dentistas:', err)
       }
     }
 
-    const deleteDentist = () => {
-      const index = rows.value.findIndex(
-        d => Number(d.id) === Number(selectedDentist.value.id)
-      )
-      
-      if (index > -1) {
-        rows.value[index].state = 'deleted'
+    const handleDentistCreate = async () => {
+      try {
+        showNewDialog.value = false
         rebuildFuse()
         filterRows()
+        
+        // Notificación de éxito
+        $q.notify({
+          type: 'positive',
+          message: 'Dentista creado exitosamente',
+          position: 'top-right',
+          timeout: 3000
+        })
+      } catch (err) { 
+        console.error('Error en handleDentistCreate:', err) 
       }
     }
 
-    const viewDentist = (dentist) => {
-      selectedDentist.value = { ...dentist }
-      showDetailDialog.value = true
+    const handleDentistUpdate = async () => {
+      try {
+        showEditDialog.value = false
+        rebuildFuse()
+        filterRows()
+        
+        // Notificación de éxito
+        $q.notify({
+          type: 'positive',
+          message: 'Dentista actualizado exitosamente',
+          position: 'top-right',
+          timeout: 3000
+        })
+      } catch (err) { 
+        console.error('Error en handleDentistUpdate:', err) 
+      }
     }
 
-    const editDentist = (dentist) => {
-      selectedDentist.value = { ...dentist }
-      showEditDialog.value = true
-      showDetailDialog.value = false
-    }
-
-    const openNewDentistDialog = () => {
-      showNewDialog.value = true
-    }
-
+    // MODIFICADO: Función de eliminación mejorada
     const confirmDeleteDentist = (dentist) => {
       selectedDentist.value = { ...dentist }
       showDeleteDialog.value = true
     }
 
-    onMounted(() => {
-      loadSpecialties()
-      loadDentists()
-    })
+    const deleteDentist = async () => {
+      if (!selectedDentist.value) return
+      
+      try {
+        await store.eliminarDentistaCompleto(selectedDentist.value.id)
+        
+        // Cerrar diálogo y limpiar
+        showDeleteDialog.value = false
+        selectedDentist.value = null
+        
+        // Actualizar lista
+        await loadDentistas()
+        
+        // Notificación de éxito
+        $q.notify({
+          type: 'positive',
+          message: 'Dentista eliminado exitosamente',
+          position: 'top-right',
+          timeout: 3000
+        })
+      } catch (err) { 
+        console.error('Error eliminando dentista:', err)
+        
+        // Notificación de error
+        $q.notify({
+          type: 'negative',
+          message: 'Error al eliminar el dentista. Intente nuevamente.',
+          position: 'top-right',
+          timeout: 5000
+        })
+      }
+    }
 
-    watch(search, () => {
-      filterRows()
+    const viewDentist = (dentist) => { 
+      selectedDentist.value = { ...dentist }
+      showDetailDialog.value = true 
+    }
+    
+    const editDentist = (dentist) => { 
+      selectedDentist.value = { ...dentist }
+      showEditDialog.value = true
+      showDetailDialog.value = false 
+    }
+    
+    const openNewDentistDialog = () => { showNewDialog.value = true }
+
+    onMounted(async () => { 
+      await loadDentistas() 
     })
+    
+    watch(search, filterRows)
+    watch(rows, () => { 
+      rebuildFuse()
+      filterRows() 
+    }, { immediate: true })
 
     return {
+      store,
       search,
       columns,
-      rows,
       filteredRows,
       selectedDentist,
       showDetailDialog,
@@ -598,7 +533,8 @@ export default {
       activeDentistsCount,
       inactiveDentistsCount,
       totalSpecialties,
-      filterRows,
+      stats,
+      loadDentistas,
       handleDentistCreate,
       handleDentistUpdate,
       deleteDentist,
@@ -609,9 +545,9 @@ export default {
       getFullName,
       getInitials,
       handleImageError,
+      getImageUrl,
       formatState,
       getStateClass,
-      getSpecialtyName,
       getAvatarColor
     }
   }

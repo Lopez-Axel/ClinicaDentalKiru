@@ -82,8 +82,8 @@
                 <div class="branch-floating-card branch-floating-card-1">
                   <q-icon name="location_on" color="red" size="24px" />
                   <div class="branch-floating-text">
-                    <strong>5+</strong>
-                    <span>Sucursales</span>
+                    <strong>{{ sucursalesActivasCount }}</strong>
+                    <span>Sucursales Activas</span>
                   </div>
                 </div>
                 
@@ -99,7 +99,7 @@
                   <q-icon name="map" color="primary" size="24px" />
                   <div class="branch-floating-text">
                     <strong>GPS</strong>
-                    <span>Navegación</span>
+                    <span>Precisión</span>
                   </div>
                 </div>
               </div>
@@ -128,10 +128,29 @@
             <q-icon name="place" color="primary" size="32px" />
             <div class="branch-title-line"></div>
           </div>
+          
+          <!-- Barra de búsqueda -->
+          <div class="branch-search-container">
+            <q-input
+              v-model="searchQuery"
+              placeholder="Buscar sucursal por nombre, dirección o ubicación..."
+              outlined
+              dense
+              class="branch-search-input"
+              @update:model-value="sucursalStore.setSearch"
+            >
+              <template v-slot:prepend>
+                <q-icon name="search" />
+              </template>
+              <template v-slot:append>
+                <q-icon v-if="searchQuery" name="clear" class="cursor-pointer" @click="clearSearch" />
+              </template>
+            </q-input>
+          </div>
         </div>
         
         <!-- Loading State -->
-        <div v-if="publicarStore.loading" class="branch-loading-state">
+        <div v-if="sucursalStore.loading" class="branch-loading-state">
           <div class="branch-loading-content">
             <q-spinner-gears color="primary" size="60px" />
             <div class="branch-loading-text">Cargando sucursales...</div>
@@ -139,20 +158,32 @@
         </div>
 
         <!-- Empty State -->
-        <div v-else-if="filteredBranches.length === 0" class="branch-empty-state">
+        <div v-else-if="sucursalesActivasFiltradas.length === 0" class="branch-empty-state">
           <div class="branch-empty-illustration">
             <q-icon name="location_off" size="80px" />
             <div class="branch-empty-circle branch-empty-circle-1"></div>
             <div class="branch-empty-circle branch-empty-circle-2"></div>
           </div>
-          <div class="branch-empty-title">No hay sucursales disponibles</div>
-          <p class="branch-empty-text">Próximamente abriremos nuevas sucursales en tu zona.</p>
+          <div class="branch-empty-title">
+            {{ searchQuery ? 'No se encontraron sucursales' : 'No hay sucursales activas disponibles' }}
+          </div>
+          <p class="branch-empty-text">
+            {{ searchQuery ? 'Intenta con otros términos de búsqueda' : 'Próximamente abriremos nuevas sucursales en tu zona.' }}
+          </p>
+          <q-btn
+            v-if="searchQuery"
+            color="primary"
+            label="Limpiar búsqueda"
+            @click="clearSearch"
+            unelevated
+            no-caps
+          />
         </div>
         
         <!-- Sucursales Grid -->
         <div v-else class="row q-col-gutter-lg">
           <div 
-            v-for="(branch, index) in filteredBranches" 
+            v-for="(branch, index) in sucursalesActivasFiltradas" 
             :key="branch.id" 
             class="col-12 col-sm-6 col-lg-4 animated fadeInUp"
             :style="{ animationDelay: `${index * 0.1}s` }"
@@ -161,10 +192,10 @@
               <div class="branch-branch-image-wrapper">
                 <div class="branch-branch-gradient"></div>
                 <q-img 
-                  :src="branch.imagen || '/default-branch.jpg'" 
+                  :src="sucursalStore.getImagePath(branch.imagen) || '/default-branch.jpg'" 
                   :alt="branch.nombre" 
                   class="branch-branch-image"
-                  @error="handleImageError"
+                  @error="sucursalStore.handleImageError"
                   ratio="4/3"
                 />
                 <div class="branch-branch-overlay">
@@ -174,17 +205,6 @@
                     </div>
                     <p class="branch-overlay-text">Ver detalles completos</p>
                   </div>
-                </div>
-                <div class="branch-branch-status">
-                  <q-chip 
-                    :color="branch.activo ? 'green' : 'red'" 
-                    text-color="white" 
-                    size="md"
-                    :icon="branch.activo ? 'check_circle' : 'cancel'"
-                    class="branch-status-chip"
-                  >
-                    {{ branch.activo ? 'Abierto' : 'Cerrado' }}
-                  </q-chip>
                 </div>
               </div>
               
@@ -202,6 +222,11 @@
                   <div class="branch-info-item">
                     <q-icon name="place" size="18px" />
                     <span>{{ branch.ubicacion }}</span>
+                  </div>
+                  
+                  <div v-if="branch.latitud && branch.longitud" class="branch-info-item">
+                    <q-icon name="gps_fixed" size="18px" />
+                    <span>Coordenadas: {{ formatCoordinates(branch.latitud, branch.longitud) }}</span>
                   </div>
                 </div>
                 
@@ -314,10 +339,10 @@
             <div class="col-12 col-md-6">
               <div class="branch-dialog-image-wrapper">
                 <q-img
-                  :src="selectedBranch.imagen || '/default-branch.jpg'"
+                  :src="sucursalStore.getImagePath(selectedBranch.imagen) || '/default-branch.jpg'"
                   :alt="selectedBranch.nombre"
                   class="branch-dialog-image"
-                  @error="handleImageError"
+                  @error="sucursalStore.handleImageError"
                 />
               </div>
               
@@ -339,6 +364,28 @@
                     class="branch-map-iframe"
                   ></iframe>
                 </div>
+                
+                <!-- Información de coordenadas -->
+                <div v-if="selectedBranch.latitud && selectedBranch.longitud" class="branch-coordinates-info">
+                  <div class="branch-coordinates-header">
+                    <q-icon name="gps_fixed" size="18px" />
+                    <h6>Coordenadas GPS</h6>
+                  </div>
+                  <div class="branch-coordinates-details">
+                    <div class="branch-coordinate-item">
+                      <span class="branch-coordinate-label">Latitud:</span>
+                      <span class="branch-coordinate-value">{{ selectedBranch.latitud }}°</span>
+                    </div>
+                    <div class="branch-coordinate-item">
+                      <span class="branch-coordinate-label">Longitud:</span>
+                      <span class="branch-coordinate-value">{{ selectedBranch.longitud }}°</span>
+                    </div>
+                    <div class="branch-coordinate-item">
+                      <span class="branch-coordinate-label">Formato:</span>
+                      <span class="branch-coordinate-value">{{ formatCoordinates(selectedBranch.latitud, selectedBranch.longitud) }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             
@@ -350,12 +397,12 @@
                 
                 <div class="branch-detail-badge">
                   <q-chip 
-                    :color="selectedBranch.activo ? 'green' : 'red'" 
+                    color="green" 
                     text-color="white" 
-                    :icon="selectedBranch.activo ? 'check_circle' : 'cancel'"
+                    icon="check_circle"
                     size="lg"
                   >
-                    {{ selectedBranch.activo ? 'Abierto Ahora' : 'Cerrado' }}
+                    Abierto Ahora
                   </q-chip>
                 </div>
                 
@@ -390,19 +437,33 @@
                     
                     <q-separator />
                     
+                    <q-item v-if="selectedBranch.latitud && selectedBranch.longitud" class="branch-detail-info-item">
+                      <q-item-section avatar>
+                        <q-avatar color="purple-1" text-color="purple" icon="gps_fixed" size="48px" />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label caption class="branch-info-label">Coordenadas GPS</q-item-label>
+                        <q-item-label class="branch-info-value">
+                          {{ formatCoordinates(selectedBranch.latitud, selectedBranch.longitud) }}
+                        </q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    
+                    <q-separator v-if="selectedBranch.latitud && selectedBranch.longitud" />
+                    
                     <q-item class="branch-detail-info-item">
                       <q-item-section avatar>
                         <q-avatar 
-                          :color="selectedBranch.activo ? 'green-1' : 'red-1'" 
-                          :text-color="selectedBranch.activo ? 'green' : 'red'" 
-                          :icon="selectedBranch.activo ? 'check_circle' : 'cancel'"
+                          color="green-1" 
+                          text-color="green" 
+                          icon="check_circle"
                           size="48px" 
                         />
                       </q-item-section>
                       <q-item-section>
                         <q-item-label caption class="branch-info-label">Estado</q-item-label>
                         <q-item-label class="branch-info-value">
-                          {{ selectedBranch.activo ? 'Abierto' : 'Cerrado' }}
+                          Abierto
                         </q-item-label>
                       </q-item-section>
                     </q-item>
@@ -427,7 +488,6 @@
                     unelevated
                     no-caps
                     class="branch-action-btn-primary"
-                    :disable="!selectedBranch.activo"
                   />
                   <q-btn 
                     color="secondary" 
@@ -448,7 +508,7 @@
       </q-card>
     </q-dialog>
 
-    <!-- Dialog del mapa completo -->
+    <!-- Dialog del mapa completo con todas las sucursales -->
     <q-dialog v-model="mapDialog" maximized transition-show="scale" transition-hide="scale">
       <q-card class="branch-map-dialog-card">
         <q-card-section class="branch-map-dialog-header bg-primary text-white">
@@ -466,9 +526,10 @@
         </q-card-section>
         
         <q-card-section class="branch-map-dialog-content">
+          <!-- Mapa dinámico con todas las sucursales activas -->
           <div class="branch-map-container-full">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3825.123456789!2d-67.1101!3d-17.9758!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTfCsDU4JzMzLjAiUyA2N8KwMDYnMzYuNCJX!5e0!3m2!1ses!2sbo!4v1234567890"
+              :src="generateAllBranchesMapUrl()"
               width="100%"
               height="600"
               style="border:0;"
@@ -477,6 +538,43 @@
               referrerpolicy="no-referrer-when-downgrade"
               class="branch-map-iframe-full"
             ></iframe>
+          </div>
+          
+          <!-- Lista de sucursales en el mapa -->
+          <div class="branch-map-sucursales-list">
+            <h5 class="branch-map-list-title">
+              <q-icon name="apartment" size="20px" />
+              Sucursales en el Mapa
+            </h5>
+            <div class="row q-col-gutter-md">
+              <div 
+                v-for="branch in sucursalesActivasFiltradas" 
+                :key="branch.id" 
+                class="col-12 col-sm-6 col-md-4"
+              >
+                <q-card flat bordered class="branch-map-sucursal-card">
+                  <q-card-section>
+                    <div class="branch-map-sucursal-title">{{ branch.nombre }}</div>
+                    <div class="branch-map-sucursal-location">
+                      <q-icon name="location_on" size="14px" />
+                      {{ branch.ubicacion }}
+                    </div>
+                    <div v-if="branch.latitud && branch.longitud" class="branch-map-sucursal-coords">
+                      <q-icon name="gps_fixed" size="14px" />
+                      {{ formatCoordinates(branch.latitud, branch.longitud) }}
+                    </div>
+                    <q-btn
+                      flat
+                      color="primary"
+                      label="Ver en mapa"
+                      size="sm"
+                      @click="centerMapOnBranch(branch)"
+                      class="branch-map-center-btn"
+                    />
+                  </q-card-section>
+                </q-card>
+              </div>
+            </div>
           </div>
         </q-card-section>
       </q-card>
@@ -487,26 +585,32 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useNotifications } from 'src/composables/useNotifications'
-import { usePublicarSucursal } from 'src/stores/publicarSucursal'
+import { useSucursalStore } from 'src/stores/sucursalStore'
 import AppointmentModal from 'components/AppointmentModal.vue'
 
 const { notifyInfo } = useNotifications()
-const publicarStore = usePublicarSucursal()
+const sucursalStore = useSucursalStore()
 
 // Datos reactivos
 const appointmentDialog = ref(false)
 const branchDialog = ref(false)
 const mapDialog = ref(false)
+const searchQuery = ref('')
 const selectedBranch = ref(null)
 
 // Computed properties
-const filteredBranches = computed(() => {
-  return publicarStore.sucursalesActivas
+const sucursalesActivasFiltradas = computed(() => {
+  // Filtrar solo sucursales activas (activo === 1)
+  return sucursalStore.filteredBranches.filter(branch => branch.activo === 1)
+})
+
+const sucursalesActivasCount = computed(() => {
+  return sucursalStore.sucursalesActivas.length
 })
 
 // Cargar datos de sucursales al montar el componente
 onMounted(() => {
-  publicarStore.cargarSucursales()
+  sucursalStore.listar()
 })
 
 // Métodos
@@ -517,11 +621,17 @@ const openAppointmentDialog = () => {
 
 const openBranchDetail = (branch) => {
   selectedBranch.value = branch
+  sucursalStore.setSelectedBranch(branch)
   branchDialog.value = true
 }
 
 const openMapDialog = () => {
   mapDialog.value = true
+}
+
+const clearSearch = () => {
+  searchQuery.value = ''
+  sucursalStore.setSearch('')
 }
 
 const truncateDescription = (description) => {
@@ -531,22 +641,69 @@ const truncateDescription = (description) => {
     : description
 }
 
+const formatCoordinates = (lat, lng) => {
+  // Formatear coordenadas a un formato legible
+  const latDir = lat >= 0 ? 'N' : 'S'
+  const lngDir = lng >= 0 ? 'E' : 'O'
+  const absLat = Math.abs(lat).toFixed(4)
+  const absLng = Math.abs(lng).toFixed(4)
+  return `${absLat}°${latDir}, ${absLng}°${lngDir}`
+}
+
 const generateMapUrl = (branch) => {
   if (branch.latitud && branch.longitud) {
+    // Usar coordenadas exactas si están disponibles
     return `https://maps.google.com/maps?q=${branch.latitud},${branch.longitud}&z=15&output=embed`
   }
-  return 'https://maps.google.com/maps?q=Oruro,Bolivia&z=13&output=embed'
+  // Fallback a la dirección si no hay coordenadas
+  const address = encodeURIComponent(`${branch.direccion}, ${branch.ubicacion}`)
+  return `https://maps.google.com/maps?q=${address}&z=15&output=embed`
+}
+
+const generateAllBranchesMapUrl = () => {
+  const sucursales = sucursalesActivasFiltradas.value
+  
+  if (sucursales.length === 0) {
+    return 'https://maps.google.com/maps?q=Oruro,Bolivia&z=12&output=embed'
+  }
+
+  // Si hay sucursales con coordenadas, centrar el mapa en el promedio
+  const sucursalesConCoordenadas = sucursales.filter(s => s.latitud && s.longitud)
+  
+  if (sucursalesConCoordenadas.length > 0) {
+    // Calcular centro promedio
+    const avgLat = sucursalesConCoordenadas.reduce((sum, s) => sum + parseFloat(s.latitud), 0) / sucursalesConCoordenadas.length
+    const avgLng = sucursalesConCoordenadas.reduce((sum, s) => sum + parseFloat(s.longitud), 0) / sucursalesConCoordenadas.length
+    
+    // Crear marcadores para cada sucursal
+    const markers = sucursalesConCoordenadas
+      .map((s, i) => 
+        `&markers=color:red%7Clabel:${i+1}%7C${s.latitud},${s.longitud}`
+      )
+      .join('')
+    
+    return `https://maps.google.com/maps?q=${avgLat},${avgLng}&z=12${markers}&output=embed`
+  }
+
+  // Fallback a Oruro como centro
+  return 'https://maps.google.com/maps?q=Oruro,Bolivia&z=12&output=embed'
+}
+
+const centerMapOnBranch = (branch) => {
+  if (branch.latitud && branch.longitud) {
+    // Aquí podrías implementar lógica para centrar el iframe en la sucursal
+    notifyInfo(`Centrando mapa en ${branch.nombre}`)
+    // Nota: Para cambiar el iframe dinámicamente, necesitarías reemplazar el src
+    // o usar la API de Google Maps JavaScript
+  }
 }
 
 const generateDirectionsUrl = (branch) => {
   if (branch.latitud && branch.longitud) {
     return `https://www.google.com/maps/dir/?api=1&destination=${branch.latitud},${branch.longitud}`
   }
-  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(branch.direccion)}`
-}
-
-const handleImageError = (event) => {
-  event.target.src = '/default-branch.jpg'
+  const address = encodeURIComponent(`${branch.direccion}, ${branch.ubicacion}`)
+  return `https://www.google.com/maps/dir/?api=1&destination=${address}`
 }
 
 // Funciones para manejar eventos del modal de citas

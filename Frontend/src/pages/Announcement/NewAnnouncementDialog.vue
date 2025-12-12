@@ -5,6 +5,7 @@
         <div class="row items-center">
           <div class="col">
             <div class="text-h6">Nuevo Anuncio</div>
+            <div class="text-caption">Completa todos los campos para crear un nuevo anuncio</div>
           </div>
           <div class="col-auto">
             <q-btn icon="close" flat round dense @click="closeDialog" color="white" />
@@ -14,91 +15,156 @@
 
       <q-card-section class="q-pt-lg">
         <q-form @submit.prevent="createAnuncio" class="q-gutter-md">
-          <q-input
-            v-model="formData.titulo"
-            label="Título del anuncio *"
-            outlined
+          <!-- Título -->
+          <q-input 
+            v-model="formData.titulo" 
+            label="Título del anuncio *" 
+            outlined 
             dense
             :rules="[val => !!val || 'El título es requerido']"
+            maxlength="100"
+            counter
           />
 
-          <q-select
-            v-model="formData.categoria"
-            :options="categorias"
-            label="Categoría *"
-            outlined
+          <!-- Categoría -->
+          <q-select 
+            v-model="formData.categoria" 
+            :options="categorias" 
+            label="Categoría *" 
+            outlined 
             dense
             :rules="[val => !!val || 'La categoría es requerida']"
+            emit-value
+            map-options
           />
 
-          <q-input
-            v-model="formData.descripcion"
-            label="Descripción *"
-            type="textarea"
-            rows="3"
-            outlined
+          <!-- Descripción -->
+          <q-input 
+            v-model="formData.descripcion" 
+            label="Descripción *" 
+            type="textarea" 
+            rows="3" 
+            outlined 
             dense
             :rules="[val => !!val || 'La descripción es requerida']"
+            maxlength="500"
+            counter
           />
 
+          <!-- Fechas -->
           <div class="row q-col-gutter-md">
             <div class="col-6">
-              <q-input
-                v-model="formData.fecha_publicacion"
-                label="Fecha de publicación"
-                type="date"
-                outlined
+              <q-input 
+                v-model="formData.fecha_publicacion" 
+                label="Fecha de publicación *" 
+                type="date" 
+                outlined 
                 dense
-              />
+                :rules="[val => !!val || 'La fecha de publicación es requerida']"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="event" />
+                </template>
+              </q-input>
             </div>
             <div class="col-6">
-              <q-input
-                v-model="formData.fecha_expiracion"
-                label="Fecha de expiración"
-                type="date"
-                outlined
+              <q-input 
+                v-model="formData.fecha_expiracion" 
+                label="Fecha de expiración" 
+                type="date" 
+                outlined 
                 dense
-              />
+                :rules="[val => !val || val >= formData.fecha_publicacion || 'La fecha de expiración debe ser posterior a la de publicación']"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="event" />
+                </template>
+              </q-input>
             </div>
           </div>
 
-          <q-input
-            v-model="formData.imagen"
-            label="URL de la imagen"
-            outlined
-            dense
-            placeholder="https://ejemplo.com/imagen.jpg"
-          />
+          <!-- Subir Imagen -->
+          <div class="q-mt-md">
+            <div class="text-caption text-weight-bold q-mb-xs">Imagen del anuncio:</div>
+            <q-uploader 
+              accept="image/*" 
+              label="Arrastra o haz clic para seleccionar una imagen"
+              @added="handleFileAdded"
+              @removed="handleFileRemoved"
+              :hide-upload-btn="true" 
+              auto-expand 
+              color="primary"
+              :max-file-size="5242880"
+              :max-files="1"
+              :filter="checkFileType"
+              :no-thumbnails="false"
+              class="full-width"
+            >
+              <template v-slot:list="scope">
+                <q-list separator>
+                  <q-item v-for="file in scope.files" :key="file.name">
+                    <q-item-section>
+                      <q-item-label class="full-width ellipsis">
+                        {{ file.name }}
+                      </q-item-label>
+                      <q-item-label caption>
+                        Tamaño: {{ (file.size / 1024).toFixed(2) }} KB
+                      </q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-btn icon="delete" flat round dense @click="scope.removeFile(file)" />
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </template>
+            </q-uploader>
 
-          <q-option-group
-            v-model="formData.estado"
-            :options="estadoOptions"
-            color="primary"
-            inline
-            label="Estado del anuncio"
-          />
+            <!-- Vista previa de imagen -->
+            <div v-if="formData.imagenPreview" class="image-preview q-mt-md">
+              <div class="text-caption text-weight-bold q-mb-xs">Vista previa:</div>
+              <div class="preview-container">
+                <q-img 
+                  :src="formData.imagenPreview" 
+                  style="max-height: 200px; max-width: 300px;"
+                  class="rounded-borders shadow-1"
+                  @error="handleImageError"
+                >
+                  <template v-slot:loading>
+                    <div class="absolute-full flex flex-center bg-grey-2">
+                      <q-spinner-gears color="primary" size="50px" />
+                    </div>
+                  </template>
+                </q-img>
+                <q-btn 
+                  icon="close" 
+                  round 
+                  dense 
+                  flat 
+                  color="negative" 
+                  size="sm"
+                  class="preview-close-btn"
+                  @click="removeImage"
+                />
+              </div>
+            </div>
+          </div>
 
-          <div v-if="formData.imagen" class="image-preview q-mt-md">
-            <div class="text-caption text-weight-bold q-mb-xs">Vista previa:</div>
-            <q-img
-              :src="formData.imagen"
-              style="max-height: 200px; max-width: 300px;"
-              class="rounded-borders"
-              @error="anuncioStore.handleImageError"
+          <!-- Estado -->
+          <div class="q-mt-md">
+            <div class="text-caption text-weight-bold q-mb-xs">Estado del anuncio:</div>
+            <q-option-group 
+              v-model="formData.estado" 
+              :options="estadoOptions" 
+              color="primary" 
+              inline
+              :rules="[val => !!val || 'El estado es requerido']"
             />
           </div>
 
-          <q-card-actions align="right" class="q-pt-md">
-            <q-btn label="Cancelar" color="grey" @click="closeDialog" no-caps />
-            <q-btn 
-              label="Crear Anuncio" 
-              type="submit" 
-              color="primary" 
-              unelevated 
-              no-caps
-              :disable="!isFormValid || loading"
-              :loading="loading"
-            />
+          <!-- Acciones -->
+          <q-card-actions align="right" class="q-pt-lg">
+            <q-btn label="Cancelar" color="grey-7" @click="closeDialog" flat />
+            <q-btn label="Crear Anuncio" type="submit" color="primary" :loading="loading" :disable="!isFormValid" unelevated />
           </q-card-actions>
         </q-form>
       </q-card-section>
@@ -108,24 +174,23 @@
 
 <script>
 import { ref, computed, watch } from 'vue'
+import { useQuasar } from 'quasar'
 import { useAnuncioStore } from 'src/stores/anuncioStore'
 
 export default {
   name: 'NewAnuncioDialog',
-
-  props: {
-    modelValue: { type: Boolean, required: true }
-  },
-
-  emits: ['update:modelValue'],
+  props: { modelValue: Boolean },
+  emits: ['update:modelValue', 'anuncio-created'],
 
   setup(props, { emit }) {
+    const $q = useQuasar()
     const anuncioStore = useAnuncioStore()
     const loading = ref(false)
+    const isSubmitting = ref(false) // Nueva variable para controlar submit
 
     const showDialog = computed({
       get: () => props.modelValue,
-      set: (value) => emit('update:modelValue', value)
+      set: val => emit('update:modelValue', val)
     })
 
     const formData = ref({
@@ -134,20 +199,33 @@ export default {
       categoria: 'Promoción',
       fecha_publicacion: new Date().toISOString().split('T')[0],
       fecha_expiracion: '',
-      imagen: '',
+      imagen: null,
+      imagenPreview: '',
       estado: 'activo',
       userId: 1
     })
 
-    const categorias = ['Promoción', 'Evento', 'Aviso', 'Noticia']
+    const categorias = [
+      { label: 'Promoción', value: 'Promoción' },
+      { label: 'Evento', value: 'Evento' },
+      { label: 'Aviso', value: 'Aviso' },
+      { label: 'Noticia', value: 'Noticia' },
+      { label: 'Novedad', value: 'Novedad' },
+      { label: 'Oferta Especial', value: 'Oferta Especial' }
+    ]
+
     const estadoOptions = [
       { label: 'Activo', value: 'activo' },
       { label: 'Inactivo', value: 'inactivo' }
     ]
 
-    const isFormValid = computed(() =>
-      formData.value.titulo && formData.value.descripcion && formData.value.categoria
-    )
+    const isFormValid = computed(() => {
+      return formData.value.titulo && 
+             formData.value.descripcion && 
+             formData.value.categoria && 
+             formData.value.fecha_publicacion &&
+             formData.value.estado
+    })
 
     const resetForm = () => {
       formData.value = {
@@ -156,7 +234,8 @@ export default {
         categoria: 'Promoción',
         fecha_publicacion: new Date().toISOString().split('T')[0],
         fecha_expiracion: '',
-        imagen: '',
+        imagen: null,
+        imagenPreview: '',
         estado: 'activo',
         userId: 1
       }
@@ -167,36 +246,129 @@ export default {
       resetForm()
     }
 
-    const createAnuncio = async () => {
-      if (!isFormValid.value) return
-
-      loading.value = true
-      try {
-        const payload = {
-          titulo: formData.value.titulo,
-          descripcion: formData.value.descripcion || null,
-          categoria: formData.value.categoria || null,
-          fecha_publicacion: formData.value.fecha_publicacion, // solo "YYYY-MM-DD"
-          fecha_expiracion: formData.value.fecha_expiracion || null, // "YYYY-MM-DD" o null
-          imagen: formData.value.imagen || null, // si no tienes URL, envía null
-          estado: formData.value.estado,
-          userId: Number(formData.value.userId)
+    const checkFileType = (files) => {
+      const acceptedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+      for (const file of files) {
+        if (!acceptedTypes.includes(file.type)) {
+          $q.notify({
+            type: 'warning',
+            message: 'Solo se permiten imágenes (JPEG, PNG, GIF, WebP)',
+            position: 'top-right'
+          })
+          return false
         }
+        if (file.size > 5 * 1024 * 1024) {
+          $q.notify({
+            type: 'warning',
+            message: 'La imagen debe ser menor a 5MB',
+            position: 'top-right'
+          })
+          return false
+        }
+      }
+      return true
+    }
 
-        console.log('CREAR ANUNCIO - payload:', payload)
-        await anuncioStore.agregarAnuncio(payload)
-        closeDialog()
-      } catch (error) {
-        console.error('Error creando anuncio:', error)
-      } finally {
-        loading.value = false
+    const handleFileAdded = (files) => {
+      if (files.length > 0) {
+        const file = files[0]
+        if (checkFileType([file])) {
+          formData.value.imagen = file
+          formData.value.imagenPreview = URL.createObjectURL(file)
+        } else {
+          // Remover el archivo si no es válido
+          files.splice(0, 1)
+        }
       }
     }
 
-    // Watch for dialog opening to reset form
-    watch(() => props.modelValue, (val) => {
+    const handleFileRemoved = () => {
+      if (formData.value.imagenPreview) {
+        URL.revokeObjectURL(formData.value.imagenPreview)
+      }
+      formData.value.imagen = null
+      formData.value.imagenPreview = ''
+    }
+
+    const removeImage = () => handleFileRemoved()
+    const handleImageError = (event) => {
+      console.error('Error cargando imagen:', event)
+      $q.notify({ 
+        type: 'warning', 
+        message: 'Error cargando la imagen', 
+        position: 'top-right' 
+      })
+    }
+
+    const createAnuncio = async () => {
+      // Prevenir doble submit
+      if (isSubmitting.value || !isFormValid.value) return
+      
+      isSubmitting.value = true
+      loading.value = true
+      
+      try {
+        // DEBUG: Verificar los datos antes de enviar
+        console.log('Datos del formulario:', {
+          ...formData.value,
+          imagen: formData.value.imagen ? `Archivo: ${formData.value.imagen.name}` : 'null'
+        })
+
+        // Preparar los datos de texto (excluyendo el archivo)
+        const textData = {
+          titulo: formData.value.titulo,
+          descripcion: formData.value.descripcion,
+          categoria: formData.value.categoria,
+          fecha_publicacion: formData.value.fecha_publicacion,
+          estado: formData.value.estado,
+          userId: formData.value.userId
+        }
+
+        // Agregar fecha de expiración solo si existe
+        if (formData.value.fecha_expiracion) {
+          textData.fecha_expiracion = formData.value.fecha_expiracion
+        }
+
+        // DEBUG: Verificar qué enviamos al store
+        console.log('Enviando al store:', {
+          textData,
+          imagen: formData.value.imagen
+        })
+
+        // Llamar al store con los datos separados
+        const nuevoAnuncio = await anuncioStore.crear(textData, formData.value.imagen)
+        
+        if (nuevoAnuncio) {
+          console.log('Anuncio creado:', nuevoAnuncio)
+          emit('anuncio-created', nuevoAnuncio)
+          $q.notify({ 
+            type: 'positive', 
+            message: '¡Anuncio creado exitosamente!', 
+            position: 'top-right',
+            timeout: 3000
+          })
+          closeDialog()
+        }
+      } catch (error) {
+        console.error('Error creando anuncio:', error)
+        $q.notify({ 
+          type: 'negative', 
+          message: error.response?.data?.message || 'Error creando el anuncio', 
+          position: 'top-right',
+          timeout: 5000
+        })
+      } finally {
+        loading.value = false
+        isSubmitting.value = false
+      }
+    }
+
+    // Verificar cómo se abre el diálogo desde el componente padre
+    watch(() => props.modelValue, val => { 
       if (val) {
+        console.log('Diálogo abierto')
         resetForm()
+        isSubmitting.value = false
       }
     })
 
@@ -205,11 +377,14 @@ export default {
       formData,
       categorias,
       estadoOptions,
-      anuncioStore,
       isFormValid,
       createAnuncio,
       closeDialog,
-      loading
+      loading,
+      handleFileAdded,
+      handleFileRemoved,
+      removeImage,
+      handleImageError
     }
   }
 }

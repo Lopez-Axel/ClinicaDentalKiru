@@ -18,9 +18,16 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
+app.use('/uploads', express.static('uploads'));
 
 app.use('/users', require('./routes/users.js'));
 app.use('/anuncios', require('./routes/anuncioRoutes'));
+app.use('/sucursales', require('./routes/sucursalRoutes'));
+app.use('/especialidad', require('./routes/especialidadRoutes'));
+app.use('/dentista', require('./routes/dentistaRoutes'));
+app.use('/dentistaEspecialidad', require('./routes/dentistaEspecialidadRoutes'));
+app.use('/citas', require('./routes/citaRoutes'));
+app.use('/servicios', require('./routes/servicioRoutes'));
 
 
 app.get('/', (req, res) => {

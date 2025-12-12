@@ -33,12 +33,12 @@
     <div class="specialty-search-section">
       <div class="specialty-search-container">
         <q-input
-          v-model="search"
+          v-model="store.search"
           class="specialty-search-input"
           outlined
           type="search"
           placeholder="Buscar especialidades por nombre o descripción..."
-          @input="filterSpecialities"
+          @update:model-value="store.applySearch"
           clearable
         >
           <template v-slot:prepend>
@@ -72,7 +72,7 @@
                   <i class="fa-solid fa-clipboard-list"></i>
                 </div>
                 <div class="specialty-stat-content">
-                  <div class="specialty-stat-value">{{ filteredSpecialities.length }}</div>
+                  <div class="specialty-stat-value">{{ store.searchResults.length }}</div>
                   <div class="specialty-stat-label">Especialidades Registradas</div>
                 </div>
               </div>
@@ -81,7 +81,7 @@
                   <i class="fa-solid fa-file-invoice"></i>
                 </div>
                 <div class="specialty-stat-content">
-                  <div class="specialty-stat-value">{{ totalPages }}</div>
+                  <div class="specialty-stat-value">{{ store.totalPaginas }}</div>
                   <div class="specialty-stat-label">Páginas Disponibles</div>
                 </div>
               </div>
@@ -118,13 +118,13 @@
           <div class="specialty-results-count">
             <span class="specialty-count-badge">
               <i class="fa-solid fa-list-check"></i>
-              {{ filteredSpecialities.length }} especialidad{{ filteredSpecialities.length !== 1 ? 'es' : '' }}
+              {{ store.searchResults.length }} especialidad{{ store.searchResults.length !== 1 ? 'es' : '' }}
             </span>
           </div>
         </div>
 
         <div class="specialty-cards-container">
-          <div v-if="filteredSpecialities.length === 0" class="specialty-no-data-container">
+          <div v-if="store.especialidadesPaginaActual.length === 0" class="specialty-no-data-container">
             <div class="specialty-no-data-illustration">
               <i class="fa-solid fa-tooth specialty-no-data-icon"></i>
               <div class="specialty-no-data-circle specialty-no-data-circle-1"></div>
@@ -136,7 +136,7 @@
           
           <transition-group v-else name="specialty-card-fade" tag="div" class="specialty-cards-grid">
             <div 
-              v-for="speciality in currentPageSpecialities" 
+              v-for="speciality in store.especialidadesPaginaActual" 
               :key="speciality.id"
               class="specialty-speciality-card"
             >
@@ -156,8 +156,8 @@
               </div>
               
               <div class="specialty-card-content">
-                <h4 class="specialty-card-title">{{ speciality.name }}</h4>
-                <p class="specialty-card-description">{{ truncateText(speciality.description, 80) }}</p>
+                <h4 class="specialty-card-title">{{ speciality.nombre }}</h4>
+                <p class="specialty-card-description">{{ truncateText(speciality.descripcion, 80) }}</p>
                 
                 <div class="specialty-card-actions">
                   <q-btn 
@@ -196,29 +196,30 @@
         </div>
 
         <!-- Pagination Controls -->
-        <div class="specialty-pagination-section" v-if="totalPages > 1">
+        <div class="specialty-pagination-section" v-if="store.totalPaginas > 1">
           <div class="specialty-pagination-controls">
             <q-btn
               flat
               round
               dense
               icon="fa-solid fa-chevron-left"
-              :disable="currentPage === 0"
-              @click="previousPage"
+              :disable="store.paginaActual === 0"
+              @click="store.paginaAnterior"
               class="specialty-pagination-btn"
               color="primary"
             />
             
             <div class="specialty-pagination-pages">
               <q-btn
-                v-for="page in visiblePages"
+                v-for="page in store.paginasVisibles"
                 :key="page"
                 flat
                 dense
-                :label="page + 1"
-                @click="goToPage(page)"
-                :class="['specialty-page-btn', { 'specialty-active': currentPage === page }]"
-                :color="currentPage === page ? 'primary' : 'grey-7'"
+                :label="page === '...' ? '...' : page + 1"
+                @click="() => page !== '...' && store.irAPagina(page)"
+                :class="['specialty-page-btn', { 'specialty-active': store.paginaActual === page }]"
+                :color="store.paginaActual === page ? 'primary' : 'grey-7'"
+                :disabled="page === '...'"
               />
             </div>
             
@@ -227,8 +228,8 @@
               round
               dense
               icon="fa-solid fa-chevron-right"
-              :disable="currentPage === totalPages - 1"
-              @click="nextPage"
+              :disable="store.paginaActual === store.totalPaginas - 1"
+              @click="store.siguientePagina"
               class="specialty-pagination-btn"
               color="primary"
             />
@@ -236,7 +237,7 @@
           
           <div class="specialty-pagination-info">
             <i class="fa-solid fa-info-circle"></i>
-            Página {{ currentPage + 1 }} de {{ totalPages }} • Mostrando {{ currentPageSpecialities.length }} de {{ filteredSpecialities.length }}
+            Página {{ store.paginaActual + 1 }} de {{ store.totalPaginas }} • Mostrando {{ store.especialidadesPaginaActual.length }} de {{ store.searchResults.length }}
           </div>
         </div>
       </div>
@@ -272,7 +273,7 @@
 
         <q-card-section class="q-pt-none">
           <p class="specialty-dialog-text">
-            ¿Está seguro que desea eliminar la especialidad <strong>{{ selectedSpeciality?.name }}</strong>?
+            ¿Está seguro que desea eliminar la especialidad <strong>{{ selectedSpeciality?.nombre }}</strong>?
           </p>
           <p class="specialty-dialog-subtext">
             Esta acción no se puede deshacer y la especialidad dejará de estar disponible en el sistema.
@@ -304,8 +305,8 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue'
-import { useSpecialityStore } from 'src/stores/especialidadStore'
+import { ref, onMounted } from 'vue'
+import { useEspecialidadStore } from 'src/stores/especialidadStore'
 import DetailSpecialityDialog from './DetailSpecialityDialog.vue'
 import EditSpecialityDialog from './EditSpecialityDialog.vue'
 import NewSpecialityDialog from './NewSpecialityDialog.vue'
@@ -318,26 +319,13 @@ export default {
     NewSpecialityDialog
   },
   setup() {
-    const store = useSpecialityStore()
+    const store = useEspecialidadStore()
 
-    const search = ref('')
     const showDetailDialog = ref(false)
     const showEditDialog = ref(false)
     const showNewDialog = ref(false)
     const showDeleteDialog = ref(false)
     const selectedSpeciality = ref(null)
-
-    const totalPages = computed(() => store.totalPages)
-    const currentPageSpecialities = computed(() => store.currentPageSpecialities)
-    const filteredSpecialities = computed(() => store.filteredSpecialities)
-    const visiblePages = computed(() => store.visiblePages)
-    const currentPage = computed(() => store.currentPage)
-    
-    const loadSpecialities = () => store.loadSpecialities()
-    const filterSpecialities = () => store.filterSpecialities(search.value)
-    const nextPage = () => store.nextPage()
-    const previousPage = () => store.previousPage()
-    const goToPage = (page) => store.goToPage(page)
 
     const truncateText = (text, maxLength) => {
       if (!text) return ''
@@ -368,40 +356,34 @@ export default {
       showDeleteDialog.value = true
     }
 
-    const deleteSpeciality = () => {
+    const deleteSpeciality = async () => {
       if (selectedSpeciality.value) {
-        store.deleteSpeciality(selectedSpeciality.value.id)
+        await store.eliminarEspecialidad(selectedSpeciality.value.id)
+        // No necesitas recargar porque el store ya actualiza el estado
       }
     }
 
-    const handleSpecialityUpdate = (updatedSpeciality) => {
-      store.updateSpeciality(updatedSpeciality)
+    const handleSpecialityUpdate = async (updatedSpeciality) => {
+      await store.actualizarEspecialidad(updatedSpeciality)
+      showEditDialog.value = false
     }
 
-    const handleSpecialityCreate = (newSpeciality) => {
-      store.createSpeciality(newSpeciality)
+    const handleSpecialityCreate = async (newSpeciality) => {
+      await store.crearEspecialidad(newSpeciality)
+      showNewDialog.value = false
     }
 
     onMounted(() => {
-      loadSpecialities()
+      store.cargarEspecialidades()
     })
 
     return {
-      search,
+      store,
       selectedSpeciality,
       showDetailDialog,
       showEditDialog,
       showNewDialog,
       showDeleteDialog,
-      totalPages,
-      currentPageSpecialities,
-      filteredSpecialities,
-      visiblePages,
-      currentPage,
-      filterSpecialities,
-      nextPage,
-      previousPage,
-      goToPage,
       truncateText,
       handleImageError,
       viewSpeciality,
@@ -415,4 +397,3 @@ export default {
   }
 }
 </script>
-

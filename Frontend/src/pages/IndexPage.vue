@@ -167,13 +167,21 @@
         </div>
         
         <!-- Loading State -->
-        <div v-if="anuncioStore.filteredRows.length === 0" class="home-empty-state">
+        <div v-if="loading" class="home-empty-state">
+          <div class="home-empty-illustration">
+            <q-spinner-gears color="primary" size="80px" />
+          </div>
+          <div class="home-empty-title">Cargando anuncios...</div>
+        </div>
+        
+        <!-- Empty State -->
+        <div v-else-if="anunciosActivos.length === 0" class="home-empty-state">
           <div class="home-empty-illustration">
             <q-icon name="campaign" size="80px" />
             <div class="home-empty-circle home-empty-circle-1"></div>
             <div class="home-empty-circle home-empty-circle-2"></div>
           </div>
-          <div class="home-empty-title">No hay anuncios disponibles</div>
+          <div class="home-empty-title">No hay anuncios activos disponibles</div>
           <p class="home-empty-text">Próximamente tendremos nuevas promociones para ti.</p>
         </div>
         
@@ -189,12 +197,18 @@
               <div class="home-anuncio-image-wrapper">
                 <div class="home-anuncio-gradient"></div>
                 <q-img 
-                  :src="anuncio.imagen || '/default-ad.jpg'" 
+                  :src="anuncioStore.getImagePath(anuncio.imagen) || '/default-ad.jpg'" 
                   :alt="anuncio.titulo" 
                   class="home-anuncio-image"
                   @error="anuncioStore.handleImageError"
                   ratio="1"
-                />
+                >
+                  <template v-slot:loading>
+                    <div class="absolute-full flex flex-center bg-grey-2">
+                      <q-spinner-gears color="primary" size="30px" />
+                    </div>
+                  </template>
+                </q-img>
                 <div class="home-anuncio-overlay">
                   <div class="home-anuncio-overlay-content">
                     <div class="home-overlay-icon-wrapper">
@@ -228,7 +242,12 @@
                 <div class="home-anuncio-footer">
                   <div class="home-anuncio-date">
                     <q-icon name="event" size="18px" />
-                    <span>Válido hasta: {{ anuncioStore.formatDate(anuncio.fecha_expiracion) }}</span>
+                    <span v-if="anuncio.fecha_expiracion">
+                      Válido hasta: {{ anuncioStore.formatDate(anuncio.fecha_expiracion) }}
+                    </span>
+                    <span v-else>
+                      Sin fecha de expiración
+                    </span>
                   </div>
                   
                   <q-btn
@@ -338,7 +357,7 @@
               </div>
             </div>
             <div class="col-auto">
-              <q-btn icon="close" flat round dense v-close-popup color="white" size="md" />
+              <q-btn icon="close" flat round dense @click="anuncioDialog = false" color="white" size="md" />
             </div>
           </div>
         </q-card-section>
@@ -348,11 +367,17 @@
             <div class="col-12 col-md-6">
               <div class="home-dialog-image-wrapper">
                 <q-img
-                  :src="selectedAnuncio.imagen || '/default-ad.jpg'"
+                  :src="anuncioStore.getImagePath(selectedAnuncio.imagen) || '/default-ad.jpg'"
                   :alt="selectedAnuncio.titulo"
                   class="home-dialog-image"
                   @error="anuncioStore.handleImageError"
-                />
+                >
+                  <template v-slot:loading>
+                    <div class="absolute-full flex flex-center bg-grey-2">
+                      <q-spinner-gears color="primary" size="50px" />
+                    </div>
+                  </template>
+                </q-img>
               </div>
               
               <!-- Información adicional -->
@@ -376,7 +401,25 @@
                     </q-item-section>
                     <q-item-section>
                       <q-item-label caption class="home-meta-label">Válido hasta</q-item-label>
-                      <q-item-label class="home-meta-value">{{ anuncioStore.formatDate(selectedAnuncio.fecha_expiracion) }}</q-item-label>
+                      <q-item-label class="home-meta-value">
+                        {{ selectedAnuncio.fecha_expiracion ? anuncioStore.formatDate(selectedAnuncio.fecha_expiracion) : 'Sin fecha' }}
+                      </q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  
+                  <q-separator />
+                  
+                  <q-item class="home-meta-item">
+                    <q-item-section avatar>
+                      <q-avatar color="blue-1" text-color="blue" icon="info" size="48px" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label caption class="home-meta-label">Estado</q-item-label>
+                      <q-item-label class="home-meta-value">
+                        <q-badge :color="selectedAnuncio.estado === 'activo' ? 'positive' : 'negative'">
+                          {{ anuncioStore.formatState(selectedAnuncio.estado) }}
+                        </q-badge>
+                      </q-item-label>
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -422,6 +465,7 @@
                     outline
                     no-caps
                     class="home-action-btn-secondary"
+                    @click="shareAnuncio"
                   />
                 </div>
               </div>
@@ -436,34 +480,53 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useQuasar } from 'quasar'
-import { usePublicarAnuncio } from 'src/stores/publicarAnuncio'
+import { useAnuncioStore } from 'src/stores/anuncioStore'
 import AppointmentModal from 'components/AppointmentModal.vue'
 
 const $q = useQuasar()
-const anuncioStore = usePublicarAnuncio()
+const anuncioStore = useAnuncioStore()
 
 // Datos reactivos
 const appointmentDialog = ref(false)
 const anuncioDialog = ref(false)
 const selectedAnuncio = ref(null)
+const loading = ref(true)
 
-// Computed properties
+// Computed properties - Solo anuncios activos que no han expirado
 const anunciosActivos = computed(() => {
-  return anuncioStore.filteredRows.filter(anuncio => {
+  const anuncios = anuncioStore.filteredAnuncios || []
+  const hoy = new Date()
+  
+  return anuncios.filter(anuncio => {
+    // Verificar que el anuncio esté activo
     if (anuncio.estado !== 'activo') return false
     
+    // Verificar si la fecha de expiración ha pasado
     if (anuncio.fecha_expiracion) {
-      const hoy = new Date()
-      const expiracion = new Date(anuncio.fecha_expiracion)
-      return expiracion >= hoy
+      const fechaExpiracion = new Date(anuncio.fecha_expiracion)
+      // Si la fecha de expiración es en el pasado, no mostrar
+      if (fechaExpiracion < hoy) return false
     }
     
     return true
   })
 })
 
-onMounted(() => {
-  anuncioStore.initialize()
+onMounted(async () => {
+  loading.value = true
+  try {
+    // Cargar anuncios desde el store
+    await anuncioStore.listar()
+  } catch (error) {
+    console.error('Error cargando anuncios:', error)
+    $q.notify({
+      type: 'negative',
+      message: 'Error al cargar los anuncios',
+      position: 'top-right'
+    })
+  } finally {
+    loading.value = false
+  }
 })
 
 const openAppointmentDialog = () => {
@@ -478,6 +541,26 @@ const openAnuncioDetail = (anuncio) => {
 const openAppointmentDialogFromDetail = () => {
   anuncioDialog.value = false
   appointmentDialog.value = true
+}
+
+const shareAnuncio = () => {
+  if (navigator.share && selectedAnuncio.value) {
+    navigator.share({
+      title: selectedAnuncio.value.titulo,
+      text: selectedAnuncio.value.descripcion,
+      url: window.location.href
+    })
+  } else {
+    // Fallback: copiar al portapapeles
+    navigator.clipboard.writeText(
+      `${selectedAnuncio.value.titulo}\n${selectedAnuncio.value.descripcion}\n${window.location.href}`
+    )
+    $q.notify({
+      type: 'info',
+      message: 'Enlace copiado al portapapeles',
+      position: 'top-right'
+    })
+  }
 }
 
 const truncateDescription = (description) => {

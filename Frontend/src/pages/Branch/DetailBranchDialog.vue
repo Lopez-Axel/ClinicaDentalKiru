@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="showDialog" persistent maximized>
+  <q-dialog v-model="sucursalStore.showDetailDialog" persistent maximized>
     <q-card class="branch-detail-card">
 
       <!-- 🟦 ENCABEZADO -->
@@ -15,7 +15,7 @@
             round
             dense
             icon="fa-solid fa-times"
-            v-close-popup
+            @click="sucursalStore.closeDetailDialog"
             class="close-btn"
           />
         </div>
@@ -33,11 +33,11 @@
             <!-- 📷 Imagen de la Sucursal -->
             <div class="detail-image-container">
               <img
-                v-if="branchData?.imagen"
-                :src="branchData.imagen"
-                :alt="branchData.nombre"
+                v-if="sucursalStore.selectedBranch?.imagen"
+                :src="sucursalStore.getImagePath(sucursalStore.selectedBranch.imagen)"
+                :alt="sucursalStore.selectedBranch.nombre"
                 class="detail-image"
-                @error="handleImageError"
+                @error="sucursalStore.handleImageError"
               />
               <div v-else class="detail-image-placeholder">
                 <i class="fa-solid fa-building"></i>
@@ -47,7 +47,7 @@
             <!-- 🏢 Información General -->
             <div class="info-card">
               <h2 class="branch-detail-name">
-                {{ branchData?.nombre || 'Sin nombre' }}
+                {{ sucursalStore.selectedBranch?.nombre || 'Sin nombre' }}
               </h2>
 
               <!-- Ubicación -->
@@ -56,7 +56,7 @@
                 <div>
                   <div class="info-label">Ubicación</div>
                   <div class="info-value">
-                    {{ branchData?.ubicacion || 'N/A' }}
+                    {{ sucursalStore.selectedBranch?.ubicacion || 'N/A' }}
                   </div>
                 </div>
               </div>
@@ -67,7 +67,7 @@
                 <div>
                   <div class="info-label">Dirección</div>
                   <div class="info-value">
-                    {{ branchData?.direccion || 'N/A' }}
+                    {{ sucursalStore.selectedBranch?.direccion || 'N/A' }}
                   </div>
                 </div>
               </div>
@@ -78,7 +78,7 @@
                 <div>
                   <div class="info-label">Descripción</div>
                   <div class="info-value text-justify">
-                    {{ branchData?.descripcion || 'Sin descripción' }}
+                    {{ sucursalStore.selectedBranch?.descripcion || 'Sin descripción' }}
                   </div>
                 </div>
               </div>
@@ -90,11 +90,11 @@
                   <div class="info-label">Estado</div>
                   <div class="info-value">
                     <q-chip
-                      :color="branchData?.activo ? 'green' : 'red'"
+                      :color="sucursalStore.selectedBranch?.activo ? 'green' : 'red'"
                       text-color="white"
                       dense
                     >
-                      {{ branchData?.activo ? 'Activo' : 'Inactivo' }}
+                      {{ sucursalStore.selectedBranch?.activo ? 'Activo' : 'Inactivo' }}
                     </q-chip>
                   </div>
                 </div>
@@ -111,14 +111,14 @@
               <div class="detail-info-item">
                 <div class="info-label">Latitud</div>
                 <div class="info-value">
-                  {{ branchData?.latitud || 'N/A' }}
+                  {{ sucursalStore.selectedBranch?.latitud || 'N/A' }}
                 </div>
               </div>
 
               <div class="detail-info-item">
                 <div class="info-label">Longitud</div>
                 <div class="info-value">
-                  {{ branchData?.longitud || 'N/A' }}
+                  {{ sucursalStore.selectedBranch?.longitud || 'N/A' }}
                 </div>
               </div>
             </div>
@@ -135,12 +135,12 @@
 
               <div class="map-container">
                 <iframe
-                  v-if="branchData?.latitud && branchData?.longitud"
-                  :src="`https://www.google.com/maps?q=${branchData.latitud},${branchData.longitud}&hl=es&z=15&output=embed`"
+                  v-if="sucursalStore.selectedBranch?.latitud && sucursalStore.selectedBranch?.longitud"
+                  :src="`https://www.google.com/maps?q=${sucursalStore.selectedBranch.latitud},${sucursalStore.selectedBranch.longitud}&hl=es&z=15&output=embed`"
                   width="100%"
                   height="100%"
                   style="border:0;"
-                  allowfullscreen=""
+                  allowfullscreen
                   loading="lazy"
                   referrerpolicy="no-referrer-when-downgrade"
                 ></iframe>
@@ -163,7 +163,7 @@
           flat
           label="Cerrar"
           icon="fa-solid fa-times"
-          v-close-popup
+          @click="sucursalStore.closeDetailDialog"
           class="secondary-btn"
           no-caps
         />
@@ -182,38 +182,21 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { useSucursalStore } from 'src/stores/sucursalStore'
 
 export default {
   name: 'DetailBranchDialog',
-  props: {
-    modelValue: Boolean,
-    branchData: Object
-  },
-  emits: ['update:modelValue', 'edit-branch', 'close'],
-  setup(props, { emit }) {
-    const showDialog = computed({
-      get: () => props.modelValue,
-      set: (value) => emit('update:modelValue', value)
-    })
-
-    const handleImageError = (event) => {
-      event.target.style.display = 'none'
-    }
+  emits: ['edit-branch'],
+  setup(_, { emit }) {
+    const sucursalStore = useSucursalStore()
 
     const editBranch = () => {
-      emit('edit-branch', props.branchData)
-    }
-
-    const closeDialog = () => {
-      emit('close')
+      emit('edit-branch', sucursalStore.selectedBranch)
     }
 
     return {
-      showDialog,
-      handleImageError,
-      editBranch,
-      closeDialog
+      sucursalStore,
+      editBranch
     }
   }
 }

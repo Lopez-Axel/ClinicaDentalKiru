@@ -20,7 +20,7 @@
 
       <q-separator />
 
-      <q-form @submit="saveDentist" class="form-container">
+      <q-form @submit.prevent="saveDentist" class="form-container">
         <q-card-section class="dialog-content">
           <div class="form-fields">
             <div class="field-group">
@@ -30,7 +30,7 @@
                 <span class="required">*</span>
               </label>
               <q-input
-                v-model="form.name"
+                v-model="form.nombre"
                 filled
                 dense
                 :rules="[val => !!val || 'El nombre es requerido']"
@@ -45,7 +45,7 @@
                 <span>Segundo Nombre</span>
               </label>
               <q-input
-                v-model="form.second_name"
+                v-model="form.segundo_nombre"
                 filled
                 dense
                 class="form-input"
@@ -60,7 +60,7 @@
                 <span class="required">*</span>
               </label>
               <q-input
-                v-model="form.father_last_name"
+                v-model="form.apellido_paterno"
                 filled
                 dense
                 :rules="[val => !!val || 'El apellido paterno es requerido']"
@@ -75,7 +75,7 @@
                 <span>Apellido Materno</span>
               </label>
               <q-input
-                v-model="form.mother_last_name"
+                v-model="form.apellido_materno"
                 filled
                 dense
                 class="form-input"
@@ -87,35 +87,21 @@
               <label class="field-label">
                 <i class="fa-solid fa-graduation-cap"></i>
                 <span>Especialidades</span>
-                <span class="required">*</span>
               </label>
               <q-select
-                v-model="form.speciality"
+                v-model="especialidadesSeleccionadas"
                 filled
                 dense
                 multiple
                 :options="specialtyOptions"
+                option-value="value"
+                option-label="label"
                 emit-value
                 map-options
                 use-chips
-                :rules="[val => val && val.length > 0 || 'Seleccione al menos una especialidad']"
                 class="form-input"
                 placeholder="Seleccione las especialidades"
-              />
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">
-                <i class="fa-solid fa-user-tag"></i>
-                <span>Usuario del Sistema</span>
-              </label>
-              <q-input
-                v-model.number="form.userId"
-                filled
-                dense
-                type="number"
-                class="form-input"
-                placeholder="ID del usuario asignado"
+                :loading="gestionStore.cargando"
               />
             </div>
 
@@ -126,7 +112,7 @@
                 <span class="required">*</span>
               </label>
               <q-select
-                v-model="form.state"
+                v-model="form.estado"
                 filled
                 dense
                 :options="stateOptions"
@@ -144,10 +130,10 @@
                 <span>Foto del Dentista</span>
               </label>
               
-              <div v-if="form.img && !newImageFile" style="margin-bottom: 10px;">
+              <div v-if="form.imagen && !newImageFile" style="margin-bottom: 10px;">
                 <div style="display: flex; align-items: center; gap: 10px;">
                   <q-avatar size="60px">
-                    <img :src="form.img" alt="Preview" />
+                    <img :src="getImageUrl(form.imagen)" alt="Preview" />
                   </q-avatar>
                   <q-btn
                     flat
@@ -210,8 +196,9 @@
 </template>
 
 <script>
-import { ref, computed, watch } from 'vue'
-import especialidades from 'src/data/especialidades.json'
+import { ref, computed, watch, onMounted } from 'vue'
+import { useDentistaGestionStore } from 'src/stores/dentistaGestionStore'
+import { useEspecialidadStore } from 'src/stores/especialidadStore'
 
 export default {
   name: 'EditDentistDialog',
@@ -227,32 +214,35 @@ export default {
   },
   emits: ['update:modelValue', 'dentist-updated'],
   setup(props, { emit }) {
+    const gestionStore = useDentistaGestionStore()
+    const especialidadStore = useEspecialidadStore()
     const loading = ref(false)
     const newImageFile = ref(null)
     const imagePreview = ref(null)
+    const especialidadesSeleccionadas = ref([])
     
     const form = ref({
       id: null,
-      name: '',
-      second_name: '',
-      father_last_name: '',
-      mother_last_name: '',
-      speciality: [],
-      userId: null,
-      state: '',
-      img: null
+      nombre: '',
+      segundo_nombre: '',
+      apellido_paterno: '',
+      apellido_materno: '',
+      estado: 'activo',
+      imagen: null
     })
 
-    const specialtyOptions = especialidades.especialidades
-      .filter(spec => spec.state === 'active')
-      .map(spec => ({
-        label: spec.name,
-        value: spec.id
-      }))
+    const specialtyOptions = computed(() => 
+      especialidadStore.especialidades
+        .filter(spec => spec.estado === 'activo')
+        .map(spec => ({
+          label: spec.nombre,
+          value: spec.id
+        }))
+    )
 
     const stateOptions = [
-      { label: 'Activo', value: 'active' },
-      { label: 'Inactivo', value: 'inactive' }
+      { label: 'Activo', value: 'activo' },
+      { label: 'Inactivo', value: 'inactivo' }
     ]
 
     const showDialog = computed({
@@ -264,32 +254,31 @@ export default {
       if (props.dentistData) {
         form.value = {
           id: props.dentistData.id,
-          name: props.dentistData.name || '',
-          second_name: props.dentistData.second_name || '',
-          father_last_name: props.dentistData.father_last_name || '',
-          mother_last_name: props.dentistData.mother_last_name || '',
-          speciality: props.dentistData.speciality || [],
-          userId: props.dentistData.userId || null,
-          state: props.dentistData.state || 'active',
-          img: props.dentistData.img || null
+          nombre: props.dentistData.nombre || '',
+          segundo_nombre: props.dentistData.segundo_nombre || '',
+          apellido_paterno: props.dentistData.apellido_paterno || '',
+          apellido_materno: props.dentistData.apellido_materno || '',
+          estado: props.dentistData.estado || 'activo',
+          imagen: props.dentistData.imagen || null
         }
+        // Cargar especialidades del dentista
+        especialidadesSeleccionadas.value = props.dentistData.especialidades?.map(e => e.id) || []
       }
     }
 
     const resetForm = () => {
       form.value = {
         id: null,
-        name: '',
-        second_name: '',
-        father_last_name: '',
-        mother_last_name: '',
-        speciality: [],
-        userId: null,
-        state: 'active',
-        img: null
+        nombre: '',
+        segundo_nombre: '',
+        apellido_paterno: '',
+        apellido_materno: '',
+        estado: 'activo',
+        imagen: null
       }
       newImageFile.value = null
       imagePreview.value = null
+      especialidadesSeleccionadas.value = []
     }
 
     const closeDialog = () => {
@@ -310,45 +299,83 @@ export default {
     }
 
     const removeCurrentImage = () => {
-      form.value.img = null
+      form.value.imagen = null
+      newImageFile.value = null
+      imagePreview.value = null
+    }
+
+    const getImageUrl = (imagen) => {
+      if (!imagen) return ''
+      if (imagen.startsWith('http')) return imagen
+      return `http://localhost:5050${imagen}`
     }
 
     const saveDentist = async () => {
+      // Prevenir múltiples envíos
+      if (loading.value) {
+        console.log('Ya hay una operación en curso, ignorando...')
+        return
+      }
+
+      // Validación básica
+      if (!form.value.nombre?.trim() || !form.value.apellido_paterno?.trim()) {
+        alert('Nombre y apellido paterno son requeridos')
+        return
+      }
+
+      if (!form.value.id) {
+        alert('Error: No se encontró el ID del dentista')
+        return
+      }
+
       loading.value = true
       
       try {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        let imagePath = form.value.img
-
-        // Si hay nueva imagen, generar ruta
-        if (newImageFile.value) {
-          const timestamp = Date.now()
-          const fileName = `dentist_${form.value.id}_${timestamp}.${newImageFile.value.name.split('.').pop()}`
-          imagePath = `/dentists/${fileName}`
-          
-          // Aquí en producción subirías el archivo al servidor
-          console.log('Imagen a guardar:', fileName, 'en /public/dentists/')
+        const datosDentista = {
+          nombre: form.value.nombre.trim(),
+          segundo_nombre: form.value.segundo_nombre?.trim() || '',
+          apellido_paterno: form.value.apellido_paterno.trim(),
+          apellido_materno: form.value.apellido_materno?.trim() || '',
+          estado: form.value.estado
         }
 
-        const updatedDentist = {
-          ...props.dentistData,
-          name: form.value.name,
-          second_name: form.value.second_name,
-          father_last_name: form.value.father_last_name,
-          mother_last_name: form.value.mother_last_name,
-          speciality: form.value.speciality,
-          userId: form.value.userId,
-          state: form.value.state,
-          img: imagePath
+        console.log('Actualizando dentista:', {
+          id: form.value.id,
+          datos: datosDentista,
+          especialidades: especialidadesSeleccionadas.value,
+          tieneImagenNueva: !!newImageFile.value
+        })
+
+        // Usar el store de gestión que maneja todo (dentista + especialidades)
+        const dentistaActualizado = await gestionStore.actualizarDentistaCompleto(
+          form.value.id,
+          datosDentista,
+          especialidadesSeleccionadas.value,
+          newImageFile.value
+        )
+
+        if (!dentistaActualizado) {
+          throw new Error('No se pudo actualizar el dentista')
         }
 
-        emit('dentist-updated', updatedDentist)
+        console.log('Dentista actualizado exitosamente:', dentistaActualizado)
+        emit('dentist-updated', dentistaActualizado)
         closeDialog()
       } catch (error) {
         console.error('Error updating dentist:', error)
+        const errorMessage = error.response?.data?.error?.message || 
+                           error.response?.data?.message || 
+                           error.message || 
+                           'Error al actualizar el dentista'
+        alert(errorMessage)
       } finally {
         loading.value = false
+      }
+    }
+
+    const loadEspecialidades = async () => {
+      if (especialidadStore.especialidades.length === 0) {
+        await especialidadStore.cargarEspecialidades()
       }
     }
 
@@ -361,7 +388,12 @@ export default {
     watch(() => props.modelValue, (newValue) => {
       if (newValue) {
         initializeForm()
+        loadEspecialidades()
       }
+    })
+
+    onMounted(() => {
+      loadEspecialidades()
     })
 
     return {
@@ -372,10 +404,13 @@ export default {
       loading,
       newImageFile,
       imagePreview,
+      especialidadesSeleccionadas,
+      gestionStore,
       closeDialog,
       saveDentist,
       handleImageSelect,
-      removeCurrentImage
+      removeCurrentImage,
+      getImageUrl
     }
   }
 }

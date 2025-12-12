@@ -1,4 +1,4 @@
-const pool = require('../database2');
+const pool = require('../database');
 
 class UsuarioModel {
 

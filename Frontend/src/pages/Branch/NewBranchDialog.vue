@@ -1,6 +1,7 @@
 <template>
   <q-dialog v-model="showDialog" persistent maximized>
     <q-card class="new-dialog">
+      <!-- Header -->
       <q-card-section class="dialog-header">
         <div class="header-content">
           <div class="header-title">
@@ -20,7 +21,8 @@
 
       <q-separator />
 
-      <q-form @submit="createBranch" class="form-container">
+      <!-- Form -->
+      <q-form @submit.prevent="createBranch" class="form-container">
         <q-card-section class="dialog-content" style="overflow-y: auto;">
           <div class="welcome-message" style="max-width: 800px; margin: 0 auto 30px;">
             <i class="fa-solid fa-info-circle"></i>
@@ -42,10 +44,7 @@
                   v-model="form.nombre"
                   filled
                   dense
-                  :rules="[
-                    val => !!val || 'El nombre es requerido',
-                    val => val.length >= 3 || 'Mínimo 3 caracteres'
-                  ]"
+                  :rules="[val => !!val || 'El nombre es requerido', val => val.length >= 3 || 'Mínimo 3 caracteres']"
                   class="form-input"
                   placeholder="Ej: Sucursal Centro"
                 />
@@ -101,6 +100,7 @@
                 />
               </div>
 
+              <!-- Imagen -->
               <div class="field-group">
                 <label class="field-label">
                   <i class="fa-solid fa-image"></i>
@@ -113,7 +113,7 @@
                   dense
                   accept="image/*"
                   class="form-input"
-                  @update:model-value="handleImageSelect"
+                  @change="handleImageSelect"
                 >
                   <template v-slot:prepend>
                     <i class="fa-solid fa-camera"></i>
@@ -143,8 +143,6 @@
                   color="positive"
                   checked-icon="fa-solid fa-check"
                   unchecked-icon="fa-solid fa-xmark"
-                  :true-value="true"
-                  :false-value="false"
                 />
               </div>
             </div>
@@ -199,7 +197,7 @@
                       width="100%"
                       height="150"
                       style="border:0; border-radius: 8px;"
-                      allowfullscreen=""
+                      allowfullscreen
                       loading="lazy"
                       referrerpolicy="no-referrer-when-downgrade"
                     ></iframe>
@@ -251,81 +249,98 @@
   </q-dialog>
 </template>
 
-<script>
-import { ref, computed } from 'vue'
+<script setup>
+import { ref, computed, watch } from 'vue'
+import { useSucursalStore } from 'src/stores/sucursalStore'
 
-export default {
-  name: 'NewBranchDialog',
-  props: {
-    modelValue: Boolean
-  },
-  emits: ['update:modelValue', 'branch-created', 'close'],
-  setup(props, { emit }) {
-    const loading = ref(false)
-    const imageFile = ref(null)
-    const imagePreview = ref(null)
+const props = defineProps({
+  modelValue: Boolean
+})
 
-    const form = ref({
-      nombre: '',
-      ubicacion: '',
-      direccion: '',
-      descripcion: '',
-      imagen: '',
-      latitud: -17.9758,
-      longitud: -67.1101,
-      activo: true
-    })
+const emit = defineEmits(['update:modelValue', 'branch-created', 'close'])
 
-    const showDialog = computed({
-      get: () => props.modelValue,
-      set: (value) => emit('update:modelValue', value)
-    })
+// Store
+const sucursalStore = useSucursalStore()
 
-    const closeDialog = () => {
-      emit('close')
-    }
+// Estado
+const loading = ref(false)
+const imageFile = ref(null)
+const imagePreview = ref(null)
 
-    const handleImageSelect = (file) => {
-      if (file) {
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          imagePreview.value = e.target.result
-        }
-        reader.readAsDataURL(file)
-      } else {
-        imagePreview.value = null
-      }
-    }
+const form = ref({
+  nombre: '',
+  ubicacion: '',
+  direccion: '',
+  descripcion: '',
+  imagen: '',
+  latitud: -17.9758,
+  longitud: -67.1101,
+  activo: true
+})
 
-    const removeImage = () => {
-      imageFile.value = null
-      imagePreview.value = null
-    }
+// Computed para el diálogo
+const showDialog = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value)
+})
 
-    const setDefaultLocation = () => {
-      form.value.latitud = -17.9758
-      form.value.longitud = -67.1101
-      form.value.ubicacion = 'Oruro'
-    }
+// Funciones
+const closeDialog = () => {
+  emit('close')
+  resetForm()
+}
 
-    const createBranch = async () => {
-      loading.value = true
-      // Lógica de creación...
-      emit('branch-created', form.value)
-    }
-
-    return {
-      showDialog,
-      form,
-      loading,
-      imageFile,
-      imagePreview,
-      closeDialog,
-      createBranch,
-      handleImageSelect,
-      removeImage,
-      setDefaultLocation
-    }
+const handleImageSelect = (file) => {
+  imageFile.value = file
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = (e) => (imagePreview.value = e.target.result)
+    reader.readAsDataURL(file)
+  } else {
+    imagePreview.value = null
   }
 }
+
+const removeImage = () => {
+  imageFile.value = null
+  imagePreview.value = null
+}
+
+const setDefaultLocation = () => {
+  form.value.latitud = -17.9758
+  form.value.longitud = -67.1101
+  form.value.ubicacion = 'Oruro'
+}
+
+const resetForm = () => {
+  form.value = {
+    nombre: '',
+    ubicacion: '',
+    direccion: '',
+    descripcion: '',
+    imagen: '',
+    latitud: -17.9758,
+    longitud: -67.1101,
+    activo: true
+  }
+  removeImage()
+}
+
+const createBranch = async () => {
+  loading.value = true
+  try {
+    const created = await sucursalStore.crear(form.value, imageFile.value)
+    emit('branch-created', created)
+    closeDialog()
+  } catch (err) {
+    console.error('Error al crear sucursal:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Si quieres limpiar la imagen si se cierra el diálogo externamente
+watch(showDialog, (val) => {
+  if (!val) resetForm()
+})
 </script>

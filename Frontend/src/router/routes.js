@@ -9,7 +9,7 @@ import DashboardLayout from 'layouts/DashboardLayout.vue'
 export const rolePermissions = {
   DENTIST: ['dashboard', 'patients', 'reserves', 'calendar', 'odontogram', 'quotes', 'historyQuotes'],
   CLIENT: ['dashboard', 'reserves', 'quotes', 'historyQuotes'],
-  ADMIN: ['dashboard', 'users', 'dentist', 'specialties', 'announcements', 'branches', 'patients', 'reserves', 'quotes', 'historyQuotes', 'calendar', 'odontogram', 'statistics', 'purchase']
+  ADMIN: ['dashboard', 'users', 'dentist', 'specialties', 'announcements', 'branches', 'patients', 'reserves', 'quotes', 'historyQuotes', 'calendar', 'odontogram', 'statistics', 'purchase', 'servicio']
 }
 
 /**
@@ -32,7 +32,8 @@ export const dashboardMenuConfig = {
         { title: 'Dentistas', icon: 'medical_services', to: '/dentist', permission: 'dentist' },
         { title: 'Especialidades', icon: 'school', to: '/specialties', permission: 'specialties' },
         { title: 'Anuncios', icon: 'article', to: '/announcement', permission: 'announcements' },
-        { title: 'Sucursales', icon: 'business', to: '/branches', permission: 'branches' }
+        { title: 'Sucursales', icon: 'business', to: '/branches', permission: 'branches' },
+        { title: 'Servicios', icon: 'medical_services', to: '/servicio', permission: 'servicio' }
       ]
     },
     {
@@ -103,7 +104,8 @@ export const dashboardMenuConfig = {
       children: [
         { title: 'Vista Mensual', icon: 'calendar_view_month', to: '/Calendar-Month', permission: 'calendar' },
         { title: 'Vista Semanal', icon: 'calendar_view_week', to: '/Calendar-Week', permission: 'calendar' },
-        { title: 'Vista Diaria', icon: 'calendar_view_day', to: '/Calendar-Day', permission: 'calendar' }
+        { title: 'Vista Diaria', icon: 'calendar_view_day', to: '/Calendar-Day', permission: 'calendar' },
+        { title: 'Servicios', icon: 'medical_services', to: '/servicios', permission: 'services' }
       ]
     },
     {
@@ -194,7 +196,7 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: () => import('pages/Auth/LoginPage.vue'),
-    meta: { 
+    meta: {
       requiresAuth: false,
       redirectIfAuthenticated: true // Redirigir al dashboard si ya está logueado
     }
@@ -204,7 +206,7 @@ const routes = [
     path: '/auth/callback',
     name: 'AuthCallback',
     component: () => import('pages/Auth/AuthCallback.vue'),
-    meta: { 
+    meta: {
       requiresAuth: false,
       redirectIfAuthenticated: true // Redirigir al dashboard si ya está logueado
     }
@@ -215,7 +217,7 @@ const routes = [
   {
     path: '/dashboard',
     component: DashboardLayout,
-    meta: { 
+    meta: {
       requiresAuth: true,
       roles: ['ADMIN', 'DENTIST', 'CLIENT']
     },
@@ -225,7 +227,7 @@ const routes = [
         path: '',
         name: 'Dashboard',
         component: () => import('pages/DashboardPage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['DENTIST', 'CLIENT', 'ADMIN'],
           title: 'Panel Principal'
@@ -237,7 +239,7 @@ const routes = [
         path: '/users',
         name: 'Users',
         component: () => import('pages/User/UserPage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['ADMIN'],
           title: 'Gestión de Usuarios'
@@ -247,7 +249,7 @@ const routes = [
         path: '/dentist',
         name: 'Dentists',
         component: () => import('pages/Dentist/DentistPage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['ADMIN'],
           title: 'Gestión de Dentistas'
@@ -257,7 +259,7 @@ const routes = [
         path: '/specialties',
         name: 'Specialties',
         component: () => import('pages/Specialties/SpecialityPage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['ADMIN'],
           title: 'Especialidades'
@@ -267,7 +269,7 @@ const routes = [
         path: '/Announcement',
         name: 'Announcements',
         component: () => import('pages/Announcement/AnnouncementPage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['ADMIN'],
           title: 'Anuncios'
@@ -277,7 +279,7 @@ const routes = [
         path: '/branches',
         name: 'Branches',
         component: () => import('pages/Branch/BranchPage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['ADMIN'],
           title: 'Sucursales'
@@ -289,7 +291,7 @@ const routes = [
         path: '/patients',
         name: 'Patients',
         component: () => import('pages/Patient/PatientPage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['DENTIST', 'ADMIN'],
           title: 'Pacientes'
@@ -301,7 +303,7 @@ const routes = [
         path: '/reserves',
         name: 'Reserves',
         component: () => import('pages/Reserve/ReservePage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['DENTIST', 'CLIENT', 'ADMIN'],
           title: 'Reservas'
@@ -313,7 +315,7 @@ const routes = [
         path: '/quotes',
         name: 'Quotes',
         component: () => import('pages/quotes/QuotesPage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['DENTIST', 'CLIENT', 'ADMIN'],
           title: 'Cotizaciones'
@@ -323,7 +325,7 @@ const routes = [
         path: '/HistoryQuotes',
         name: 'HistoryQuotes',
         component: () => import('pages/HistoryQuotes/HistoryQuotesPage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['DENTIST', 'CLIENT', 'ADMIN'],
           title: 'Historial de Cotizaciones'
@@ -335,7 +337,7 @@ const routes = [
         path: '/Calendar-Month',
         name: 'CalendarMonth',
         component: () => import('pages/Calendar/CalendarMonthPage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['DENTIST', 'ADMIN'],
           title: 'Calendario Mensual'
@@ -345,7 +347,7 @@ const routes = [
         path: '/Calendar-Week',
         name: 'CalendarWeek',
         component: () => import('pages/Calendar/CalendarWeekPage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['DENTIST', 'ADMIN'],
           title: 'Calendario Semanal'
@@ -355,7 +357,7 @@ const routes = [
         path: '/Calendar-Day',
         name: 'CalendarDay',
         component: () => import('pages/Calendar/CalendarDayPage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['DENTIST', 'ADMIN'],
           title: 'Calendario Diario'
@@ -367,7 +369,7 @@ const routes = [
         path: '/Odontogram',
         name: 'Odontogram',
         component: () => import('pages/Odontogram/OdontogramPage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['DENTIST', 'ADMIN'],
           title: 'Odontograma'
@@ -379,7 +381,7 @@ const routes = [
         path: '/purchase',
         name: 'Purchase',
         component: () => import('pages/Purchase/PurchasePage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['CLIENT', 'ADMIN'],
           title: 'Pagos'
@@ -387,16 +389,28 @@ const routes = [
       },
 
       // ESTADÍSTICAS - Solo ADMIN
-            {
+      {
         path: '/Statistics',
         name: 'Statistics',
         component: () => import('pages/Stadistic/StadisticsPage.vue'),
-        meta: { 
+        meta: {
           requiresAuth: true,
           roles: ['ADMIN'],
           title: 'Estadísticas'
         }
       },
+      // SERVICIOS - Solo ADMIN
+      {
+        path: '/servicio',
+        name: 'ServicioAdmin',
+        component: () => import('pages/Service/ServicioPage.vue'),
+        meta: {
+          requiresAuth: true,
+          roles: ['ADMIN'],  // solo admins pueden acceder
+          title: 'Gestión de Servicios'
+        }
+      }
+
     ]
   },
 
@@ -407,7 +421,7 @@ const routes = [
     path: '/unauthorized',
     name: 'Unauthorized',
     component: () => import('pages/UnauthorizedPage.vue'),
-    meta: { 
+    meta: {
       requiresAuth: false,
       title: 'Acceso Denegado'
     }

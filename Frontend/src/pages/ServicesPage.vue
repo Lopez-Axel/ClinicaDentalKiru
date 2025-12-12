@@ -83,16 +83,16 @@
                 <div class="serv-floating-card serv-floating-card-1">
                   <q-icon name="favorite" color="red" size="24px" />
                   <div class="serv-floating-text">
-                    <strong>100%</strong>
-                    <span>Satisfacción</span>
+                    <strong>{{ servicioStore.serviciosActivos.length }}</strong>
+                    <span>Servicios Activos</span>
                   </div>
                 </div>
                 
                 <div class="serv-floating-card serv-floating-card-2">
                   <q-icon name="star" color="amber" size="24px" />
                   <div class="serv-floating-text">
-                    <strong>20+</strong>
-                    <span>Servicios</span>
+                    <strong>{{ servicioStore.categoriasUnicas.length }}</strong>
+                    <span>Categorías</span>
                   </div>
                 </div>
                 
@@ -131,78 +131,99 @@
           </div>
         </div>
         
+        <!-- Filtro de búsqueda -->
+        <div class="q-mb-lg" v-if="serviciosActivos.length > 0">
+          <q-input
+            v-model="servicioStore.search"
+            outlined
+            type="search"
+            placeholder="Buscar servicios por título o categoría..."
+            @update:model-value="servicioStore.setSearch"
+            clearable
+            class="serv-search-input"
+          >
+            <template v-slot:prepend>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </div>
+        
         <div class="row q-col-gutter-lg">
           <div 
-            v-for="(service, index) in services" 
+            v-for="(service, index) in serviciosFiltrados" 
             :key="service.id" 
             class="col-12 col-sm-6 col-md-4 animated fadeInUp"
             :style="{ animationDelay: `${index * 0.1}s` }"
           >
-            <q-card class="serv-service-card" @click="openServiceDetail(service)">
+            <q-card class="serv-service-card">
               <div class="serv-service-image-wrapper">
                 <div class="serv-service-gradient"></div>
                 <q-img 
-                  :src="service.image" 
-                  :alt="service.title" 
+                  :src="servicioStore.getImagePath(service.imagen)" 
+                  :alt="service.titulo" 
                   class="serv-service-image"
                   ratio="1"
-                />
+                  @error="servicioStore.handleImageError"
+                >
+                  <template v-slot:error>
+                    <div class="serv-image-placeholder">
+                      <q-icon name="medical_services" size="48px" color="white" />
+                    </div>
+                  </template>
+                </q-img>
                 <div class="serv-service-overlay">
                   <div class="serv-service-overlay-content">
                     <div class="serv-overlay-icon-wrapper">
-                      <q-icon :name="service.icon" color="white" size="32px" />
+                      <q-icon name="medical_services" color="white" size="32px" />
                     </div>
-                    <p class="serv-overlay-text">Ver detalles completos</p>
+                    <p class="serv-overlay-text">Servicio Dental</p>
                   </div>
                 </div>
                 <div class="serv-service-badge">
                   <q-chip 
-                    :color="service.categoryColor" 
+                    :color="getCategoryColor(service.categoria)" 
                     text-color="white" 
                     size="md"
                     icon="label"
                     class="serv-category-chip"
                   >
-                    {{ service.category }}
+                    {{ service.categoria }}
                   </q-chip>
                 </div>
               </div>
               
               <q-card-section class="serv-service-content">
                 <div class="serv-service-title">
-                  {{ service.title }}
+                  {{ service.titulo }}
                 </div>
                 
                 <div class="serv-service-description">
-                  <p>{{ service.description }}</p>
+                  <p>{{ service.descripcion }}</p>
                 </div>
                 
                 <div class="serv-service-info">
                   <div class="serv-info-item">
                     <q-icon name="schedule" size="18px" />
-                    <span>{{ service.duration }}</span>
+                    <span>Duración personalizada</span>
                   </div>
                   <div class="serv-info-item">
-                    <q-icon name="attach_money" size="18px" />
-                    <span>{{ service.price }}</span>
+                    <q-icon name="check_circle" color="positive" size="18px" />
+                    <span>Disponible</span>
                   </div>
                 </div>
               </q-card-section>
               
               <q-separator />
               
-              <q-card-actions class="serv-service-actions">
-                <q-btn 
-                  flat 
-                  label="Más Detalles" 
-                  color="primary" 
-                  icon-right="arrow_forward"
-                  no-caps
-                  class="serv-details-btn"
-                />
-              </q-card-actions>
             </q-card>
           </div>
+        </div>
+
+        <!-- Estado vacío -->
+        <div v-if="serviciosActivos.length === 0" class="text-center q-pa-xl">
+          <q-icon name="medical_services" size="100px" color="grey-5" class="q-mb-md" />
+          <h4 class="text-grey-6">No hay servicios activos disponibles</h4>
+          <p class="text-grey-5">Pronto tendremos nuevos servicios para ti</p>
         </div>
       </q-container>
     </section>
@@ -270,143 +291,31 @@
       @cancel="onAppointmentCancel"
     />
 
-    <!-- Dialog de detalle del servicio -->
-    <q-dialog v-model="serviceDialog" maximized transition-show="slide-up" transition-hide="slide-down">
-      <q-card v-if="selectedService" class="serv-dialog-card">
-        <q-card-section class="serv-dialog-header bg-primary text-white">
-          <div class="row items-center">
-            <div class="col">
-              <div class="serv-dialog-title">{{ selectedService.title }}</div>
-              <div class="serv-dialog-category">
-                <q-icon name="label" size="16px" />
-                {{ selectedService.category }}
-              </div>
-            </div>
-            <div class="col-auto">
-              <q-btn icon="close" flat round dense v-close-popup color="white" size="md" />
-            </div>
-          </div>
+    <!-- Dialog para agendar cita específica -->
+    <q-dialog v-model="appointmentServiceDialog">
+      <q-card style="min-width: 400px">
+        <q-card-section>
+          <div class="text-h6">Agendar Cita</div>
+          <div class="text-subtitle2">Para: {{ selectedServiceForAppointment?.titulo }}</div>
         </q-card-section>
         
-        <q-card-section class="serv-dialog-content">
-          <div class="row q-col-gutter-xl">
-            <div class="col-12 col-md-6">
-              <div class="serv-dialog-image-wrapper">
-                <q-img
-                  :src="selectedService.image"
-                  :alt="selectedService.title"
-                  class="serv-dialog-image"
-                />
-              </div>
-              
-              <!-- Información del servicio -->
-              <div class="serv-dialog-info-card">
-                <h5 class="serv-info-card-title">
-                  <q-icon name="info" size="20px" />
-                  Información del Servicio
-                </h5>
-                
-                <q-list bordered class="rounded-borders">
-                  <q-item class="serv-info-item">
-                    <q-item-section avatar>
-                      <q-avatar color="primary-1" text-color="primary" icon="schedule" size="48px" />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label caption class="serv-info-label">Duración</q-item-label>
-                      <q-item-label class="serv-info-value">{{ selectedService.duration }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  
-                  <q-separator />
-                  
-                  <q-item class="serv-info-item">
-                    <q-item-section avatar>
-                      <q-avatar color="green-1" text-color="green" icon="attach_money" size="48px" />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label caption class="serv-info-label">Precio</q-item-label>
-                      <q-item-label class="serv-info-value">{{ selectedService.price }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  
-                  <q-separator />
-                  
-                  <q-item class="serv-info-item">
-                    <q-item-section avatar>
-                      <q-avatar color="amber-1" text-color="amber" icon="category" size="48px" />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label caption class="serv-info-label">Categoría</q-item-label>
-                      <q-item-label>
-                        <q-chip 
-                          :color="selectedService.categoryColor" 
-                          text-color="white" 
-                          size="md"
-                        >
-                          {{ selectedService.category }}
-                        </q-chip>
-                      </q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </div>
-            </div>
-            
-            <div class="col-12 col-md-6">
-              <div class="serv-dialog-text-content">
-                <h3 class="serv-detail-title">
-                  {{ selectedService.title }}
-                </h3>
-                
-                <div class="serv-detail-badge">
-                  <q-chip :color="selectedService.categoryColor" text-color="white" icon="label" size="lg">
-                    {{ selectedService.category }}
-                  </q-chip>
-                </div>
-                
-                <div class="serv-detail-description">
-                  <h5 class="serv-description-label">
-                    <q-icon name="description" size="20px" />
-                    Descripción del Tratamiento
-                  </h5>
-                  <p class="serv-description-text">{{ selectedService.description }}</p>
-                </div>
-                
-                <div class="serv-detail-features" v-if="selectedService.features">
-                  <h5 class="serv-features-label">
-                    <q-icon name="checklist" size="20px" />
-                    Características del Tratamiento
-                  </h5>
-                  <q-list bordered class="rounded-borders">
-                    <q-item 
-                      v-for="(feature, index) in selectedService.features" 
-                      :key="index"
-                      class="serv-feature-item"
-                    >
-                      <q-item-section avatar>
-                        <q-avatar color="green-1" text-color="green" icon="check_circle" size="32px" />
-                      </q-item-section>
-                      <q-item-section>
-                        <q-item-label class="serv-feature-text">{{ feature }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                  </q-list>
-                </div>
-                
-                <div class="serv-detail-actions">
-                  <q-btn 
-                    color="primary" 
-                    label="Agendar Cita" 
-                    size="lg"
-                    icon="calendar_today"
-                    @click="openAppointmentDialog"
-                    unelevated
-                    no-caps
-                    class="serv-action-btn"
-                  />
-                </div>
-              </div>
-            </div>
+        <q-card-section>
+          <p>¿Desea agendar una cita para este servicio?</p>
+          <div class="q-mt-md">
+            <q-btn 
+              color="primary" 
+              label="Sí, Agendar" 
+              @click="confirmAppointment"
+              unelevated
+              class="full-width q-mb-sm"
+            />
+            <q-btn 
+              flat 
+              label="Cancelar" 
+              color="grey" 
+              v-close-popup
+              class="full-width"
+            />
           </div>
         </q-card-section>
       </q-card>
@@ -415,33 +324,65 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
+import { useServicioStore } from 'src/stores/servicioStore'
 import AppointmentModal from 'components/AppointmentModal.vue'
-import serviciosData from 'src/data/servicios.json'
 
 const $q = useQuasar()
+const servicioStore = useServicioStore()
 
 // Datos reactivos
 const appointmentDialog = ref(false)
-const serviceDialog = ref(false)
-const selectedService = ref(null)
-const services = ref([])
+const appointmentServiceDialog = ref(false)
+const selectedServiceForAppointment = ref(null)
 
-// Cargar datos de servicios al montar el componente
-onMounted(() => {
-  services.value = serviciosData.servicios
+// Computed: Solo servicios activos
+const serviciosActivos = computed(() => {
+  return servicioStore.servicios.filter(servicio => servicio.estado === 'activo')
+})
+
+// Computed: Servicios filtrados (activos + búsqueda)
+const serviciosFiltrados = computed(() => {
+  if (!servicioStore.search.trim()) {
+    return serviciosActivos.value
+  }
+  return servicioStore.filteredServicios.filter(servicio => servicio.estado === 'activo')
 })
 
 // Métodos
 const openAppointmentDialog = () => {
-  serviceDialog.value = false
   appointmentDialog.value = true
 }
 
-const openServiceDetail = (service) => {
-  selectedService.value = service
-  serviceDialog.value = true
+const confirmAppointment = () => {
+  if (selectedServiceForAppointment.value) {
+    $q.notify({
+      type: 'positive',
+      message: `Cita agendada para: ${selectedServiceForAppointment.value.titulo}`,
+      icon: 'calendar_today'
+    })
+    appointmentServiceDialog.value = false
+    selectedServiceForAppointment.value = null
+  }
+}
+
+// Función para obtener color según categoría
+const getCategoryColor = (categoria) => {
+  const colors = {
+    'Odontología General': 'blue',
+    'Estética Dental': 'pink',
+    'Ortodoncia': 'teal',
+    'Implantes Dentales': 'orange',
+    'Endodoncia': 'purple',
+    'Periodoncia': 'green',
+    'Cirugía Oral': 'red',
+    'Prótesis Dental': 'amber',
+    'Limpieza Dental': 'light-blue',
+    'Blanqueamiento': 'cyan',
+    'Emergencias Dentales': 'deep-orange'
+  }
+  return colors[categoria] || 'primary'
 }
 
 // Funciones para manejar eventos del modal de citas
@@ -464,4 +405,10 @@ const onHistory = () => {
 const onAppointmentCancel = () => {
   console.log('Cancelar modal de citas')
 }
+
+// Cargar servicios al montar el componente
+onMounted(() => {
+  servicioStore.listar()
+})
 </script>
+

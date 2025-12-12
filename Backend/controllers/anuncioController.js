@@ -28,7 +28,15 @@ const anuncioController = {
 
   crear: async (req, res) => {
     try {
-      const anuncio = req.body;
+      const { titulo, descripcion, categoria, fecha_publicacion, fecha_expiracion, userId, estado } = req.body;
+
+      const anuncio = { titulo, descripcion, categoria, fecha_publicacion, fecha_expiracion, userId, estado };
+
+      // Guardar imagen si se sube
+      if (req.file) {
+        anuncio.imagen = `/uploads/${req.file.filename}`;
+      }
+
       const nuevo = await AnuncioModel.crear(anuncio);
       res.status(201).json(nuevo);
     } catch (error) {
@@ -39,7 +47,26 @@ const anuncioController = {
   actualizar: async (req, res) => {
     try {
       const { id } = req.params;
-      const datos = req.body;
+      const anuncioExistente = await AnuncioModel.obtenerPorId(id);
+      if (!anuncioExistente) {
+        return res.status(404).json({ error: { message: 'Anuncio no encontrado' } });
+      }
+
+      const datos = {
+        titulo: req.body.titulo ?? anuncioExistente.titulo,
+        descripcion: req.body.descripcion ?? anuncioExistente.descripcion,
+        categoria: req.body.categoria ?? anuncioExistente.categoria,
+        fecha_publicacion: req.body.fecha_publicacion ?? anuncioExistente.fecha_publicacion,
+        fecha_expiracion: req.body.fecha_expiracion ?? anuncioExistente.fecha_expiracion,
+        userId: req.body.userId ?? anuncioExistente.userId,
+        estado: req.body.estado ?? anuncioExistente.estado,
+        imagen: anuncioExistente.imagen
+      };
+
+      if (req.file) {
+        datos.imagen = `/uploads/${req.file.filename}`;
+      }
+
       const actualizado = await AnuncioModel.actualizar(id, datos);
       res.json(actualizado);
     } catch (error) {

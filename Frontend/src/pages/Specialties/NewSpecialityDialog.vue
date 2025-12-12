@@ -20,7 +20,7 @@
 
       <q-separator />
 
-      <q-form ref="formRef" @submit="createSpeciality" class="form-container">
+      <q-form ref="formRef" @submit.prevent="createSpeciality" class="form-container">
         <q-card-section class="dialog-content">
           <div class="welcome-message">
             <i class="fa-solid fa-info-circle"></i>
@@ -35,7 +35,7 @@
                 <span class="required">*</span>
               </label>
               <q-input
-                v-model="form.name"
+                v-model="form.nombre"
                 filled
                 dense
                 :rules="[
@@ -54,7 +54,7 @@
                 <span class="required">*</span>
               </label>
               <q-input
-                v-model="form.description"
+                v-model="form.descripcion"
                 filled
                 dense
                 type="textarea"
@@ -86,7 +86,7 @@
             icon="fa-solid fa-tooth"
             :loading="loading"
             class="primary-btn"
-            :disable="!form.name || !form.description"
+            :disable="!form.nombre || !form.descripcion"
           />
         </q-card-actions>
       </q-form>
@@ -97,6 +97,7 @@
 <script>
 import { ref, computed } from 'vue'
 import { useQuasar } from 'quasar'
+import { useEspecialidadStore } from 'src/stores/especialidadStore'
 
 export default {
   name: 'NewSpecialityDialog',
@@ -106,15 +107,16 @@ export default {
       default: false
     }
   },
-  emits: ['update:modelValue', 'speciality-created'],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const $q = useQuasar()
+    const store = useEspecialidadStore()
     const loading = ref(false)
     const formRef = ref(null)
-    
+
     const form = ref({
-      name: '',
-      description: ''
+      nombre: '',
+      descripcion: ''
     })
 
     const showDialog = computed({
@@ -124,13 +126,10 @@ export default {
 
     const resetForm = () => {
       form.value = {
-        name: '',
-        description: ''
+        nombre: '',
+        descripcion: ''
       }
-      // Resetear validación del formulario
-      if (formRef.value) {
-        formRef.value.resetValidation()
-      }
+      if (formRef.value) formRef.value.resetValidation()
     }
 
     const closeDialog = () => {
@@ -139,9 +138,7 @@ export default {
     }
 
     const createSpeciality = async () => {
-      // Validar el formulario antes de proceder
       const isValid = await formRef.value.validate()
-      
       if (!isValid) {
         $q.notify({
           type: 'warning',
@@ -153,31 +150,25 @@ export default {
       }
 
       loading.value = true
-      
       try {
-        // Simular validación y procesamiento
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
         const newSpeciality = {
-          name: form.value.name.trim(),
-          description: form.value.description.trim()
-          // El store se encargará de agregar el id y state
+          nombre: form.value.nombre.trim(),
+          descripcion: form.value.descripcion.trim()
         }
 
-        emit('speciality-created', newSpeciality)
-        
-        // Mostrar mensaje de éxito
+        // Crear la especialidad directamente en el store
+        await store.crearEspecialidad(newSpeciality)
+
         $q.notify({
           type: 'positive',
-          message: `Especialidad "${newSpeciality.name}" creada correctamente`,
+          message: `Especialidad "${newSpeciality.nombre}" creada correctamente`,
           icon: 'fa-solid fa-check-circle',
           timeout: 3000
         })
 
         closeDialog()
       } catch (error) {
-        console.error('Error creating speciality:', error)
-        
+        console.error('Error creando especialidad:', error)
         $q.notify({
           type: 'negative',
           message: 'Error al crear la especialidad. Inténtelo nuevamente.',

@@ -30,7 +30,7 @@
                 <span class="required">*</span>
               </label>
               <q-input
-                v-model="form.name"
+                v-model="form.nombre"
                 filled
                 dense
                 :rules="[
@@ -49,7 +49,7 @@
                 <span class="required">*</span>
               </label>
               <q-input
-                v-model="form.description"
+                v-model="form.descripcion"
                 filled
                 dense
                 type="textarea"
@@ -81,7 +81,7 @@
             icon="fa-solid fa-save"
             :loading="loading"
             class="primary-btn"
-            :disable="!form.name || !form.description"
+            :disable="!form.nombre || !form.descripcion"
           />
         </q-card-actions>
       </q-form>
@@ -100,21 +100,21 @@ export default {
       type: Boolean,
       default: false
     },
-    specialityData: {
+    specialityData: {  // Cambiado de specialityId a specialityData
       type: Object,
-      default: () => null
+      default: () => ({})
     }
   },
-  emits: ['update:modelValue', 'speciality-updated'],
+  emits: ['update:modelValue', 'speciality-updated'],  // Agregado este emit
   setup(props, { emit }) {
     const $q = useQuasar()
     const loading = ref(false)
     const formRef = ref(null)
-    
+
     const form = ref({
       id: null,
-      name: '',
-      description: ''
+      nombre: '',
+      descripcion: ''
     })
 
     const showDialog = computed({
@@ -123,11 +123,11 @@ export default {
     })
 
     const initializeForm = () => {
-      if (props.specialityData) {
+      if (props.specialityData && props.specialityData.id) {
         form.value = {
           id: props.specialityData.id,
-          name: props.specialityData.name || '',
-          description: props.specialityData.description || ''
+          nombre: props.specialityData.nombre || '',
+          descripcion: props.specialityData.descripcion || ''
         }
       }
     }
@@ -135,12 +135,10 @@ export default {
     const resetForm = () => {
       form.value = {
         id: null,
-        name: '',
-        description: ''
+        nombre: '',
+        descripcion: ''
       }
-      if (formRef.value) {
-        formRef.value.resetValidation()
-      }
+      if (formRef.value) formRef.value.resetValidation()
     }
 
     const closeDialog = () => {
@@ -149,9 +147,7 @@ export default {
     }
 
     const saveSpeciality = async () => {
-      // Validar el formulario antes de proceder
       const isValid = await formRef.value.validate()
-      
       if (!isValid) {
         $q.notify({
           type: 'warning',
@@ -163,31 +159,26 @@ export default {
       }
 
       loading.value = true
-      
       try {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
+        // Emitir los datos actualizados al componente padre
         const updatedSpeciality = {
-          ...props.specialityData,
-          name: form.value.name.trim(),
-          description: form.value.description.trim()
-          // Mantenemos el id y state originales del store
+          id: form.value.id,
+          nombre: form.value.nombre.trim(),
+          descripcion: form.value.descripcion.trim()
         }
-
+        
         emit('speciality-updated', updatedSpeciality)
-
-        // Mostrar mensaje de éxito
+        
         $q.notify({
           type: 'positive',
-          message: `Especialidad "${updatedSpeciality.name}" actualizada correctamente`,
+          message: `Especialidad "${form.value.nombre}" actualizada correctamente`,
           icon: 'fa-solid fa-check-circle',
           timeout: 3000
         })
-
+        
         closeDialog()
       } catch (error) {
-        console.error('Error updating speciality:', error)
-        
+        console.error('Error en el diálogo de edición:', error)
         $q.notify({
           type: 'negative',
           message: 'Error al actualizar la especialidad. Inténtelo nuevamente.',
@@ -199,17 +190,16 @@ export default {
       }
     }
 
-    watch(() => props.specialityData, (newData) => {
-      if (newData) {
+    watch(() => props.modelValue, (val) => {
+      if (val) initializeForm()
+    })
+
+    // También observar cambios en specialityData
+    watch(() => props.specialityData, (val) => {
+      if (val && val.id) {
         initializeForm()
       }
     }, { immediate: true })
-
-    watch(() => props.modelValue, (newValue) => {
-      if (newValue) {
-        initializeForm()
-      }
-    })
 
     return {
       showDialog,

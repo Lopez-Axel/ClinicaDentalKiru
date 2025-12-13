@@ -45,6 +45,8 @@ export const servicioService = {
     });
   },
 
-  // Eliminar servicio
-  delete: (id) => axios.delete(`${API_URL}/${id}`)
+  // Activar/Desactivar servicio
+  toggleEstado: (id, estado) => {
+    return axios.patch(`${API_URL}/${id}/toggle-estado`, { estado });
+  }
 };

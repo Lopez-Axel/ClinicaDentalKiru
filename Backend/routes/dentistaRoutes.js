@@ -7,6 +7,6 @@ router.get('/', dentistaController.listar);
 router.get('/:id', dentistaController.obtenerPorId);
 router.post('/', upload.single('imagen'), dentistaController.crear);
 router.put('/:id', upload.single('imagen'), dentistaController.actualizar);
-router.delete('/:id', dentistaController.eliminar);
+router.patch('/:id/toggle-estado', dentistaController.toggleEstado);
 
 module.exports = router;

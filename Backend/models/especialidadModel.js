@@ -25,7 +25,9 @@ class EspecialidadModel {
     ];
 
     const [result] = await pool.query(sql, params);
-    return { id: result.insertId, ...especialidad };
+    // Devolver el objeto completo desde la base de datos
+    const [rows] = await pool.query('SELECT * FROM especialidad WHERE id = ?', [result.insertId]);
+    return rows[0];
   }
 
   static async actualizar(id, especialidad) {
@@ -43,12 +45,8 @@ class EspecialidadModel {
     ];
 
     await pool.query(sql, params);
-    return { id, ...especialidad };
-  }
-
-  static async eliminar(id) {
-    await pool.query('DELETE FROM especialidad WHERE id = ?', [id]);
-    return true;
+    const [rows] = await pool.query('SELECT * FROM especialidad WHERE id = ?', [id]);
+    return rows[0];
   }
 
 }

@@ -79,53 +79,58 @@
       </div>
     </div>
 
-    <div v-else class="dentist-table-container">
-      <div class="dentist-table-header">
-        <div class="dentist-table-title-section">
-          <h3 class="dentist-table-title">Lista de Dentistas</h3>
-          <div class="dentist-table-underline"></div>
-        </div>
-        <div class="dentist-results-count">
-          <span class="dentist-count-badge">
-            <i class="fa-solid fa-list-check"></i>
-            {{ filteredRows.length }} dentista{{ filteredRows.length !== 1 ? 's' : '' }}
-          </span>
-          <q-btn 
-            flat 
-            round 
-            icon="fa-solid fa-sync-alt" 
-            @click="loadDentistas"
-            :loading="store.cargando"
-            class="dentist-refresh-btn"
-            size="sm"
-          >
-            <q-tooltip>Actualizar lista</q-tooltip>
-          </q-btn>
-        </div>
-      </div>
-
-      <q-table
-        class="dentist-data-table"
-        flat
-        :rows="filteredRows"
-        :columns="columns"
-        row-key="id"
-        :rows-per-page-options="[5, 10, 15, 20, 0]"
-        :pagination="{ rowsPerPage: 10 }"
-        separator="cell"
-        :loading="store.cargando"
-      >
-        <template v-slot:no-data>
-          <div class="dentist-no-data-container">
-            <div class="dentist-no-data-illustration">
-              <i class="fa-solid fa-user-doctor-slash dentist-no-data-icon"></i>
-              <div class="dentist-no-data-circle dentist-no-data-circle-1"></div>
-              <div class="dentist-no-data-circle dentist-no-data-circle-2"></div>
-            </div>
-            <p class="dentist-no-data-text">No se encontraron dentistas</p>
-            <p class="dentist-no-data-subtext">Intenta ajustar los filtros de búsqueda o agrega un nuevo dentista</p>
+    <div v-else>
+      <!-- Dentistas Activos -->
+      <div class="dentist-table-container">
+        <div class="dentist-table-header">
+          <div class="dentist-table-title-section">
+            <h3 class="dentist-table-title">
+              <i class="fa-solid fa-check-circle" style="color: #4caf50; margin-right: 8px;"></i>
+              Dentistas Activos
+            </h3>
+            <div class="dentist-table-underline"></div>
           </div>
-        </template>
+          <div class="dentist-results-count">
+            <span class="dentist-count-badge">
+              <i class="fa-solid fa-list-check"></i>
+              {{ filteredActiveDentists.length }} dentista{{ filteredActiveDentists.length !== 1 ? 's' : '' }}
+            </span>
+            <q-btn 
+              flat 
+              round 
+              icon="fa-solid fa-sync-alt" 
+              @click="loadDentistas"
+              :loading="store.cargando"
+              class="dentist-refresh-btn"
+              size="sm"
+            >
+              <q-tooltip>Actualizar lista</q-tooltip>
+            </q-btn>
+          </div>
+        </div>
+
+        <q-table
+          class="dentist-data-table"
+          flat
+          :rows="filteredActiveDentists"
+          :columns="columns"
+          row-key="id"
+          :rows-per-page-options="[5, 10, 15, 20, 0]"
+          :pagination="{ rowsPerPage: 10 }"
+          separator="cell"
+          :loading="store.cargando"
+        >
+          <template v-slot:no-data>
+            <div class="dentist-no-data-container">
+              <div class="dentist-no-data-illustration">
+                <i class="fa-solid fa-user-doctor-slash dentist-no-data-icon"></i>
+                <div class="dentist-no-data-circle dentist-no-data-circle-1"></div>
+                <div class="dentist-no-data-circle dentist-no-data-circle-2"></div>
+              </div>
+              <p class="dentist-no-data-text">No hay dentistas activos</p>
+              <p class="dentist-no-data-subtext">Los dentistas activos aparecerán aquí</p>
+            </div>
+          </template>
 
         <template v-slot:body-cell-imagen="props">
           <q-td :props="props">
@@ -172,7 +177,6 @@
           </q-td>
         </template>
 
-        <!-- MODIFICADO: Solo 3 botones -->
         <template v-slot:body-cell-acciones="props">
           <q-td :props="props">
             <div class="dentist-actions-container">
@@ -204,12 +208,12 @@
                 flat 
                 dense 
                 round 
-                icon="fa-solid fa-trash" 
-                @click="confirmDeleteDentist(props.row)" 
-                color="negative"
+                icon="fa-solid fa-pause-circle" 
+                @click="toggleDentistStatus(props.row)" 
+                color="warning"
                 size="sm"
               >
-                <q-tooltip>Eliminar dentista</q-tooltip>
+                <q-tooltip>Desactivar dentista</q-tooltip>
               </q-btn>
             </div>
           </q-td>
@@ -217,48 +221,142 @@
       </q-table>
     </div>
 
+    <!-- Dentistas Inactivos -->
+    <div class="dentist-table-container" style="margin-top: 40px;">
+      <div class="dentist-table-header">
+        <div class="dentist-table-title-section">
+          <h3 class="dentist-table-title">
+            <i class="fa-solid fa-pause-circle" style="color: #ff9800; margin-right: 8px;"></i>
+            Dentistas Inactivos
+          </h3>
+          <div class="dentist-table-underline"></div>
+        </div>
+        <div class="dentist-results-count">
+          <span class="dentist-count-badge">
+            <i class="fa-solid fa-list-check"></i>
+            {{ filteredInactiveDentists.length }} dentista{{ filteredInactiveDentists.length !== 1 ? 's' : '' }}
+          </span>
+        </div>
+      </div>
+
+      <q-table
+        class="dentist-data-table dentist-inactive-table"
+        flat
+        :rows="filteredInactiveDentists"
+        :columns="columns"
+        row-key="id"
+        :rows-per-page-options="[5, 10, 15, 20, 0]"
+        :pagination="{ rowsPerPage: 10 }"
+        separator="cell"
+        :loading="store.cargando"
+      >
+        <template v-slot:no-data>
+          <div class="dentist-no-data-container">
+            <div class="dentist-no-data-illustration">
+              <i class="fa-solid fa-user-doctor-slash dentist-no-data-icon"></i>
+              <div class="dentist-no-data-circle dentist-no-data-circle-1"></div>
+              <div class="dentist-no-data-circle dentist-no-data-circle-2"></div>
+            </div>
+            <p class="dentist-no-data-text">No hay dentistas inactivos</p>
+            <p class="dentist-no-data-subtext">Los dentistas inactivos aparecerán aquí</p>
+          </div>
+        </template>
+
+        <template v-slot:body-cell-imagen="props">
+          <q-td :props="props">
+            <q-avatar 
+              size="56px"
+              :color="props.row.imagen ? 'transparent' : getAvatarColor(props.row.nombre)"
+              style="opacity: 0.6;"
+            >
+              <img 
+                v-if="props.row.imagen" 
+                :src="getImageUrl(props.row.imagen)" 
+                :alt="getFullName(props.row)"
+                @error="handleImageError"
+              />
+              <span v-else>{{ getInitials(props.row) }}</span>
+            </q-avatar>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-nombre="props">
+          <q-td :props="props" style="opacity: 0.7;">
+            <div>{{ getFullName(props.row) }}</div>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-especialidades="props">
+          <q-td :props="props" style="opacity: 0.7;">
+            <q-chip
+              v-for="esp in props.row.especialidades || []"
+              :key="esp.id"
+              dense
+              size="sm"
+              :color="esp.estado === 'activo' ? 'primary' : 'grey'"
+              text-color="white"
+            >
+              {{ esp.nombre }}
+            </q-chip>
+            <span v-if="!(props.row.especialidades && props.row.especialidades.length)">Sin especialidades</span>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-estado="props">
+          <q-td :props="props">
+            <q-badge :label="formatState(props.row.estado)" :class="getStateClass(props.row.estado)" />
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-acciones="props">
+          <q-td :props="props">
+            <div class="dentist-actions-container">
+              <q-btn 
+                flat 
+                dense 
+                round 
+                icon="fa-solid fa-eye" 
+                @click="viewDentist(props.row)" 
+                color="grey-7"
+                size="sm"
+              >
+                <q-tooltip>Ver detalles</q-tooltip>
+              </q-btn>
+              
+              <q-btn 
+                flat 
+                dense 
+                round 
+                icon="fa-solid fa-edit" 
+                @click="editDentist(props.row)" 
+                color="primary"
+                size="sm"
+              >
+                <q-tooltip>Editar dentista</q-tooltip>
+              </q-btn>
+              
+              <q-btn 
+                flat 
+                dense 
+                round 
+                icon="fa-solid fa-play-circle" 
+                @click="toggleDentistStatus(props.row)" 
+                color="positive"
+                size="sm"
+              >
+                <q-tooltip>Activar dentista</q-tooltip>
+              </q-btn>
+            </div>
+          </q-td>
+        </template>
+      </q-table>
+    </div>
+    </div>
+
     <!-- Dialogs -->
     <DetailDentistDialog v-model="showDetailDialog" :dentist-data="selectedDentist" @edit-dentist="editDentist" />
     <EditDentistDialog v-model="showEditDialog" :dentist-data="selectedDentist" @dentist-updated="handleDentistUpdate" />
     <NewDentistDialog v-model="showNewDialog" @dentist-created="handleDentistCreate" />
-    
-    <!-- AGREGADO: Diálogo de confirmación para eliminar -->
-    <q-dialog v-model="showDeleteDialog" persistent>
-      <q-card class="dentist-delete-dialog" style="min-width: 350px">
-        <q-card-section class="row items-center q-pb-none">
-          <q-avatar icon="fa-solid fa-trash-can" color="negative" text-color="white" />
-          <span class="q-ml-sm text-h6">Confirmar eliminación</span>
-        </q-card-section>
-
-        <q-card-section>
-          <div class="text-body1">
-            ¿Estás seguro de que deseas eliminar al dentista 
-            <strong>{{ selectedDentist ? getFullName(selectedDentist) : '' }}</strong>?
-          </div>
-          <div class="text-caption text-grey q-mt-sm">
-            Esta acción no se puede deshacer. Se eliminarán todas las especialidades asociadas.
-          </div>
-        </q-card-section>
-
-        <q-card-actions align="right" class="q-pa-md">
-          <q-btn 
-            flat 
-            label="Cancelar" 
-            color="grey" 
-            v-close-popup 
-            :disable="store.cargando"
-          />
-          <q-btn 
-            flat 
-            label="Eliminar" 
-            color="negative" 
-            @click="deleteDentist" 
-            :loading="store.cargando"
-            icon="fa-solid fa-trash-can"
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
@@ -311,28 +409,44 @@ export default {
     const $q = useQuasar() // AGREGADO: Para notificaciones
     const store = useDentistaGestionStore()
     const search = ref('')
-    const filteredRows = ref([])
     const selectedDentist = ref(null)
-    
-    // Inicializar filteredRows con los datos disponibles
-    const initializeFilteredRows = () => {
-      if (store.dentistasCompletos && store.dentistasCompletos.length > 0) {
-        filteredRows.value = store.dentistasCompletos.filter(d => d.estado !== 'eliminado')
-      } else {
-        filteredRows.value = []
-      }
-    }
     
     const showDetailDialog = ref(false)
     const showEditDialog = ref(false)
     const showNewDialog = ref(false)
-    const showDeleteDialog = ref(false)
     let fuse = null
 
     const activeDentistsCount = computed(() => store.dentistasCompletos.filter(d => d.estado === 'activo').length)
     const inactiveDentistsCount = computed(() => store.dentistasCompletos.filter(d => d.estado === 'inactivo').length)
     const totalSpecialties = computed(() => store.dentistasCompletos.reduce((acc, d) => acc + (d.especialidades?.length || 0), 0))
     const rows = computed(() => store.dentistasCompletos || [])
+
+    // Filtrar dentistas activos e inactivos según la búsqueda
+    const filteredActiveDentists = computed(() => {
+      const activos = store.dentistasCompletos.filter(d => d.estado === 'activo')
+      if (!search.value?.trim()) return activos
+      
+      if (fuse) {
+        const results = fuse.search(search.value.trim())
+        return results.map(r => r.item).filter(d => d.estado === 'activo')
+      }
+      return activos.filter(d => 
+        getFullName(d).toLowerCase().includes(search.value.toLowerCase())
+      )
+    })
+
+    const filteredInactiveDentists = computed(() => {
+      const inactivos = store.dentistasCompletos.filter(d => d.estado === 'inactivo')
+      if (!search.value?.trim()) return inactivos
+      
+      if (fuse) {
+        const results = fuse.search(search.value.trim())
+        return results.map(r => r.item).filter(d => d.estado === 'inactivo')
+      }
+      return inactivos.filter(d => 
+        getFullName(d).toLowerCase().includes(search.value.toLowerCase())
+      )
+    })
 
     const stats = computed(() => [
       {
@@ -392,31 +506,14 @@ export default {
     const getStateClass = (state) => STATE_CLASSES[state] || 'dentist-state-default'
 
     const rebuildFuse = () => {
-      const collection = rows.value.filter(d => d.estado !== 'eliminado')
-      fuse ? fuse.setCollection(collection) : fuse = new Fuse(collection, FUSE_OPTIONS)
-    }
-
-    const filterRows = () => {
-      if (!search.value?.trim()) { 
-        filteredRows.value = rows.value.filter(d => d.estado !== 'eliminado')
-        return 
-      }
-      if (fuse) {
-        filteredRows.value = fuse.search(search.value.trim()).map(r => r.item)
-      } else {
-        filteredRows.value = rows.value.filter(d => d.estado !== 'eliminado')
-      }
+      // Incluir todos los dentistas para búsqueda
+      fuse ? fuse.setCollection(rows.value) : fuse = new Fuse(rows.value, FUSE_OPTIONS)
     }
 
     const loadDentistas = async () => {
       try {
         await store.cargarDentistasCompletos()
         rebuildFuse()
-        filterRows()
-        // Asegurar que filteredRows tenga datos
-        if (filteredRows.value.length === 0 && store.dentistasCompletos.length > 0) {
-          initializeFilteredRows()
-        }
       } catch (err) { 
         console.error('Error cargando dentistas:', err)
       }
@@ -426,7 +523,6 @@ export default {
       try {
         showNewDialog.value = false
         rebuildFuse()
-        filterRows()
         
         // Notificación de éxito
         $q.notify({
@@ -444,7 +540,6 @@ export default {
       try {
         showEditDialog.value = false
         rebuildFuse()
-        filterRows()
         
         // Notificación de éxito
         $q.notify({
@@ -458,39 +553,26 @@ export default {
       }
     }
 
-    // MODIFICADO: Función de eliminación mejorada
-    const confirmDeleteDentist = (dentist) => {
-      selectedDentist.value = { ...dentist }
-      showDeleteDialog.value = true
-    }
-
-    const deleteDentist = async () => {
-      if (!selectedDentist.value) return
-      
+    // Función para activar/desactivar dentista
+    const toggleDentistStatus = async (dentist) => {
       try {
-        await store.eliminarDentistaCompleto(selectedDentist.value.id)
-        
-        // Cerrar diálogo y limpiar
-        showDeleteDialog.value = false
-        selectedDentist.value = null
+        const nuevoEstado = dentist.estado === 'activo' ? 'inactivo' : 'activo'
+        await store.toggleEstadoDentista(dentist.id, nuevoEstado)
         
         // Actualizar lista
-        await loadDentistas()
+        rebuildFuse()
         
-        // Notificación de éxito
         $q.notify({
           type: 'positive',
-          message: 'Dentista eliminado exitosamente',
+          message: `Dentista ${nuevoEstado === 'activo' ? 'activado' : 'desactivado'} exitosamente`,
           position: 'top-right',
           timeout: 3000
         })
-      } catch (err) { 
-        console.error('Error eliminando dentista:', err)
-        
-        // Notificación de error
+      } catch (error) {
+        console.error('Error al cambiar estado del dentista:', error)
         $q.notify({
           type: 'negative',
-          message: 'Error al eliminar el dentista. Intente nuevamente.',
+          message: 'Error al cambiar el estado del dentista',
           position: 'top-right',
           timeout: 5000
         })
@@ -514,22 +596,20 @@ export default {
       await loadDentistas() 
     })
     
-    watch(search, filterRows)
     watch(rows, () => { 
       rebuildFuse()
-      filterRows() 
     }, { immediate: true })
 
     return {
       store,
       search,
       columns,
-      filteredRows,
+      filteredActiveDentists,
+      filteredInactiveDentists,
       selectedDentist,
       showDetailDialog,
       showEditDialog,
       showNewDialog,
-      showDeleteDialog,
       activeDentistsCount,
       inactiveDentistsCount,
       totalSpecialties,
@@ -537,11 +617,10 @@ export default {
       loadDentistas,
       handleDentistCreate,
       handleDentistUpdate,
-      deleteDentist,
+      toggleDentistStatus,
       viewDentist,
       editDentist,
       openNewDentistDialog,
-      confirmDeleteDentist,
       getFullName,
       getInitials,
       handleImageError,

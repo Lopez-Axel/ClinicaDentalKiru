@@ -22,7 +22,6 @@ export const useSucursalStore = defineStore('sucursal', () => {
   const showDetailDialog = ref(false)
   const showEditDialog = ref(false)
   const showNewDialog = ref(false)
-  const showDeleteDialog = ref(false)
 
   // ================= CRUD =================
   const listar = async () => {
@@ -73,13 +72,19 @@ export const useSucursalStore = defineStore('sucursal', () => {
     }
   }
 
-  const eliminar = async (id) => {
+  const toggleActivo = async (id, nuevoEstado) => {
     try {
-      await sucursalService.delete(id)
-      sucursales.value = sucursales.value.filter(s => s.id !== id)
-      filteredBranches.value = filteredBranches.value.filter(s => s.id !== id)
+      const res = await sucursalService.toggleActivo(id, nuevoEstado)
+      const index = sucursales.value.findIndex(s => s.id === id)
+      if (index !== -1) {
+        sucursales.value[index] = res.data
+      }
+      rebuildFuse()
+      filterBranches()
+      return res.data
     } catch (err) {
-      console.error('Error al eliminar sucursal:', err)
+      console.error('Error al cambiar estado de sucursal:', err)
+      throw err
     }
   }
 
@@ -114,14 +119,10 @@ export const useSucursalStore = defineStore('sucursal', () => {
   const openNewDialog = () => showNewDialog.value = true
   const closeNewDialog = () => showNewDialog.value = false
 
-  const confirmDeleteBranch = (branch) => { setSelectedBranch(branch); showDeleteDialog.value = true }
-  const closeDeleteDialog = () => { showDeleteDialog.value = false; setSelectedBranch(null) }
-
   const closeAllDialogs = () => {
     showDetailDialog.value = false
     showEditDialog.value = false
     showNewDialog.value = false
-    showDeleteDialog.value = false
     setSelectedBranch(null)
   }
 
@@ -141,7 +142,7 @@ export const useSucursalStore = defineStore('sucursal', () => {
   const sucursalesActivas = computed(() => sucursales.value.filter(s => s.activo))
   const sucursalesInactivas = computed(() => sucursales.value.filter(s => !s.activo))
   const ciudadesUnicas = computed(() => [...new Set(sucursales.value.map(s => s.ubicacion))])
-  const isAnyDialogOpen = computed(() => showDetailDialog.value || showEditDialog.value || showNewDialog.value || showDeleteDialog.value)
+  const isAnyDialogOpen = computed(() => showDetailDialog.value || showEditDialog.value || showNewDialog.value)
 
   return {
     sucursales,
@@ -153,7 +154,6 @@ export const useSucursalStore = defineStore('sucursal', () => {
     showDetailDialog,
     showEditDialog,
     showNewDialog,
-    showDeleteDialog,
     totalSucursales,
     sucursalesActivas,
     sucursalesInactivas,
@@ -164,7 +164,7 @@ export const useSucursalStore = defineStore('sucursal', () => {
     obtenerPorId,
     crear,
     actualizar,
-    eliminar,
+    toggleActivo,
     filterBranches,
     setSearch,
     setSelectedBranch,
@@ -174,8 +174,6 @@ export const useSucursalStore = defineStore('sucursal', () => {
     closeEditDialog,
     openNewDialog,
     closeNewDialog,
-    confirmDeleteBranch,
-    closeDeleteDialog,
     closeAllDialogs,
     getImagePath,
     handleImageError

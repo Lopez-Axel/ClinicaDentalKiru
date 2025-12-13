@@ -114,7 +114,8 @@ export default {
     const form = ref({
       id: null,
       nombre: '',
-      descripcion: ''
+      descripcion: '',
+      estado: 'activo'
     })
 
     const showDialog = computed({
@@ -127,7 +128,8 @@ export default {
         form.value = {
           id: props.specialityData.id,
           nombre: props.specialityData.nombre || '',
-          descripcion: props.specialityData.descripcion || ''
+          descripcion: props.specialityData.descripcion || '',
+          estado: props.specialityData.estado || 'activo'
         }
       }
     }
@@ -136,7 +138,8 @@ export default {
       form.value = {
         id: null,
         nombre: '',
-        descripcion: ''
+        descripcion: '',
+        estado: 'activo'
       }
       if (formRef.value) formRef.value.resetValidation()
     }
@@ -160,11 +163,12 @@ export default {
 
       loading.value = true
       try {
-        // Emitir los datos actualizados al componente padre
+        // Emitir los datos actualizados al componente padre, incluyendo el estado
         const updatedSpeciality = {
           id: form.value.id,
           nombre: form.value.nombre.trim(),
-          descripcion: form.value.descripcion.trim()
+          descripcion: form.value.descripcion.trim(),
+          estado: form.value.estado || 'activo'
         }
         
         emit('speciality-updated', updatedSpeciality)

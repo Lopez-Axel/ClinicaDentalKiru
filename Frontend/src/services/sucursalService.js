@@ -40,5 +40,7 @@ export const sucursalService = {
     });
   },
 
-  delete: (id) => axios.delete(`${API_URL}/${id}`)
+  toggleActivo: (id, activo) => {
+    return axios.patch(`${API_URL}/${id}/toggle-activo`, { activo });
+  }
 };

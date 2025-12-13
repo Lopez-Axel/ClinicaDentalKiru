@@ -8,5 +8,5 @@ export const especialidadService = {
   getById: (id) => axios.get(`${API_URL}/${id}`),
   create: (data) => axios.post(API_URL, data),
   update: (id, data) => axios.put(`${API_URL}/${id}`, data),
-  delete: (id) => axios.delete(`${API_URL}/${id}`)
+  toggleEstado: (id, estado) => axios.patch(`${API_URL}/${id}/toggle-estado`, { estado })
 };

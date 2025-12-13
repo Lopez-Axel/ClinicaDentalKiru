@@ -7,6 +7,6 @@ router.get('/', sucursalController.listar);
 router.get('/:id', sucursalController.obtenerPorId);
 router.post('/', upload.single('imagen'), sucursalController.crear);
 router.put('/:id', upload.single('imagen'), sucursalController.actualizar);
-router.delete('/:id', sucursalController.eliminar);
+router.patch('/:id/toggle-activo', sucursalController.toggleActivo);
 
 module.exports = router;

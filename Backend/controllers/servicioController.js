@@ -71,13 +71,32 @@ const servicioController = {
     }
   },
 
-  eliminar: async (req, res) => {
+  toggleEstado: async (req, res) => {
     try {
       const { id } = req.params;
-      await ServicioModel.eliminar(id);
-      res.json({ message: 'Servicio eliminado correctamente' });
+      const { estado } = req.body;
+
+      // Validar que estado sea válido
+      if (estado !== 'activo' && estado !== 'inactivo') {
+        return res.status(400).json({ error: { message: 'El estado debe ser "activo" o "inactivo"' } });
+      }
+
+      // Obtener el servicio existente
+      const servicioExistente = await ServicioModel.obtenerPorId(id);
+      if (!servicioExistente) {
+        return res.status(404).json({ error: { message: 'Servicio no encontrado' } });
+      }
+
+      // Actualizar solo el estado
+      const datos = {
+        ...servicioExistente,
+        estado: estado
+      };
+
+      const actualizado = await ServicioModel.actualizar(id, datos);
+      res.json(actualizado);
     } catch (error) {
-      res.status(500).json({ error: { message: 'Error al eliminar el servicio' } });
+      res.status(400).json({ error: { message: error.message || 'Error al cambiar el estado del servicio' } });
     }
   }
 

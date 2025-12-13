@@ -85,14 +85,32 @@ const dentistaController = {
     }
   },
 
-
-  eliminar: async (req, res) => {
+  toggleEstado: async (req, res) => {
     try {
       const { id } = req.params;
-      await DentistaModel.eliminar(id);
-      res.json({ message: 'Dentista eliminado correctamente' });
+      const { estado } = req.body;
+
+      // Validar que estado sea válido
+      if (estado !== 'activo' && estado !== 'inactivo') {
+        return res.status(400).json({ error: { message: 'El estado debe ser "activo" o "inactivo"' } });
+      }
+
+      // Obtener el dentista existente
+      const dentistaExistente = await DentistaModel.obtenerPorId(id);
+      if (!dentistaExistente) {
+        return res.status(404).json({ error: { message: 'Dentista no encontrado' } });
+      }
+
+      // Actualizar solo el estado
+      const datos = {
+        ...dentistaExistente,
+        estado: estado
+      };
+
+      const actualizado = await DentistaModel.actualizar(id, datos);
+      res.json(actualizado);
     } catch (error) {
-      res.status(500).json({ error: { message: 'Error al eliminar el dentista' } });
+      res.status(400).json({ error: { message: error.message || 'Error al cambiar el estado del dentista' } });
     }
   }
 

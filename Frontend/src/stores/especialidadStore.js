@@ -21,6 +21,9 @@ export const useEspecialidadStore = defineStore('especialidad', () => {
   // -----------------------------
   // Computed
   // -----------------------------
+  const especialidadesActivas = computed(() => especialidades.value.filter(e => e.estado === 'activo'))
+  const especialidadesInactivas = computed(() => especialidades.value.filter(e => e.estado === 'inactivo'))
+  
   const totalPaginas = computed(() => Math.ceil(searchResults.value.length / itemsPorPagina))
   const especialidadesPaginaActual = computed(() => {
     const inicio = paginaActual.value * itemsPorPagina
@@ -71,32 +74,51 @@ export const useEspecialidadStore = defineStore('especialidad', () => {
   const crearEspecialidad = async (nuevaEspecialidad) => {
     try {
       const { data } = await especialidadService.create(nuevaEspecialidad)
-      especialidades.value.push(data)
+      // Asegurarse de que el estado esté presente (por defecto 'activo')
+      const especialidadCreada = {
+        ...data,
+        estado: data.estado || 'activo'
+      }
+      especialidades.value.push(especialidadCreada)
       rebuildFuse()
+      return especialidadCreada
     } catch (error) {
       console.error('Error creando especialidad:', error)
+      throw error
     }
   }
 
   const actualizarEspecialidad = async (especialidadActualizada) => {
     try {
-      await especialidadService.update(especialidadActualizada.id, especialidadActualizada)
+      const { data } = await especialidadService.update(especialidadActualizada.id, especialidadActualizada)
       const index = especialidades.value.findIndex(e => e.id === especialidadActualizada.id)
-      if (index > -1) especialidades.value[index] = { ...especialidadActualizada }
+      if (index > -1) {
+        // Usar los datos completos devueltos por el backend (que incluyen el estado)
+        especialidades.value[index] = { ...data }
+      } else {
+        // Si no existe en el array, agregarlo
+        especialidades.value.push({ ...data })
+      }
       rebuildFuse()
+      return data
     } catch (error) {
       console.error('Error actualizando especialidad:', error)
+      throw error
     }
   }
 
-  const eliminarEspecialidad = async (id) => {
+  const toggleEstado = async (id, nuevoEstado) => {
     try {
-      await especialidadService.delete(id)
+      const res = await especialidadService.toggleEstado(id, nuevoEstado)
       const index = especialidades.value.findIndex(e => e.id === id)
-      if (index > -1) especialidades.value[index].estado = 'inactivo'
+      if (index > -1) {
+        especialidades.value[index] = res.data
+      }
       rebuildFuse()
+      return res.data
     } catch (error) {
-      console.error('Error eliminando especialidad:', error)
+      console.error('Error cambiando estado de especialidad:', error)
+      throw error
     }
   }
 
@@ -104,19 +126,19 @@ export const useEspecialidadStore = defineStore('especialidad', () => {
   // Fuse.js
   // -----------------------------
   const rebuildFuse = () => {
-    const activos = especialidades.value.filter(e => e.estado !== 'inactivo')
-    fuse.value = new Fuse(activos, fuseOptions)
+    // Incluir todas las especialidades para búsqueda
+    fuse.value = new Fuse(especialidades.value, fuseOptions)
     applySearch()
   }
 
   const applySearch = () => {
-    const activos = especialidades.value.filter(e => e.estado !== 'inactivo')
+    // Incluir todas las especialidades en la búsqueda
     if (!search.value || search.value.trim() === '') {
-      searchResults.value = activos
+      searchResults.value = especialidades.value
     } else if (fuse.value) {
       searchResults.value = fuse.value.search(search.value.trim()).map(r => r.item)
     } else {
-      searchResults.value = activos
+      searchResults.value = especialidades.value
     }
     paginaActual.value = 0
   }
@@ -137,10 +159,12 @@ export const useEspecialidadStore = defineStore('especialidad', () => {
     totalPaginas,
     especialidadesPaginaActual,
     paginasVisibles,
+    especialidadesActivas,
+    especialidadesInactivas,
     cargarEspecialidades,
     crearEspecialidad,
     actualizarEspecialidad,
-    eliminarEspecialidad,
+    toggleEstado,
     rebuildFuse,
     applySearch,
     siguientePagina,

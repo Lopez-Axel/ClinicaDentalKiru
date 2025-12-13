@@ -214,38 +214,33 @@ export const useDentistaGestionStore = defineStore('dentistaGestion', {
       }
     },
 
-    async eliminarDentistaCompleto(id) {
+    async toggleEstadoDentista(id, nuevoEstado) {
       this.cargando = true
       this.error = null
 
       try {
         const dentistaStore = useDentistaStore()
-        const dentistaEspecialidadStore = useDentistaEspecialidadStore()
 
-        try {
-          await dentistaEspecialidadStore.obtenerPorDentista(id)
-          const especialidadesIds = dentistaEspecialidadStore.especialidadesDentista
+        // Actualizar el estado del dentista
+        const dentistaActualizado = await dentistaStore.toggleEstado(id, nuevoEstado)
 
-          for (const especialidadId of especialidadesIds) {
-            await dentistaEspecialidadStore.eliminar(id, especialidadId)
+        if (!dentistaActualizado) {
+          throw new Error('No se pudo cambiar el estado del dentista')
+        }
+
+        // Actualizar en la lista local
+        const index = this.dentistasCompletos.findIndex(d => d.id === id)
+        if (index !== -1) {
+          this.dentistasCompletos[index] = {
+            ...this.dentistasCompletos[index],
+            estado: nuevoEstado
           }
-        } catch (relError) {
-          console.warn('Error eliminando relaciones de especialidades:', relError)
         }
 
-        const resultado = await dentistaStore.eliminarDentista(id)
-
-        if (!resultado) {
-          throw new Error('No se pudo eliminar el dentista')
-        }
-
-        // Remover de la lista local
-        this.dentistasCompletos = this.dentistasCompletos.filter(d => d.id !== id)
-
-        return true
+        return dentistaActualizado
       } catch (error) {
-        console.error('Error eliminando dentista completo:', error)
-        this.error = error.response?.data?.error?.message || error.message || 'Error al eliminar dentista'
+        console.error('Error cambiando estado de dentista:', error)
+        this.error = error.response?.data?.error?.message || error.message || 'Error al cambiar estado del dentista'
         throw error
       } finally {
         this.cargando = false

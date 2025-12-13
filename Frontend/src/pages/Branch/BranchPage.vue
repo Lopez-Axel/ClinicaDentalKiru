@@ -102,35 +102,38 @@
       </div>
     </div>
 
-    <!-- Branches Grid -->
+    <!-- Sucursales Activas -->
     <div class="branch-content-section">
       <div class="branch-section-header">
         <div class="branch-section-title-wrapper">
-          <h3 class="branch-section-title">Lista de Sucursales</h3>
+          <h3 class="branch-section-title">
+            <i class="fa-solid fa-check-circle" style="color: #4caf50; margin-right: 8px;"></i>
+            Sucursales Activas
+          </h3>
           <div class="branch-title-underline"></div>
         </div>
         <div class="branch-results-count">
           <span class="branch-count-badge">
             <i class="fa-solid fa-list-check"></i>
-            {{ sucursalStore.filteredBranches.length }} sucursal{{ sucursalStore.filteredBranches.length !== 1 ? 'es' : '' }}
+            {{ filteredActiveBranches.length }} sucursal{{ filteredActiveBranches.length !== 1 ? 'es' : '' }}
           </span>
         </div>
       </div>
 
       <div class="branch-cards-container">
-        <div v-if="sucursalStore.filteredBranches.length === 0" class="branch-no-data-container">
+        <div v-if="filteredActiveBranches.length === 0" class="branch-no-data-container">
           <div class="branch-no-data-illustration">
             <i class="fa-solid fa-store-slash branch-no-data-icon"></i>
             <div class="branch-no-data-circle branch-no-data-circle-1"></div>
             <div class="branch-no-data-circle branch-no-data-circle-2"></div>
           </div>
-          <p class="branch-no-data-text">No se encontraron sucursales</p>
-          <p class="branch-no-data-subtext">Intenta ajustar los filtros de búsqueda o agrega una nueva sucursal</p>
+          <p class="branch-no-data-text">No hay sucursales activas</p>
+          <p class="branch-no-data-subtext">Las sucursales activas aparecerán aquí</p>
         </div>
 
         <transition-group v-else name="branch-card-fade" tag="div" class="branch-cards-grid">
           <q-card
-            v-for="branch in sucursalStore.filteredBranches"
+            v-for="branch in filteredActiveBranches"
             :key="branch.id"
             class="branch-speciality-card"
           >
@@ -155,9 +158,9 @@
               </div>
 
               <!-- Status Badge -->
-              <div class="branch-card-status-badge" :class="branch.activo ? 'active' : 'inactive'">
-                <i class="fa-solid" :class="branch.activo ? 'fa-check' : 'fa-pause'"></i>
-                {{ branch.activo ? 'Activa' : 'Inactiva' }}
+              <div class="branch-card-status-badge active">
+                <i class="fa-solid fa-check"></i>
+                Activa
               </div>
             </div>
 
@@ -214,12 +217,143 @@
               <q-btn
                 flat
                 dense
-                icon="fa-solid fa-trash"
-                label="Eliminar"
-                @click="sucursalStore.confirmDeleteBranch(branch)"
-                class="branch-action-btn branch-delete-btn"
+                icon="fa-solid fa-pause-circle"
+                label="Desactivar"
+                @click="toggleBranchStatus(branch)"
+                class="branch-action-btn branch-deactivate-btn"
                 no-caps
                 size="sm"
+                color="warning"
+              />
+            </q-card-actions>
+          </q-card>
+        </transition-group>
+      </div>
+    </div>
+
+    <!-- Sucursales Inactivas -->
+    <div class="branch-content-section" style="margin-top: 40px;">
+      <div class="branch-section-header">
+        <div class="branch-section-title-wrapper">
+          <h3 class="branch-section-title">
+            <i class="fa-solid fa-pause-circle" style="color: #ff9800; margin-right: 8px;"></i>
+            Sucursales Inactivas
+          </h3>
+          <div class="branch-title-underline"></div>
+        </div>
+        <div class="branch-results-count">
+          <span class="branch-count-badge">
+            <i class="fa-solid fa-list-check"></i>
+            {{ filteredInactiveBranches.length }} sucursal{{ filteredInactiveBranches.length !== 1 ? 'es' : '' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="branch-cards-container">
+        <div v-if="filteredInactiveBranches.length === 0" class="branch-no-data-container">
+          <div class="branch-no-data-illustration">
+            <i class="fa-solid fa-store-slash branch-no-data-icon"></i>
+            <div class="branch-no-data-circle branch-no-data-circle-1"></div>
+            <div class="branch-no-data-circle branch-no-data-circle-2"></div>
+          </div>
+          <p class="branch-no-data-text">No hay sucursales inactivas</p>
+          <p class="branch-no-data-subtext">Las sucursales inactivas aparecerán aquí</p>
+        </div>
+
+        <transition-group v-else name="branch-card-fade" tag="div" class="branch-cards-grid">
+          <q-card
+            v-for="branch in filteredInactiveBranches"
+            :key="branch.id"
+            class="branch-speciality-card branch-inactive-card"
+          >
+            <!-- Image Section -->
+            <div class="branch-card-image-container">
+              <img
+                v-if="branch.imagen"
+                :src="`http://localhost:5050${branch.imagen}`"
+                :alt="branch.nombre"
+                class="branch-card-image"
+                @error="sucursalStore.handleImageError"
+                style="opacity: 0.6;"
+              />
+              <div v-else class="branch-card-image-placeholder">
+                <i class="fa-solid fa-building"></i>
+              </div>
+              <div class="branch-image-overlay"></div>
+              
+              <!-- Location Badge -->
+              <div class="branch-card-location-badge">
+                <i class="fa-solid fa-location-dot"></i>
+                {{ branch.ubicacion }}
+              </div>
+
+              <!-- Status Badge -->
+              <div class="branch-card-status-badge inactive">
+                <i class="fa-solid fa-pause"></i>
+                Inactiva
+              </div>
+            </div>
+
+            <!-- Content Section -->
+            <q-card-section class="branch-card-content">
+              <h4 class="branch-card-title">{{ branch.nombre }}</h4>
+              
+              <div class="branch-info-grid">
+                <div class="branch-info-item">
+                  <div class="branch-info-icon">
+                    <i class="fa-solid fa-map-marker-alt"></i>
+                  </div>
+                  <div class="branch-info-content">
+                    <div class="branch-info-label">Dirección</div>
+                    <div class="branch-info-value">{{ branch.direccion }}</div>
+                  </div>
+                </div>
+
+                <div class="branch-info-item">
+                  <div class="branch-info-icon">
+                    <i class="fa-solid fa-circle-info"></i>
+                  </div>
+                  <div class="branch-info-content">
+                    <div class="branch-info-label">Descripción</div>
+                    <div class="branch-info-value">{{ truncateText(branch.descripcion, 60) }}</div>
+                  </div>
+                </div>
+              </div>
+            </q-card-section>
+
+            <!-- Actions Section -->
+            <q-separator />
+            <q-card-actions class="branch-card-actions">
+              <q-btn
+                flat
+                dense
+                icon="fa-solid fa-eye"
+                label="Ver"
+                @click="sucursalStore.openDetailDialog(branch)"
+                class="branch-action-btn branch-view-btn"
+                no-caps
+                size="sm"
+              />
+              <q-btn
+                flat
+                dense
+                icon="fa-solid fa-edit"
+                label="Editar"
+                @click="sucursalStore.openEditDialog(branch)"
+                class="branch-action-btn branch-edit-btn"
+                no-caps
+                size="sm"
+              />
+              <q-btn
+                flat
+                dense
+                icon="fa-solid fa-play-circle"
+                label="Activar"
+                @click="toggleBranchStatus(branch)"
+                class="branch-action-btn branch-activate-btn"
+                no-caps
+                size="sm"
+                color="positive"
               />
             </q-card-actions>
           </q-card>
@@ -253,66 +387,87 @@
       @close="sucursalStore.closeNewDialog"
     />
 
-    <!-- Delete Confirmation Dialog -->
-    <q-dialog v-model="sucursalStore.showDeleteDialog" persistent>
-      <q-card class="branch-confirm-dialog">
-        <q-card-section class="branch-dialog-header">
-          <div class="branch-dialog-icon-container">
-            <i class="fa-solid fa-exclamation-triangle branch-dialog-icon"></i>
-          </div>
-          <h3 class="branch-dialog-title">Confirmar Eliminación</h3>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none">
-          <p class="branch-dialog-text">
-            ¿Está seguro que desea eliminar la sucursal <strong>{{ sucursalStore.selectedBranch?.nombre }}</strong>?
-          </p>
-          <p class="branch-dialog-subtext">
-            Esta acción no se puede deshacer y la sucursal será removida del sistema.
-          </p>
-        </q-card-section>
-
-        <q-card-actions class="branch-dialog-actions">
-          <q-btn 
-            flat 
-            label="Cancelar" 
-            color="grey-7" 
-            @click="sucursalStore.closeDeleteDialog" 
-            no-caps
-            class="branch-dialog-btn"
-          />
-          <q-btn 
-            unelevated
-            label="Eliminar Sucursal" 
-            color="negative" 
-            @click="sucursalStore.eliminar(sucursalStore.selectedBranch.id)"
-            no-caps
-            class="branch-dialog-btn branch-dialog-delete-btn"
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
 <script setup>
 import { onMounted, computed } from 'vue'
+import { useQuasar } from 'quasar'
 import { useSucursalStore } from 'src/stores/sucursalStore'
 import DetailBranchDialog from './DetailBranchDialog.vue'
 import EditBranchDialog from './EditBranchDialog.vue'
 import NewBranchDialog from './NewBranchDialog.vue'
 
-// Inicializamos el store
+// Inicializamos el store y Quasar
+const $q = useQuasar()
 const sucursalStore = useSucursalStore()
 
 // Contadores activos e inactivos usando computed
 const activeBranchesCount = computed(() => sucursalStore.sucursalesActivas.length)
 const inactiveBranchesCount = computed(() => sucursalStore.sucursalesInactivas.length)
 
+// Filtrar sucursales activas e inactivas según la búsqueda
+const filteredActiveBranches = computed(() => {
+  const activas = sucursalStore.sucursalesActivas
+  if (!sucursalStore.search.trim()) return activas
+  
+  // Aplicar filtro de búsqueda
+  const fuse = sucursalStore.fuse
+  if (fuse) {
+    const results = fuse.search(sucursalStore.search.trim())
+    return results.map(r => r.item).filter(b => b.activo)
+  }
+  return activas.filter(b => 
+    b.nombre.toLowerCase().includes(sucursalStore.search.toLowerCase()) ||
+    b.ubicacion.toLowerCase().includes(sucursalStore.search.toLowerCase()) ||
+    b.direccion.toLowerCase().includes(sucursalStore.search.toLowerCase())
+  )
+})
+
+const filteredInactiveBranches = computed(() => {
+  const inactivas = sucursalStore.sucursalesInactivas
+  if (!sucursalStore.search.trim()) return inactivas
+  
+  // Aplicar filtro de búsqueda
+  const fuse = sucursalStore.fuse
+  if (fuse) {
+    const results = fuse.search(sucursalStore.search.trim())
+    return results.map(r => r.item).filter(b => !b.activo)
+  }
+  return inactivas.filter(b => 
+    b.nombre.toLowerCase().includes(sucursalStore.search.toLowerCase()) ||
+    b.ubicacion.toLowerCase().includes(sucursalStore.search.toLowerCase()) ||
+    b.direccion.toLowerCase().includes(sucursalStore.search.toLowerCase())
+  )
+})
+
 // Función de truncar texto (para las cards)
 const truncateText = (text, maxLength) => {
   if (!text) return ''
   return text.length <= maxLength ? text : text.substring(0, maxLength) + '...'
+}
+
+// Función para activar/desactivar sucursal
+const toggleBranchStatus = async (branch) => {
+  try {
+    const nuevoEstado = !branch.activo
+    await sucursalStore.toggleActivo(branch.id, nuevoEstado)
+    
+    $q.notify({
+      type: 'positive',
+      message: `Sucursal ${nuevoEstado ? 'activada' : 'desactivada'} exitosamente`,
+      position: 'top-right',
+      timeout: 3000
+    })
+  } catch (error) {
+    console.error('Error al cambiar estado de la sucursal:', error)
+    $q.notify({
+      type: 'negative',
+      message: 'Error al cambiar el estado de la sucursal',
+      position: 'top-right',
+      timeout: 5000
+    })
+  }
 }
 
 // Cargar las sucursales al montar la página

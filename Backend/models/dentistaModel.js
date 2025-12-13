@@ -50,12 +50,8 @@ class DentistaModel {
     ];
 
     await pool.query(sql, params);
-    return { id, ...dentista };
-  }
-
-  static async eliminar(id) {
-    await pool.query('DELETE FROM dentista WHERE id = ?', [id]);
-    return true;
+    const [rows] = await pool.query('SELECT * FROM dentista WHERE id = ?', [id]);
+    return rows[0];
   }
 
 }

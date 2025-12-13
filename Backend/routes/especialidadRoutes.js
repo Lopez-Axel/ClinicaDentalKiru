@@ -6,6 +6,6 @@ router.get('/', especialidadController.listar);
 router.get('/:id', especialidadController.obtenerPorId);
 router.post('/', especialidadController.crear);
 router.put('/:id', especialidadController.actualizar);
-router.delete('/:id', especialidadController.eliminar);
+router.patch('/:id/toggle-estado', especialidadController.toggleEstado);
 
 module.exports = router;

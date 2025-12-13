@@ -21,7 +21,6 @@ export const useServicioStore = defineStore('servicios', () => {
   const showDetailDialog = ref(false)
   const showEditDialog = ref(false)
   const showNewDialog = ref(false)
-  const showDeleteDialog = ref(false)
 
   // ================= CRUD =================
   const listar = async () => {
@@ -87,13 +86,23 @@ export const useServicioStore = defineStore('servicios', () => {
     }
   }
 
-  const eliminar = async (id) => {
+  const toggleEstado = async (id, nuevoEstado) => {
     try {
-      await servicioService.delete(id)
-      servicios.value = servicios.value.filter(s => s.id !== id)
-      filteredServicios.value = filteredServicios.value.filter(s => s.id !== id)
+      const res = await servicioService.toggleEstado(id, nuevoEstado)
+      const index = servicios.value.findIndex(s => s.id === id)
+      if (index !== -1) {
+        servicios.value[index] = res.data
+      }
+      const filteredIndex = filteredServicios.value.findIndex(s => s.id === id)
+      if (filteredIndex !== -1) {
+        filteredServicios.value[filteredIndex] = res.data
+      }
+      rebuildFuse()
+      filterServicios()
+      return res.data
     } catch (err) {
-      console.error('Error al eliminar servicio:', err)
+      console.error('Error al cambiar estado de servicio:', err)
+      throw err
     }
   }
 
@@ -128,14 +137,10 @@ export const useServicioStore = defineStore('servicios', () => {
   const openNewDialog = () => showNewDialog.value = true
   const closeNewDialog = () => showNewDialog.value = false
 
-  const confirmDeleteServicio = (servicio) => { setSelectedServicio(servicio); showDeleteDialog.value = true }
-  const closeDeleteDialog = () => { showDeleteDialog.value = false; setSelectedServicio(null) }
-
   const closeAllDialogs = () => {
     showDetailDialog.value = false
     showEditDialog.value = false
     showNewDialog.value = false
-    showDeleteDialog.value = false
     setSelectedServicio(null)
   }
 
@@ -153,12 +158,11 @@ export const useServicioStore = defineStore('servicios', () => {
   const serviciosActivos = computed(() => servicios.value.filter(s => s.estado === 'activo'))
   const serviciosInactivos = computed(() => servicios.value.filter(s => s.estado === 'inactivo'))
   const categoriasUnicas = computed(() => [...new Set(servicios.value.map(s => s.categoria))])
-  const isAnyDialogOpen = computed(() => showDetailDialog.value || showEditDialog.value || showNewDialog.value || showDeleteDialog.value)
+  const isAnyDialogOpen = computed(() => showDetailDialog.value || showEditDialog.value || showNewDialog.value)
 
   // ================= Aliases =================
   const agregarServicio = crear
   const actualizarServicio = actualizar
-  const eliminarServicio = eliminar
 
   const formatDate = (date) => new Date(date).toLocaleDateString()
   const formatState = (state) => state === 'activo' ? 'Activo' : 'Inactivo'
@@ -174,7 +178,6 @@ export const useServicioStore = defineStore('servicios', () => {
     showDetailDialog,
     showEditDialog,
     showNewDialog,
-    showDeleteDialog,
     totalServicios,
     serviciosActivos,
     serviciosInactivos,
@@ -185,12 +188,11 @@ export const useServicioStore = defineStore('servicios', () => {
     obtenerPorId,
     crear,
     actualizar,
-    eliminar,
+    toggleEstado,
 
     // Aliases
     agregarServicio,
     actualizarServicio,
-    eliminarServicio,
 
     filterServicios,
     setSearch,
@@ -201,8 +203,6 @@ export const useServicioStore = defineStore('servicios', () => {
     closeEditDialog,
     openNewDialog,
     closeNewDialog,
-    confirmDeleteServicio,
-    closeDeleteDialog,
     closeAllDialogs,
     getImagePath,
     handleImageError,

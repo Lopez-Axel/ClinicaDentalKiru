@@ -41,19 +41,15 @@ class ServicioModel {
     const params = [
       servicio.titulo,
       servicio.descripcion,
-      servicio.imagen,
+      servicio.imagen || null,
       servicio.categoria,
-      servicio.estado,
+      servicio.estado || 'activo',
       id
     ];
 
     await pool.query(sql, params);
-    return { id, ...servicio };
-  }
-
-  static async eliminar(id) {
-    await pool.query('DELETE FROM servicios WHERE id = ?', [id]);
-    return true;
+    const [rows] = await pool.query('SELECT * FROM servicios WHERE id = ?', [id]);
+    return rows[0];
   }
 }
 

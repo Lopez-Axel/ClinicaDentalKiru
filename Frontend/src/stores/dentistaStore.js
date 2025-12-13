@@ -107,20 +107,26 @@ export const useDentistaStore = defineStore('dentistas', {
       }
     },
 
-    async eliminarDentista(id) {
+    async toggleEstado(id, nuevoEstado) {
       this.cargando = true;
       this.error = null;
 
       try {
-        await dentistaService.delete(id);
-        this.dentistas = this.dentistas.filter((d) => d.id !== id);
-        return true;
+        const res = await dentistaService.toggleEstado(id, nuevoEstado);
+        const dentistaActualizado = res.data;
+
+        const index = this.dentistas.findIndex((d) => d.id === id);
+        if (index !== -1) {
+          this.dentistas[index] = dentistaActualizado;
+        }
+
+        return dentistaActualizado;
       } catch (err) {
-        console.error('Error eliminarDentista:', err);
+        console.error('Error toggleEstado:', err);
         this.error =
           err?.response?.data?.error?.message ||
-          'Error al eliminar el dentista';
-        return false;
+          'Error al cambiar el estado del dentista';
+        throw err;
       } finally {
         this.cargando = false;
       }

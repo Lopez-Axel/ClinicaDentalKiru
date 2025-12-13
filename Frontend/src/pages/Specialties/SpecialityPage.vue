@@ -110,33 +110,37 @@
 
       <!-- Right Side - Specialities Grid -->
       <div class="specialty-specialities-section">
+        <!-- Especialidades Activas -->
         <div class="specialty-section-header">
           <div class="specialty-section-title-wrapper">
-            <h3 class="specialty-section-title">Catálogo de Especialidades</h3>
+            <h3 class="specialty-section-title">
+              <i class="fa-solid fa-check-circle" style="color: #4caf50; margin-right: 8px;"></i>
+              Especialidades Activas
+            </h3>
             <div class="specialty-title-underline"></div>
           </div>
           <div class="specialty-results-count">
             <span class="specialty-count-badge">
               <i class="fa-solid fa-list-check"></i>
-              {{ store.searchResults.length }} especialidad{{ store.searchResults.length !== 1 ? 'es' : '' }}
+              {{ filteredActiveEspecialidades.length }} especialidad{{ filteredActiveEspecialidades.length !== 1 ? 'es' : '' }}
             </span>
           </div>
         </div>
 
         <div class="specialty-cards-container">
-          <div v-if="store.especialidadesPaginaActual.length === 0" class="specialty-no-data-container">
+          <div v-if="filteredActiveEspecialidades.length === 0" class="specialty-no-data-container">
             <div class="specialty-no-data-illustration">
               <i class="fa-solid fa-tooth specialty-no-data-icon"></i>
               <div class="specialty-no-data-circle specialty-no-data-circle-1"></div>
               <div class="specialty-no-data-circle specialty-no-data-circle-2"></div>
             </div>
-            <p class="specialty-no-data-text">No se encontraron especialidades</p>
-            <p class="specialty-no-data-subtext">Intenta ajustar los filtros de búsqueda o agrega una nueva especialidad</p>
+            <p class="specialty-no-data-text">No hay especialidades activas</p>
+            <p class="specialty-no-data-subtext">Las especialidades activas aparecerán aquí</p>
           </div>
           
           <transition-group v-else name="specialty-card-fade" tag="div" class="specialty-cards-grid">
             <div 
-              v-for="speciality in store.especialidadesPaginaActual" 
+              v-for="speciality in filteredActiveEspecialidades" 
               :key="speciality.id"
               class="specialty-speciality-card"
             >
@@ -152,6 +156,10 @@
                 </q-img>
                 <div class="specialty-card-badge">
                   <i class="fa-solid fa-star"></i>
+                </div>
+                <div class="specialty-card-status-badge active">
+                  <i class="fa-solid fa-check"></i>
+                  Activa
                 </div>
               </div>
               
@@ -182,11 +190,11 @@
                   <q-btn 
                     flat 
                     dense
-                    icon="fa-solid fa-trash"
-                    label="Eliminar"
-                    color="negative"
-                    @click="confirmDeleteSpeciality(speciality)"
-                    class="specialty-action-btn specialty-delete-btn"
+                    icon="fa-solid fa-pause-circle"
+                    label="Desactivar"
+                    color="warning"
+                    @click="toggleSpecialityStatus(speciality)"
+                    class="specialty-action-btn specialty-deactivate-btn"
                     no-caps
                   />
                 </div>
@@ -195,50 +203,98 @@
           </transition-group>
         </div>
 
-        <!-- Pagination Controls -->
-        <div class="specialty-pagination-section" v-if="store.totalPaginas > 1">
-          <div class="specialty-pagination-controls">
-            <q-btn
-              flat
-              round
-              dense
-              icon="fa-solid fa-chevron-left"
-              :disable="store.paginaActual === 0"
-              @click="store.paginaAnterior"
-              class="specialty-pagination-btn"
-              color="primary"
-            />
-            
-            <div class="specialty-pagination-pages">
-              <q-btn
-                v-for="page in store.paginasVisibles"
-                :key="page"
-                flat
-                dense
-                :label="page === '...' ? '...' : page + 1"
-                @click="() => page !== '...' && store.irAPagina(page)"
-                :class="['specialty-page-btn', { 'specialty-active': store.paginaActual === page }]"
-                :color="store.paginaActual === page ? 'primary' : 'grey-7'"
-                :disabled="page === '...'"
-              />
+        <!-- Especialidades Inactivas -->
+        <div class="specialty-section-header" style="margin-top: 40px;">
+          <div class="specialty-section-title-wrapper">
+            <h3 class="specialty-section-title">
+              <i class="fa-solid fa-pause-circle" style="color: #ff9800; margin-right: 8px;"></i>
+              Especialidades Inactivas
+            </h3>
+            <div class="specialty-title-underline"></div>
+          </div>
+          <div class="specialty-results-count">
+            <span class="specialty-count-badge">
+              <i class="fa-solid fa-list-check"></i>
+              {{ filteredInactiveEspecialidades.length }} especialidad{{ filteredInactiveEspecialidades.length !== 1 ? 'es' : '' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="specialty-cards-container">
+          <div v-if="filteredInactiveEspecialidades.length === 0" class="specialty-no-data-container">
+            <div class="specialty-no-data-illustration">
+              <i class="fa-solid fa-tooth specialty-no-data-icon"></i>
+              <div class="specialty-no-data-circle specialty-no-data-circle-1"></div>
+              <div class="specialty-no-data-circle specialty-no-data-circle-2"></div>
             </div>
-            
-            <q-btn
-              flat
-              round
-              dense
-              icon="fa-solid fa-chevron-right"
-              :disable="store.paginaActual === store.totalPaginas - 1"
-              @click="store.siguientePagina"
-              class="specialty-pagination-btn"
-              color="primary"
-            />
+            <p class="specialty-no-data-text">No hay especialidades inactivas</p>
+            <p class="specialty-no-data-subtext">Las especialidades inactivas aparecerán aquí</p>
           </div>
           
-          <div class="specialty-pagination-info">
-            <i class="fa-solid fa-info-circle"></i>
-            Página {{ store.paginaActual + 1 }} de {{ store.totalPaginas }} • Mostrando {{ store.especialidadesPaginaActual.length }} de {{ store.searchResults.length }}
-          </div>
+          <transition-group v-else name="specialty-card-fade" tag="div" class="specialty-cards-grid">
+            <div 
+              v-for="speciality in filteredInactiveEspecialidades" 
+              :key="speciality.id"
+              class="specialty-speciality-card specialty-inactive-card"
+            >
+              <div class="specialty-card-image-container">
+                <q-img 
+                  :src="speciality.image || 'https://i.pinimg.com/originals/ea/d5/5a/ead55a380087931b94a3968f54d8fbda.jpg'"
+                  :ratio="4/3"
+                  spinner-color="primary"
+                  @error="handleImageError"
+                  class="specialty-card-image"
+                  style="opacity: 0.6;"
+                >
+                  <div class="specialty-image-overlay"></div>
+                </q-img>
+                <div class="specialty-card-badge">
+                  <i class="fa-solid fa-star"></i>
+                </div>
+                <div class="specialty-card-status-badge inactive">
+                  <i class="fa-solid fa-pause"></i>
+                  Inactiva
+                </div>
+              </div>
+              
+              <div class="specialty-card-content">
+                <h4 class="specialty-card-title" style="opacity: 0.7;">{{ speciality.nombre }}</h4>
+                <p class="specialty-card-description" style="opacity: 0.7;">{{ truncateText(speciality.descripcion, 80) }}</p>
+                
+                <div class="specialty-card-actions">
+                  <q-btn 
+                    flat 
+                    dense
+                    icon="fa-solid fa-eye"
+                    label="Ver"
+                    @click="viewSpeciality(speciality)"
+                    class="specialty-action-btn specialty-view-btn"
+                    no-caps
+                  />
+                  <q-btn 
+                    flat 
+                    dense
+                    icon="fa-solid fa-edit"
+                    label="Editar"
+                    color="primary"
+                    @click="editSpeciality(speciality)"
+                    class="specialty-action-btn specialty-edit-btn"
+                    no-caps
+                  />
+                  <q-btn 
+                    flat 
+                    dense
+                    icon="fa-solid fa-play-circle"
+                    label="Activar"
+                    color="positive"
+                    @click="toggleSpecialityStatus(speciality)"
+                    class="specialty-action-btn specialty-activate-btn"
+                    no-caps
+                  />
+                </div>
+              </div>
+            </div>
+          </transition-group>
         </div>
       </div>
     </div>
@@ -261,51 +317,12 @@
       @speciality-created="handleSpecialityCreate"
     />
 
-    <!-- Delete Confirmation Dialog -->
-    <q-dialog v-model="showDeleteDialog" persistent>
-      <q-card class="specialty-confirm-dialog">
-        <q-card-section class="specialty-dialog-header">
-          <div class="specialty-dialog-icon-container">
-            <i class="fa-solid fa-exclamation-triangle specialty-dialog-icon"></i>
-          </div>
-          <h3 class="specialty-dialog-title">Confirmar Eliminación</h3>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none">
-          <p class="specialty-dialog-text">
-            ¿Está seguro que desea eliminar la especialidad <strong>{{ selectedSpeciality?.nombre }}</strong>?
-          </p>
-          <p class="specialty-dialog-subtext">
-            Esta acción no se puede deshacer y la especialidad dejará de estar disponible en el sistema.
-          </p>
-        </q-card-section>
-
-        <q-card-actions class="specialty-dialog-actions">
-          <q-btn 
-            flat 
-            label="Cancelar" 
-            color="grey-7" 
-            v-close-popup 
-            no-caps
-            class="specialty-dialog-btn"
-          />
-          <q-btn 
-            unelevated
-            label="Eliminar Especialidad" 
-            color="negative" 
-            @click="deleteSpeciality"      
-            v-close-popup 
-            no-caps
-            class="specialty-dialog-btn specialty-dialog-delete-btn"
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useQuasar } from 'quasar'
 import { useEspecialidadStore } from 'src/stores/especialidadStore'
 import DetailSpecialityDialog from './DetailSpecialityDialog.vue'
 import EditSpecialityDialog from './EditSpecialityDialog.vue'
@@ -319,12 +336,12 @@ export default {
     NewSpecialityDialog
   },
   setup() {
+    const $q = useQuasar()
     const store = useEspecialidadStore()
 
     const showDetailDialog = ref(false)
     const showEditDialog = ref(false)
     const showNewDialog = ref(false)
-    const showDeleteDialog = ref(false)
     const selectedSpeciality = ref(null)
 
     const truncateText = (text, maxLength) => {
@@ -335,6 +352,34 @@ export default {
     const handleImageError = (event) => {
       event.target.src = 'https://cdn.quasar.dev/img/parallax2.jpg'
     }
+
+    // Filtrar especialidades activas e inactivas según la búsqueda
+    const filteredActiveEspecialidades = computed(() => {
+      const activas = store.especialidadesActivas
+      if (!store.search.trim()) return activas
+      
+      // Aplicar filtro de búsqueda
+      const fuse = store.fuse
+      if (fuse) {
+        const results = fuse.search(store.search.trim())
+        return results.map(r => r.item).filter(e => e.estado === 'activo')
+      }
+      return activas.filter(e => 
+        e.nombre.toLowerCase().includes(store.search.toLowerCase()) ||
+        e.descripcion.toLowerCase().includes(store.search.toLowerCase())
+      )
+    })
+
+    const filteredInactiveEspecialidades = computed(() => {
+      const inactivas = store.especialidadesInactivas
+      if (!store.search.trim()) return inactivas
+      
+      // Aplicar filtro de búsqueda simple para inactivas
+      return inactivas.filter(e => 
+        e.nombre.toLowerCase().includes(store.search.toLowerCase()) ||
+        e.descripcion.toLowerCase().includes(store.search.toLowerCase())
+      )
+    })
 
     const viewSpeciality = (speciality) => {
       selectedSpeciality.value = { ...speciality }
@@ -351,15 +396,26 @@ export default {
       showNewDialog.value = true
     }
 
-    const confirmDeleteSpeciality = (speciality) => {
-      selectedSpeciality.value = { ...speciality }
-      showDeleteDialog.value = true
-    }
-
-    const deleteSpeciality = async () => {
-      if (selectedSpeciality.value) {
-        await store.eliminarEspecialidad(selectedSpeciality.value.id)
-        // No necesitas recargar porque el store ya actualiza el estado
+    // Función para activar/desactivar especialidad
+    const toggleSpecialityStatus = async (speciality) => {
+      try {
+        const nuevoEstado = speciality.estado === 'activo' ? 'inactivo' : 'activo'
+        await store.toggleEstado(speciality.id, nuevoEstado)
+        
+        $q.notify({
+          type: 'positive',
+          message: `Especialidad ${nuevoEstado === 'activo' ? 'activada' : 'desactivada'} exitosamente`,
+          position: 'top-right',
+          timeout: 3000
+        })
+      } catch (error) {
+        console.error('Error al cambiar estado de la especialidad:', error)
+        $q.notify({
+          type: 'negative',
+          message: 'Error al cambiar el estado de la especialidad',
+          position: 'top-right',
+          timeout: 5000
+        })
       }
     }
 
@@ -383,14 +439,14 @@ export default {
       showDetailDialog,
       showEditDialog,
       showNewDialog,
-      showDeleteDialog,
+      filteredActiveEspecialidades,
+      filteredInactiveEspecialidades,
       truncateText,
       handleImageError,
       viewSpeciality,
       editSpeciality,
       openNewSpecialityDialog,
-      confirmDeleteSpeciality,
-      deleteSpeciality,
+      toggleSpecialityStatus,
       handleSpecialityUpdate,
       handleSpecialityCreate
     }

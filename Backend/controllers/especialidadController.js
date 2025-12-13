@@ -47,13 +47,32 @@ const especialidadController = {
     }
   },
 
-  eliminar: async (req, res) => {
+  toggleEstado: async (req, res) => {
     try {
       const { id } = req.params;
-      await EspecialidadModel.eliminar(id);
-      res.json({ message: 'Especialidad eliminada correctamente' });
+      const { estado } = req.body;
+
+      // Validar que estado sea válido
+      if (estado !== 'activo' && estado !== 'inactivo') {
+        return res.status(400).json({ error: { message: 'El estado debe ser "activo" o "inactivo"' } });
+      }
+
+      // Obtener la especialidad existente
+      const especialidadExistente = await EspecialidadModel.obtenerPorId(id);
+      if (!especialidadExistente) {
+        return res.status(404).json({ error: { message: 'Especialidad no encontrada' } });
+      }
+
+      // Actualizar solo el estado
+      const datos = {
+        ...especialidadExistente,
+        estado: estado
+      };
+
+      const actualizado = await EspecialidadModel.actualizar(id, datos);
+      res.json(actualizado);
     } catch (error) {
-      res.status(500).json({ error: { message: 'Error al eliminar la especialidad' } });
+      res.status(400).json({ error: { message: error.message || 'Error al cambiar el estado de la especialidad' } });
     }
   }
 

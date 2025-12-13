@@ -40,5 +40,7 @@ export const dentistaService = {
     });
   },
 
-  delete: (id) => axios.delete(`${API_URL}/${id}`)
+  toggleEstado: (id, estado) => {
+    return axios.patch(`${API_URL}/${id}/toggle-estado`, { estado });
+  }
 };

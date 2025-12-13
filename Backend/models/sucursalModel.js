@@ -46,20 +46,16 @@ class SucursalModel {
       sucursal.ubicacion,
       sucursal.direccion,
       sucursal.descripcion,
-      sucursal.imagen,
-      sucursal.latitud,
-      sucursal.longitud,
-      sucursal.activo,
+      sucursal.imagen || null,
+      sucursal.latitud || null,
+      sucursal.longitud || null,
+      sucursal.activo !== undefined ? sucursal.activo : true,
       id
     ];
 
     await pool.query(sql, params);
-    return { id, ...sucursal };
-  }
-
-  static async eliminar(id) {
-    await pool.query('DELETE FROM sucursales WHERE id = ?', [id]);
-    return true;
+    const [rows] = await pool.query('SELECT * FROM sucursales WHERE id = ?', [id]);
+    return rows[0];
   }
 
 }

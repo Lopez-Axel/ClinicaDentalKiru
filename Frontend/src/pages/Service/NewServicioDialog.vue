@@ -1,7 +1,7 @@
 <template>
   <q-dialog v-model="showDialog" persistent>
-    <q-card class="new-dialog" style="min-width: 600px; max-width: 800px;">
-      <q-card-section class="dialog-header bg-primary text-white">
+    <q-card class="new-dialog">
+      <q-card-section class="dialog-header">
         <div class="row items-center">
           <div class="col">
             <div class="text-h6">Nuevo Servicio</div>

@@ -17,15 +17,14 @@
         <q-toolbar-title class="kiru-toolbar-title">
           <div class="kiru-logo-container">
             <div class="kiru-logo-icon">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <path d="M16 4C12 4 8 6 8 12C8 18 10 24 12 26C13 27 15 28 16 28C17 28 19 27 20 26C22 24 24 18 24 12C24 6 20 4 16 4Z" fill="#FF6B35" stroke="#FF5722" stroke-width="1.5"/>
-                <circle cx="13" cy="14" r="1.5" fill="white"/>
-                <circle cx="19" cy="14" r="1.5" fill="white"/>
-                <path d="M12 20C13 21 15 22 16 22C17 22 19 21 20 20" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
+              <img 
+                src="/KiruIMG/LogoKiru.png" 
+                alt="Logo KIRU" 
+                style="width:100px; height:60px; object-fit: contain;"
+              />
             </div>
             <div class="kiru-logo-text">
-              <div class="kiru-brand-name">KIRU</div>
+              <div class="kiru-brand-name">Kiru</div>
               <div class="kiru-brand-subtitle">Odontología</div>
             </div>
           </div>

@@ -252,7 +252,7 @@ $serv-border-dark: #334155;
 .serv-services-page {
   background: $serv-bg-light;
   overflow-x: hidden;
-  
+
   @include serv-dark-mode {
     background: $serv-bg-dark;
   }
@@ -264,11 +264,11 @@ $serv-border-dark: #334155;
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
   padding: 100px 0 80px;
   overflow: hidden;
-  
+
   @include serv-dark-mode {
     background: linear-gradient(135deg, $serv-bg-dark 0%, #1e3a5f 50%, $serv-bg-dark 100%);
   }
-  
+
   @media (max-width: 768px) {
     padding: 60px 0 40px;
   }
@@ -289,7 +289,7 @@ $serv-border-dark: #334155;
   border-radius: 50%;
   opacity: 0.1;
   animation: float 20s ease-in-out infinite;
-  
+
   @include serv-dark-mode {
     opacity: 0.05;
   }
@@ -332,7 +332,7 @@ $serv-border-dark: #334155;
   font-size: 0.875rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
-  
+
   @include serv-dark-mode {
     background: rgba($serv-primary, 0.2);
     color: #60a5fa;
@@ -346,15 +346,15 @@ $serv-border-dark: #334155;
   line-height: 1.1;
   margin-bottom: 1.5rem;
   letter-spacing: -0.02em;
-  
+
   @include serv-dark-mode {
     color: $serv-text-dark;
   }
-  
+
   @media (max-width: 1024px) {
     font-size: 2.8rem;
   }
-  
+
   @media (max-width: 768px) {
     font-size: 2.2rem;
     text-align: center;
@@ -367,7 +367,7 @@ $serv-border-dark: #334155;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -385,11 +385,11 @@ $serv-border-dark: #334155;
   color: $serv-text-light-secondary;
   line-height: 1.7;
   margin-bottom: 2rem;
-  
+
   @include serv-dark-mode {
     color: $serv-text-dark-secondary;
   }
-  
+
   @media (max-width: 768px) {
     font-size: 1.1rem;
     text-align: center;
@@ -401,7 +401,7 @@ $serv-border-dark: #334155;
   flex-direction: column;
   gap: 12px;
   margin-bottom: 2rem;
-  
+
   @media (max-width: 768px) {
     align-items: center;
   }
@@ -413,11 +413,11 @@ $serv-border-dark: #334155;
   gap: 12px;
   font-size: 1rem;
   color: $serv-text-light-secondary;
-  
+
   @include serv-dark-mode {
     color: $serv-text-dark-secondary;
   }
-  
+
   span {
     font-weight: 500;
   }
@@ -427,7 +427,7 @@ $serv-border-dark: #334155;
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  
+
   @media (max-width: 768px) {
     justify-content: center;
   }
@@ -440,7 +440,7 @@ $serv-border-dark: #334155;
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba($serv-primary, 0.3);
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba($serv-primary, 0.4);
@@ -453,11 +453,11 @@ $serv-border-dark: #334155;
   font-size: 1rem;
   border-radius: 12px;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: rgba($serv-primary, 0.1);
     transform: translateY(-2px);
-    
+
     @include serv-dark-mode {
       background: rgba($serv-primary, 0.2);
     }
@@ -469,7 +469,7 @@ $serv-border-dark: #334155;
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  
+
   @media (max-width: 768px) {
     max-width: 400px;
     margin-top: 3rem;
@@ -487,7 +487,7 @@ $serv-border-dark: #334155;
   filter: blur(60px);
   z-index: 0;
   animation: pulse 3s ease-in-out infinite;
-  
+
   @include serv-dark-mode {
     background: radial-gradient(circle, rgba($serv-primary, 0.3), transparent 70%);
   }
@@ -502,13 +502,13 @@ $serv-border-dark: #334155;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 1;
-  
+
   @include serv-dark-mode {
     background: rgba($serv-bg-dark-alt, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   }
-  
+
   @media (max-width: 768px) {
     padding: 20px;
     border-radius: 24px;
@@ -541,15 +541,15 @@ $serv-border-dark: #334155;
   align-items: center;
   gap: 12px;
   animation: float 4s ease-in-out infinite;
-  
+
   @include serv-dark-mode {
     background: $serv-bg-dark-alt;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   }
-  
+
   @media (max-width: 768px) {
     padding: 12px 16px;
-    
+
     .q-icon {
       font-size: 20px !important;
     }
@@ -559,22 +559,22 @@ $serv-border-dark: #334155;
 .serv-floating-text {
   display: flex;
   flex-direction: column;
-  
+
   strong {
     font-size: 1.25rem;
     font-weight: 700;
     color: $serv-text-light;
     line-height: 1;
-    
+
     @include serv-dark-mode {
       color: $serv-text-dark;
     }
   }
-  
+
   span {
     font-size: 0.75rem;
     color: $serv-text-light-secondary;
-    
+
     @include serv-dark-mode {
       color: $serv-text-dark-secondary;
     }
@@ -585,7 +585,7 @@ $serv-border-dark: #334155;
   top: 15%;
   right: -10%;
   animation-delay: 0s;
-  
+
   @media (max-width: 768px) {
     top: 10%;
     right: -5%;
@@ -596,7 +596,7 @@ $serv-border-dark: #334155;
   bottom: 20%;
   left: -12%;
   animation-delay: 1.5s;
-  
+
   @media (max-width: 768px) {
     bottom: 15%;
     left: -8%;
@@ -607,7 +607,7 @@ $serv-border-dark: #334155;
   top: 50%;
   right: -15%;
   animation-delay: 3s;
-  
+
   @media (max-width: 768px) {
     top: 45%;
     right: -10%;
@@ -619,11 +619,11 @@ $serv-border-dark: #334155;
   position: relative;
   padding: 100px 0;
   background: $serv-bg-light-alt;
-  
+
   @include serv-dark-mode {
     background: $serv-bg-dark-alt;
   }
-  
+
   @media (max-width: 768px) {
     padding: 60px 0;
   }
@@ -643,7 +643,7 @@ $serv-border-dark: #334155;
   position: absolute;
   width: 100%;
   height: 100px;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -659,8 +659,13 @@ $serv-border-dark: #334155;
 }
 
 @keyframes wave {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(-50%);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .serv-section-header {
@@ -681,7 +686,7 @@ $serv-border-dark: #334155;
   font-size: 0.875rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  
+
   @include serv-dark-mode {
     background: linear-gradient(135deg, rgba($serv-primary, 0.2), rgba($serv-secondary, 0.2));
     color: #60a5fa;
@@ -693,11 +698,11 @@ $serv-border-dark: #334155;
   font-weight: 800;
   color: $serv-text-light;
   margin-bottom: 0.75rem;
-  
+
   @include serv-dark-mode {
     color: $serv-text-dark;
   }
-  
+
   @media (max-width: 768px) {
     font-size: 2rem;
   }
@@ -707,7 +712,7 @@ $serv-border-dark: #334155;
   font-size: 1.25rem;
   color: $serv-text-light-secondary;
   margin-bottom: 1.5rem;
-  
+
   @include serv-dark-mode {
     color: $serv-text-dark-secondary;
   }
@@ -737,12 +742,12 @@ $serv-border-dark: #334155;
   cursor: pointer;
   border: 1px solid $serv-border-light;
   position: relative;
-  
+
   @include serv-dark-mode {
     background: $serv-bg-dark;
     border: 1px solid $serv-border-dark;
   }
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -755,19 +760,19 @@ $serv-border-dark: #334155;
     transition: opacity 0.3s ease;
     z-index: 0;
   }
-  
+
   &:hover {
     transform: translateY(-12px) scale(1.02);
     box-shadow: 0 20px 40px rgba($serv-primary, 0.2);
-    
+
     &::before {
       opacity: 1;
     }
-    
+
     .serv-service-overlay {
       opacity: 1;
     }
-    
+
     .serv-service-image {
       transform: scale(1.1);
     }
@@ -778,7 +783,7 @@ $serv-border-dark: #334155;
   position: relative;
   overflow: hidden;
   background: $serv-bg-light-alt;
-  
+
   @include serv-dark-mode {
     background: $serv-bg-dark-alt;
   }
@@ -817,7 +822,7 @@ $serv-border-dark: #334155;
   text-align: center;
   transform: translateY(10px);
   transition: transform 0.3s ease;
-  
+
   .serv-service-card:hover & {
     transform: translateY(0);
   }
@@ -874,7 +879,7 @@ $serv-border-dark: #334155;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  
+
   @include serv-dark-mode {
     color: $serv-text-dark;
   }
@@ -882,7 +887,7 @@ $serv-border-dark: #334155;
 
 .serv-service-description {
   margin-bottom: 1.25rem;
-  
+
   p {
     color: $serv-text-light-secondary;
     font-size: 0.95rem;
@@ -892,7 +897,7 @@ $serv-border-dark: #334155;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    
+
     @include serv-dark-mode {
       color: $serv-text-dark-secondary;
     }
@@ -904,7 +909,7 @@ $serv-border-dark: #334155;
   gap: 1.5rem;
   padding-top: 1rem;
   border-top: 1px solid $serv-border-light;
-  
+
   @include serv-dark-mode {
     border-top-color: $serv-border-dark;
   }
@@ -917,11 +922,11 @@ $serv-border-dark: #334155;
   color: $serv-text-light-secondary;
   font-size: 0.875rem;
   font-weight: 600;
-  
+
   @include serv-dark-mode {
     color: $serv-text-dark-secondary;
   }
-  
+
   .q-icon {
     color: $serv-primary;
   }
@@ -930,7 +935,7 @@ $serv-border-dark: #334155;
 .serv-service-actions {
   padding: 1rem 1.75rem;
   background: $serv-bg-light-alt;
-  
+
   @include serv-dark-mode {
     background: rgba(255, 255, 255, 0.02);
   }
@@ -939,10 +944,10 @@ $serv-border-dark: #334155;
 .serv-details-btn {
   font-weight: 600;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: rgba($serv-primary, 0.1);
-    
+
     @include serv-dark-mode {
       background: rgba($serv-primary, 0.2);
     }
@@ -955,7 +960,7 @@ $serv-border-dark: #334155;
   background: linear-gradient(135deg, $serv-primary 0%, $serv-primary-dark 100%);
   padding: 100px 0;
   overflow: hidden;
-  
+
   @media (max-width: 768px) {
     padding: 60px 0;
   }
@@ -1005,7 +1010,7 @@ $serv-border-dark: #334155;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   animation: particle-float 10s ease-in-out infinite;
-  
+
   @for $i from 1 through 20 {
     &:nth-child(#{$i}) {
       top: random(100) * 1%;
@@ -1017,10 +1022,13 @@ $serv-border-dark: #334155;
 }
 
 @keyframes particle-float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) translateX(0);
     opacity: 0;
   }
+
   50% {
     transform: translateY(-50px) translateX(20px);
     opacity: 1;
@@ -1053,7 +1061,7 @@ $serv-border-dark: #334155;
   color: white;
   margin-bottom: 1.5rem;
   line-height: 1.2;
-  
+
   @media (max-width: 768px) {
     font-size: 2.2rem;
   }
@@ -1061,7 +1069,7 @@ $serv-border-dark: #334155;
 
 .serv-cta-highlight {
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -1082,7 +1090,7 @@ $serv-border-dark: #334155;
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
-  
+
   @media (max-width: 768px) {
     font-size: 1.1rem;
   }
@@ -1094,7 +1102,7 @@ $serv-border-dark: #334155;
   gap: 2rem;
   margin-bottom: 2.5rem;
   flex-wrap: wrap;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
@@ -1118,7 +1126,7 @@ $serv-border-dark: #334155;
   border-radius: 14px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
@@ -1136,7 +1144,7 @@ $serv-border-dark: #334155;
   padding: 2rem;
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -1169,11 +1177,11 @@ $serv-border-dark: #334155;
 
 .serv-dialog-content {
   padding: 2.5rem;
-  
+
   @include serv-dark-mode {
     background: $serv-bg-dark;
   }
-  
+
   @media (max-width: 768px) {
     padding: 1.5rem;
   }
@@ -1185,7 +1193,7 @@ $serv-border-dark: #334155;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
   margin-bottom: 2rem;
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -1215,7 +1223,7 @@ $serv-border-dark: #334155;
   font-weight: 700;
   color: $serv-text-light;
   margin-bottom: 1rem;
-  
+
   @include serv-dark-mode {
     color: $serv-text-dark;
   }
@@ -1223,7 +1231,7 @@ $serv-border-dark: #334155;
 
 .serv-dialog-info-card .q-list {
   background: white;
-  
+
   @include serv-dark-mode {
     background: $serv-bg-dark-alt;
     border-color: $serv-border-dark;
@@ -1233,10 +1241,10 @@ $serv-border-dark: #334155;
 .serv-info-item {
   padding: 1.25rem;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: $serv-bg-light-alt;
-    
+
     @include serv-dark-mode {
       background: rgba(255, 255, 255, 0.05);
     }
@@ -1255,7 +1263,7 @@ $serv-border-dark: #334155;
   font-size: 1.1rem;
   font-weight: 700;
   color: $serv-text-light;
-  
+
   @include serv-dark-mode {
     color: $serv-text-dark;
   }
@@ -1273,11 +1281,11 @@ $serv-border-dark: #334155;
   color: $serv-text-light;
   margin-bottom: 1.5rem;
   line-height: 1.3;
-  
+
   @include serv-dark-mode {
     color: $serv-text-dark;
   }
-  
+
   @media (max-width: 768px) {
     font-size: 1.75rem;
   }
@@ -1293,7 +1301,7 @@ $serv-border-dark: #334155;
   border-radius: 20px;
   margin-bottom: 2.5rem;
   border-left: 4px solid $serv-primary;
-  
+
   @include serv-dark-mode {
     background: $serv-bg-dark-alt;
   }
@@ -1307,7 +1315,7 @@ $serv-border-dark: #334155;
   font-weight: 700;
   color: $serv-text-light;
   margin-bottom: 1rem;
-  
+
   @include serv-dark-mode {
     color: $serv-text-dark;
   }
@@ -1317,7 +1325,7 @@ $serv-border-dark: #334155;
   font-size: 1.05rem;
   color: $serv-text-light-secondary;
   line-height: 1.8;
-  
+
   @include serv-dark-mode {
     color: $serv-text-dark-secondary;
   }
@@ -1325,10 +1333,10 @@ $serv-border-dark: #334155;
 
 .serv-detail-features {
   margin-bottom: 2.5rem;
-  
+
   .q-list {
     background: white;
-    
+
     @include serv-dark-mode {
       background: $serv-bg-dark-alt;
       border-color: $serv-border-dark;
@@ -1344,7 +1352,7 @@ $serv-border-dark: #334155;
   font-weight: 700;
   color: $serv-text-light;
   margin-bottom: 1rem;
-  
+
   @include serv-dark-mode {
     color: $serv-text-dark;
   }
@@ -1353,10 +1361,10 @@ $serv-border-dark: #334155;
 .serv-feature-item {
   padding: 1rem;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: rgba($serv-primary, 0.05);
-    
+
     @include serv-dark-mode {
       background: rgba($serv-primary, 0.1);
     }
@@ -1367,7 +1375,7 @@ $serv-border-dark: #334155;
   font-size: 1rem;
   color: $serv-text-light;
   font-weight: 500;
-  
+
   @include serv-dark-mode {
     color: $serv-text-dark;
   }
@@ -1385,7 +1393,7 @@ $serv-border-dark: #334155;
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba($serv-primary, 0.3);
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba($serv-primary, 0.4);
@@ -1398,6 +1406,7 @@ $serv-border-dark: #334155;
     opacity: 0;
     transform: translateX(-40px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -1409,6 +1418,7 @@ $serv-border-dark: #334155;
     opacity: 0;
     transform: translateY(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1420,6 +1430,7 @@ $serv-border-dark: #334155;
     opacity: 0;
     transform: translateY(40px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1431,6 +1442,7 @@ $serv-border-dark: #334155;
     opacity: 0;
     transform: scale(0.85);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -1441,25 +1453,32 @@ $serv-border-dark: #334155;
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-25px);
   }
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.8;
     transform: scale(1);
   }
+
   50% {
     opacity: 1;
     transform: scale(1.05);

@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="showDialog" persistent>
-    <q-card class="new-dialog" style="min-width: 700px;">
+    <q-card class="new-dialog">
       <q-card-section class="dialog-header">
         <div class="header-content">
           <div class="header-title">

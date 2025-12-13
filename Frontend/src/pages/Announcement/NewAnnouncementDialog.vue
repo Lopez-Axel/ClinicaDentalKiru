@@ -1,7 +1,7 @@
 <template>
   <q-dialog v-model="showDialog" persistent>
-    <q-card class="new-dialog" style="min-width: 600px; max-width: 800px;">
-      <q-card-section class="dialog-header bg-primary text-white">
+    <q-card class="new-dialog">
+      <q-card-section class="dialog-header">
         <div class="row items-center">
           <div class="col">
             <div class="text-h6">Nuevo Anuncio</div>
@@ -176,6 +176,7 @@
 import { ref, computed, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { useAnuncioStore } from 'src/stores/anuncioStore'
+import { useAuthStore } from 'src/stores/authStore'
 
 export default {
   name: 'NewAnuncioDialog',
@@ -185,6 +186,7 @@ export default {
   setup(props, { emit }) {
     const $q = useQuasar()
     const anuncioStore = useAnuncioStore()
+    const authStore = useAuthStore()
     const loading = ref(false)
     const isSubmitting = ref(false) // Nueva variable para controlar submit
 
@@ -192,6 +194,11 @@ export default {
       get: () => props.modelValue,
       set: val => emit('update:modelValue', val)
     })
+
+    // Obtener el userId del usuario logueado
+    const getCurrentUserId = () => {
+      return authStore.user?.id || null
+    }
 
     const formData = ref({
       titulo: '',
@@ -202,7 +209,7 @@ export default {
       imagen: null,
       imagenPreview: '',
       estado: 'activo',
-      userId: 1
+      userId: getCurrentUserId()
     })
 
     const categorias = [
@@ -237,7 +244,7 @@ export default {
         imagen: null,
         imagenPreview: '',
         estado: 'activo',
-        userId: 1
+        userId: getCurrentUserId()
       }
     }
 
@@ -304,14 +311,32 @@ export default {
       // Prevenir doble submit
       if (isSubmitting.value || !isFormValid.value) return
       
+      // Verificar que el usuario esté autenticado
+      if (!authStore.isAuthenticated || !authStore.user?.id) {
+        $q.notify({
+          type: 'negative',
+          message: 'Debes estar autenticado para crear un anuncio',
+          position: 'top-right',
+          timeout: 5000
+        })
+        return
+      }
+      
       isSubmitting.value = true
       loading.value = true
       
       try {
+        // Asegurar que el userId esté actualizado con el usuario logueado
+        const currentUserId = getCurrentUserId()
+        if (!currentUserId) {
+          throw new Error('No se pudo obtener el ID del usuario autenticado')
+        }
+
         // DEBUG: Verificar los datos antes de enviar
         console.log('Datos del formulario:', {
           ...formData.value,
-          imagen: formData.value.imagen ? `Archivo: ${formData.value.imagen.name}` : 'null'
+          imagen: formData.value.imagen ? `Archivo: ${formData.value.imagen.name}` : 'null',
+          userId: currentUserId
         })
 
         // Preparar los datos de texto (excluyendo el archivo)
@@ -321,7 +346,7 @@ export default {
           categoria: formData.value.categoria,
           fecha_publicacion: formData.value.fecha_publicacion,
           estado: formData.value.estado,
-          userId: formData.value.userId
+          userId: currentUserId
         }
 
         // Agregar fecha de expiración solo si existe
@@ -367,6 +392,8 @@ export default {
     watch(() => props.modelValue, val => { 
       if (val) {
         console.log('Diálogo abierto')
+        // Actualizar el userId cada vez que se abre el diálogo
+        formData.value.userId = getCurrentUserId()
         resetForm()
         isSubmitting.value = false
       }
@@ -389,3 +416,4 @@ export default {
   }
 }
 </script>
+

@@ -1,11 +1,10 @@
 <template>
   <q-dialog v-model="showDialog" persistent>
-    <q-card class="edit-dialog" style="min-width: 600px; max-width: 800px;">
-      <q-card-section class="dialog-header bg-primary text-white">
+    <q-card class="edit-dialog">
+      <q-card-section class="dialog-header">
         <div class="row items-center">
           <div class="col">
             <div class="text-h6">Editar Servicio</div>
-            <div v-if="formData.id" class="text-caption">ID: #{{ formData.id }}</div>
           </div>
           <div class="col-auto">
             <q-btn icon="close" flat round dense @click="closeDialog" color="white" />

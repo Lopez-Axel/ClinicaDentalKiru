@@ -1,8 +1,8 @@
-// Variables de color para historial de citas - Tema púrpura vibrante
-$historyquotes-primary: #8B5CF6;
-$historyquotes-primary-dark: #7C3AED;
-$historyquotes-secondary: #A78BFA;
-$historyquotes-accent: #C4B5FD;
+// Variables de color para historial de citas - Tema naranja vibrante
+$historyquotes-primary: #FF6B35;
+$historyquotes-primary-dark: #E55A2B;
+$historyquotes-secondary: #FF9B70;
+$historyquotes-accent: #FFB896;
 $historyquotes-success: #10B981;
 $historyquotes-warning: #F59E0B;
 $historyquotes-danger: #EF4444;
@@ -10,17 +10,17 @@ $historyquotes-info: #06B6D4;
 
 // Modo claro
 $historyquotes-bg-light: #ffffff;
-$historyquotes-bg-light-alt: #F8FAFC;
-$historyquotes-text-light: #4C1D95;
-$historyquotes-text-light-secondary: #6D28D9;
-$historyquotes-border-light: #DDD6FE;
+$historyquotes-bg-light-alt: #FFF5F0;
+$historyquotes-text-light: #7A2E0B;
+$historyquotes-text-light-secondary: #B45309;
+$historyquotes-border-light: #FED7AA;
 
 // Modo oscuro
-$historyquotes-bg-dark: #4C1D95;
-$historyquotes-bg-dark-alt: #5B21B6;
-$historyquotes-text-dark: #EDE9FE;
-$historyquotes-text-dark-secondary: #C4B5FD;
-$historyquotes-border-dark: #7C3AED;
+$historyquotes-bg-dark: #451A03;
+$historyquotes-bg-dark-alt: #7C2D12;
+$historyquotes-text-dark: #FED7AA;
+$historyquotes-text-dark-secondary: #FDBA74;
+$historyquotes-border-dark: #EA580C;
 
 // Mixins para dark mode
 @mixin historyquotes-dark-mode {
@@ -34,11 +34,11 @@ $historyquotes-border-dark: #7C3AED;
   min-height: 100vh;
   background: $historyquotes-bg-light-alt;
   padding: 2rem;
-  
+
   @include historyquotes-dark-mode {
     background: $historyquotes-bg-dark;
   }
-  
+
   @media (max-width: 768px) {
     padding: 1rem;
   }
@@ -53,7 +53,7 @@ $historyquotes-border-dark: #7C3AED;
   margin-bottom: 2rem;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba($historyquotes-primary, 0.4);
-  
+
   @media (max-width: 768px) {
     padding: 1.5rem;
     border-radius: 16px;
@@ -92,9 +92,12 @@ $historyquotes-border-dark: #7C3AED;
 }
 
 @keyframes historyquotes-float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-20px);
   }
@@ -113,7 +116,7 @@ $historyquotes-border-dark: #7C3AED;
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  
+
   @media (max-width: 768px) {
     gap: 1rem;
   }
@@ -129,7 +132,7 @@ $historyquotes-border-dark: #7C3AED;
   align-items: center;
   justify-content: center;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  
+
   @media (max-width: 768px) {
     width: 60px;
     height: 60px;
@@ -140,7 +143,7 @@ $historyquotes-border-dark: #7C3AED;
 .historyquotes-header-icon {
   font-size: 2rem;
   color: white;
-  
+
   @media (max-width: 768px) {
     font-size: 1.75rem;
   }
@@ -152,7 +155,7 @@ $historyquotes-border-dark: #7C3AED;
   color: white;
   margin: 0 0 0.5rem 0;
   letter-spacing: -0.5px;
-  
+
   @media (max-width: 768px) {
     font-size: 1.75rem;
   }
@@ -162,7 +165,7 @@ $historyquotes-border-dark: #7C3AED;
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.95);
   margin: 0;
-  
+
   @media (max-width: 768px) {
     font-size: 0.9rem;
   }
@@ -179,7 +182,7 @@ $historyquotes-border-dark: #7C3AED;
   padding: 1.5rem;
   box-shadow: 0 4px 16px rgba($historyquotes-primary, 0.1);
   border: 1px solid $historyquotes-border-light;
-  
+
   @include historyquotes-dark-mode {
     background: $historyquotes-bg-dark-alt;
     border-color: $historyquotes-border-dark;
@@ -198,11 +201,11 @@ $historyquotes-border-dark: #7C3AED;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   @include historyquotes-dark-mode {
     color: $historyquotes-text-dark;
   }
-  
+
   i {
     color: $historyquotes-primary;
   }
@@ -219,7 +222,7 @@ $historyquotes-border-dark: #7C3AED;
   grid-template-columns: 1fr 1fr auto;
   gap: 1rem;
   align-items: end;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -238,11 +241,11 @@ $historyquotes-border-dark: #7C3AED;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   @include historyquotes-dark-mode {
     color: $historyquotes-text-dark;
   }
-  
+
   i {
     color: $historyquotes-primary;
     font-size: 0.75rem;
@@ -259,14 +262,15 @@ $historyquotes-border-dark: #7C3AED;
   padding: 10px 24px;
   font-weight: 600;
   border-radius: 12px;
+  background: linear-gradient(135deg, $historyquotes-primary 0%, $historyquotes-primary-dark 100%);
   box-shadow: 0 4px 14px rgba($historyquotes-primary, 0.3);
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba($historyquotes-primary, 0.4);
   }
-  
+
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -305,11 +309,11 @@ $historyquotes-border-dark: #7C3AED;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   @include historyquotes-dark-mode {
     color: $historyquotes-text-dark;
   }
-  
+
   i {
     color: $historyquotes-primary;
   }
@@ -337,7 +341,7 @@ $historyquotes-border-dark: #7C3AED;
   border-radius: 50px;
   font-size: 0.875rem;
   font-weight: 600;
-  
+
   @include historyquotes-dark-mode {
     background: rgba($historyquotes-primary, 0.2);
     color: $historyquotes-text-dark-secondary;
@@ -349,7 +353,7 @@ $historyquotes-border-dark: #7C3AED;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   gap: 1.5rem;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -362,12 +366,12 @@ $historyquotes-border-dark: #7C3AED;
   box-shadow: 0 4px 16px rgba($historyquotes-primary, 0.1);
   border: 1px solid $historyquotes-border-light;
   transition: all 0.3s ease;
-  
+
   @include historyquotes-dark-mode {
     background: $historyquotes-bg-dark-alt;
     border-color: $historyquotes-border-dark;
   }
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba($historyquotes-primary, 0.15);
@@ -391,7 +395,7 @@ $historyquotes-border-dark: #7C3AED;
   background: linear-gradient(135deg, $historyquotes-primary, $historyquotes-primary-dark);
   color: white;
   font-size: 1.25rem;
-  
+
   &.reservation {
     background: linear-gradient(135deg, $historyquotes-secondary, $historyquotes-primary);
   }
@@ -407,7 +411,7 @@ $historyquotes-border-dark: #7C3AED;
   color: $historyquotes-text-light;
   margin: 0 0 0.5rem 0;
   line-height: 1.4;
-  
+
   @include historyquotes-dark-mode {
     color: $historyquotes-text-dark;
   }
@@ -421,12 +425,12 @@ $historyquotes-border-dark: #7C3AED;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  
+
   &.appointment {
     background: rgba($historyquotes-primary, 0.1);
     color: $historyquotes-primary;
   }
-  
+
   &.reservation {
     background: rgba($historyquotes-secondary, 0.1);
     color: $historyquotes-secondary;
@@ -443,7 +447,7 @@ $historyquotes-border-dark: #7C3AED;
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  
+
   &.compact {
     align-items: center;
     gap: 0.5rem;
@@ -470,7 +474,7 @@ $historyquotes-border-dark: #7C3AED;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  
+
   @include historyquotes-dark-mode {
     color: $historyquotes-text-dark-secondary;
   }
@@ -480,7 +484,7 @@ $historyquotes-border-dark: #7C3AED;
   color: $historyquotes-text-light-secondary;
   font-size: 0.875rem;
   font-weight: 500;
-  
+
   @include historyquotes-dark-mode {
     color: $historyquotes-text-dark;
   }
@@ -505,7 +509,7 @@ $historyquotes-border-dark: #7C3AED;
   font-weight: 600;
   color: $historyquotes-text-light;
   font-size: 0.875rem;
-  
+
   @include historyquotes-dark-mode {
     color: $historyquotes-text-dark;
   }
@@ -521,7 +525,7 @@ $historyquotes-border-dark: #7C3AED;
   margin-top: 1.25rem;
   padding-top: 1rem;
   border-top: 1px solid $historyquotes-border-light;
-  
+
   @include historyquotes-dark-mode {
     border-top-color: $historyquotes-border-dark;
   }
@@ -534,11 +538,11 @@ $historyquotes-border-dark: #7C3AED;
   color: $historyquotes-text-light-secondary;
   font-size: 0.8rem;
   font-weight: 500;
-  
+
   @include historyquotes-dark-mode {
     color: $historyquotes-text-dark-secondary;
   }
-  
+
   i {
     color: $historyquotes-primary;
     font-size: 0.7rem;
@@ -567,7 +571,7 @@ $historyquotes-border-dark: #7C3AED;
   color: $historyquotes-text-light-secondary;
   position: relative;
   z-index: 2;
-  
+
   @include historyquotes-dark-mode {
     color: $historyquotes-text-dark-secondary;
   }
@@ -596,10 +600,13 @@ $historyquotes-border-dark: #7C3AED;
 }
 
 @keyframes historyquotes-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.6;
   }
+
   50% {
     transform: scale(1.1);
     opacity: 1;
@@ -611,7 +618,7 @@ $historyquotes-border-dark: #7C3AED;
   font-weight: 700;
   color: $historyquotes-text-light;
   margin: 0 0 0.5rem 0;
-  
+
   @include historyquotes-dark-mode {
     color: $historyquotes-text-dark;
   }
@@ -623,7 +630,7 @@ $historyquotes-border-dark: #7C3AED;
   margin: 0;
   max-width: 300px;
   margin: 0 auto;
-  
+
   @include historyquotes-dark-mode {
     color: $historyquotes-text-dark-secondary;
   }
@@ -640,16 +647,16 @@ $historyquotes-border-dark: #7C3AED;
   .historyquotes-filter-row {
     grid-template-columns: 1fr;
   }
-  
+
   .historyquotes-section-header {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .historyquotes-cards-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .historyquotes-card {
     padding: 1.25rem;
   }
@@ -659,17 +666,17 @@ $historyquotes-border-dark: #7C3AED;
   .historyquotes-page-title {
     font-size: 1.5rem;
   }
-  
+
   .historyquotes-section-title {
     font-size: 1.25rem;
   }
-  
+
   .historyquotes-card-header {
     flex-direction: column;
     text-align: center;
     gap: 0.75rem;
   }
-  
+
   .historyquotes-card-icon-container {
     align-self: center;
   }

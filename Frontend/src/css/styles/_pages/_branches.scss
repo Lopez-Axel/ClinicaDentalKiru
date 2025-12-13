@@ -35,7 +35,7 @@
   border-radius: var(--radius-xl);
   height: 100%;
   cursor: pointer;
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -239,7 +239,7 @@
 .details-btn {
   font-weight: 600;
   transition: all var(--transition-fast);
-  
+
   &:hover {
     transform: translateX(4px);
   }
@@ -473,7 +473,7 @@ $branch-border-dark: #334155;
 .branch-branch-page {
   background: $branch-bg-light;
   overflow-x: hidden;
-  
+
   @include branch-dark-mode {
     background: $branch-bg-dark;
   }
@@ -485,11 +485,11 @@ $branch-border-dark: #334155;
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
   padding: 100px 0 80px;
   overflow: hidden;
-  
+
   @include branch-dark-mode {
     background: linear-gradient(135deg, $branch-bg-dark 0%, #1e3a5f 50%, $branch-bg-dark 100%);
   }
-  
+
   @media (max-width: 768px) {
     padding: 60px 0 40px;
   }
@@ -510,7 +510,7 @@ $branch-border-dark: #334155;
   border-radius: 50%;
   opacity: 0.1;
   animation: branch-float 20s ease-in-out infinite;
-  
+
   @include branch-dark-mode {
     opacity: 0.05;
   }
@@ -553,7 +553,7 @@ $branch-border-dark: #334155;
   font-size: 0.875rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
-  
+
   @include branch-dark-mode {
     background: rgba($branch-primary, 0.2);
     color: #60a5fa;
@@ -567,15 +567,15 @@ $branch-border-dark: #334155;
   line-height: 1.1;
   margin-bottom: 1.5rem;
   letter-spacing: -0.02em;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark;
   }
-  
+
   @media (max-width: 1024px) {
     font-size: 2.8rem;
   }
-  
+
   @media (max-width: 768px) {
     font-size: 2.2rem;
     text-align: center;
@@ -588,7 +588,7 @@ $branch-border-dark: #334155;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -606,11 +606,11 @@ $branch-border-dark: #334155;
   color: $branch-text-light-secondary;
   line-height: 1.7;
   margin-bottom: 2rem;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark-secondary;
   }
-  
+
   @media (max-width: 768px) {
     font-size: 1.1rem;
     text-align: center;
@@ -622,7 +622,7 @@ $branch-border-dark: #334155;
   flex-direction: column;
   gap: 12px;
   margin-bottom: 2rem;
-  
+
   @media (max-width: 768px) {
     align-items: center;
   }
@@ -634,11 +634,11 @@ $branch-border-dark: #334155;
   gap: 12px;
   font-size: 1rem;
   color: $branch-text-light-secondary;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark-secondary;
   }
-  
+
   span {
     font-weight: 500;
   }
@@ -648,7 +648,7 @@ $branch-border-dark: #334155;
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  
+
   @media (max-width: 768px) {
     justify-content: center;
   }
@@ -661,7 +661,7 @@ $branch-border-dark: #334155;
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba($branch-primary, 0.3);
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba($branch-primary, 0.4);
@@ -674,11 +674,11 @@ $branch-border-dark: #334155;
   font-size: 1rem;
   border-radius: 12px;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: rgba($branch-primary, 0.1);
     transform: translateY(-2px);
-    
+
     @include branch-dark-mode {
       background: rgba($branch-primary, 0.2);
     }
@@ -690,7 +690,7 @@ $branch-border-dark: #334155;
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  
+
   @media (max-width: 768px) {
     max-width: 400px;
     margin-top: 3rem;
@@ -708,7 +708,7 @@ $branch-border-dark: #334155;
   filter: blur(60px);
   z-index: 0;
   animation: branch-pulse 3s ease-in-out infinite;
-  
+
   @include branch-dark-mode {
     background: radial-gradient(circle, rgba($branch-primary, 0.3), transparent 70%);
   }
@@ -723,13 +723,13 @@ $branch-border-dark: #334155;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 1;
-  
+
   @include branch-dark-mode {
     background: rgba($branch-bg-dark-alt, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   }
-  
+
   @media (max-width: 768px) {
     padding: 20px;
     border-radius: 24px;
@@ -762,15 +762,15 @@ $branch-border-dark: #334155;
   align-items: center;
   gap: 12px;
   animation: branch-float 4s ease-in-out infinite;
-  
+
   @include branch-dark-mode {
     background: $branch-bg-dark-alt;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   }
-  
+
   @media (max-width: 768px) {
     padding: 12px 16px;
-    
+
     .q-icon {
       font-size: 20px !important;
     }
@@ -780,22 +780,22 @@ $branch-border-dark: #334155;
 .branch-floating-text {
   display: flex;
   flex-direction: column;
-  
+
   strong {
     font-size: 1.25rem;
     font-weight: 700;
     color: $branch-text-light;
     line-height: 1;
-    
+
     @include branch-dark-mode {
       color: $branch-text-dark;
     }
   }
-  
+
   span {
     font-size: 0.75rem;
     color: $branch-text-light-secondary;
-    
+
     @include branch-dark-mode {
       color: $branch-text-dark-secondary;
     }
@@ -806,7 +806,7 @@ $branch-border-dark: #334155;
   top: 15%;
   right: -10%;
   animation-delay: 0s;
-  
+
   @media (max-width: 768px) {
     top: 10%;
     right: -5%;
@@ -817,7 +817,7 @@ $branch-border-dark: #334155;
   bottom: 20%;
   left: -12%;
   animation-delay: 1.5s;
-  
+
   @media (max-width: 768px) {
     bottom: 15%;
     left: -8%;
@@ -828,7 +828,7 @@ $branch-border-dark: #334155;
   top: 50%;
   right: -15%;
   animation-delay: 3s;
-  
+
   @media (max-width: 768px) {
     top: 45%;
     right: -10%;
@@ -840,11 +840,11 @@ $branch-border-dark: #334155;
   position: relative;
   padding: 100px 0;
   background: $branch-bg-light-alt;
-  
+
   @include branch-dark-mode {
     background: $branch-bg-dark-alt;
   }
-  
+
   @media (max-width: 768px) {
     padding: 60px 0;
   }
@@ -864,7 +864,7 @@ $branch-border-dark: #334155;
   position: absolute;
   width: 100%;
   height: 100px;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -897,7 +897,7 @@ $branch-border-dark: #334155;
   font-size: 0.875rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  
+
   @include branch-dark-mode {
     background: linear-gradient(135deg, rgba($branch-primary, 0.2), rgba($branch-secondary, 0.2));
     color: #60a5fa;
@@ -909,11 +909,11 @@ $branch-border-dark: #334155;
   font-weight: 800;
   color: $branch-text-light;
   margin-bottom: 0.75rem;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark;
   }
-  
+
   @media (max-width: 768px) {
     font-size: 2rem;
   }
@@ -923,7 +923,7 @@ $branch-border-dark: #334155;
   font-size: 1.25rem;
   color: $branch-text-light-secondary;
   margin-bottom: 1.5rem;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark-secondary;
   }
@@ -960,7 +960,7 @@ $branch-border-dark: #334155;
   font-size: 1.5rem;
   font-weight: 600;
   color: $branch-text-light;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark;
   }
@@ -982,7 +982,7 @@ $branch-border-dark: #334155;
   position: absolute;
   border-radius: 50%;
   border: 2px dashed $branch-border-light;
-  
+
   @include branch-dark-mode {
     border-color: $branch-border-dark;
   }
@@ -1011,7 +1011,7 @@ $branch-border-dark: #334155;
   font-weight: 700;
   color: $branch-text-light;
   margin-bottom: 0.75rem;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark;
   }
@@ -1020,7 +1020,7 @@ $branch-border-dark: #334155;
 .branch-empty-text {
   font-size: 1.1rem;
   color: $branch-text-light-secondary;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark-secondary;
   }
@@ -1035,12 +1035,12 @@ $branch-border-dark: #334155;
   cursor: pointer;
   border: 1px solid $branch-border-light;
   position: relative;
-  
+
   @include branch-dark-mode {
     background: $branch-bg-dark;
     border: 1px solid $branch-border-dark;
   }
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -1053,19 +1053,19 @@ $branch-border-dark: #334155;
     transition: opacity 0.3s ease;
     z-index: 0;
   }
-  
+
   &:hover {
     transform: translateY(-12px) scale(1.02);
     box-shadow: 0 20px 40px rgba($branch-primary, 0.2);
-    
+
     &::before {
       opacity: 1;
     }
-    
+
     .branch-branch-overlay {
       opacity: 1;
     }
-    
+
     .branch-branch-image {
       transform: scale(1.1);
     }
@@ -1076,7 +1076,7 @@ $branch-border-dark: #334155;
   position: relative;
   overflow: hidden;
   background: $branch-bg-light-alt;
-  
+
   @include branch-dark-mode {
     background: $branch-bg-dark-alt;
   }
@@ -1115,7 +1115,7 @@ $branch-border-dark: #334155;
   text-align: center;
   transform: translateY(10px);
   transition: transform 0.3s ease;
-  
+
   .branch-branch-card:hover & {
     transform: translateY(0);
   }
@@ -1167,7 +1167,7 @@ $branch-border-dark: #334155;
   color: $branch-text-light;
   margin-bottom: 0.75rem;
   line-height: 1.4;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark;
   }
@@ -1181,11 +1181,11 @@ $branch-border-dark: #334155;
   font-size: 0.95rem;
   margin-bottom: 1rem;
   font-weight: 500;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark-secondary;
   }
-  
+
   .q-icon {
     color: $branch-primary;
   }
@@ -1197,7 +1197,7 @@ $branch-border-dark: #334155;
   margin-bottom: 1rem;
   padding-top: 1rem;
   border-top: 1px solid $branch-border-light;
-  
+
   @include branch-dark-mode {
     border-top-color: $branch-border-dark;
   }
@@ -1210,11 +1210,11 @@ $branch-border-dark: #334155;
   color: $branch-text-light-secondary;
   font-size: 0.875rem;
   font-weight: 600;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark-secondary;
   }
-  
+
   .q-icon {
     color: $branch-primary;
   }
@@ -1230,7 +1230,7 @@ $branch-border-dark: #334155;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    
+
     @include branch-dark-mode {
       color: $branch-text-dark-secondary;
     }
@@ -1240,7 +1240,7 @@ $branch-border-dark: #334155;
 .branch-branch-actions {
   padding: 1rem 1.75rem;
   background: $branch-bg-light-alt;
-  
+
   @include branch-dark-mode {
     background: rgba(255, 255, 255, 0.02);
   }
@@ -1249,10 +1249,10 @@ $branch-border-dark: #334155;
 .branch-details-btn {
   font-weight: 600;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: rgba($branch-primary, 0.1);
-    
+
     @include branch-dark-mode {
       background: rgba($branch-primary, 0.2);
     }
@@ -1265,7 +1265,7 @@ $branch-border-dark: #334155;
   background: linear-gradient(135deg, $branch-primary 0%, $branch-primary-dark 100%);
   padding: 100px 0;
   overflow: hidden;
-  
+
   @media (max-width: 768px) {
     padding: 60px 0;
   }
@@ -1315,7 +1315,7 @@ $branch-border-dark: #334155;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   animation: branch-particle-float 10s ease-in-out infinite;
-  
+
   @for $i from 1 through 20 {
     &:nth-child(#{$i}) {
       top: random(100) * 1%;
@@ -1352,7 +1352,7 @@ $branch-border-dark: #334155;
   color: white;
   margin-bottom: 1.5rem;
   line-height: 1.2;
-  
+
   @media (max-width: 768px) {
     font-size: 2.2rem;
   }
@@ -1360,7 +1360,7 @@ $branch-border-dark: #334155;
 
 .branch-cta-highlight {
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -1381,7 +1381,7 @@ $branch-border-dark: #334155;
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
-  
+
   @media (max-width: 768px) {
     font-size: 1.1rem;
   }
@@ -1393,7 +1393,7 @@ $branch-border-dark: #334155;
   gap: 2rem;
   margin-bottom: 2.5rem;
   flex-wrap: wrap;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
@@ -1417,7 +1417,7 @@ $branch-border-dark: #334155;
   border-radius: 14px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
@@ -1435,7 +1435,7 @@ $branch-border-dark: #334155;
   padding: 2rem;
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -1468,11 +1468,11 @@ $branch-border-dark: #334155;
 
 .branch-dialog-content {
   padding: 2.5rem;
-  
+
   @include branch-dark-mode {
     background: $branch-bg-dark;
   }
-  
+
   @media (max-width: 768px) {
     padding: 1.5rem;
   }
@@ -1484,7 +1484,7 @@ $branch-border-dark: #334155;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
   margin-bottom: 2rem;
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -1514,7 +1514,7 @@ $branch-border-dark: #334155;
   font-weight: 700;
   color: $branch-text-light;
   margin-bottom: 1rem;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark;
   }
@@ -1524,7 +1524,7 @@ $branch-border-dark: #334155;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  
+
   @include branch-dark-mode {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   }
@@ -1548,11 +1548,11 @@ $branch-border-dark: #334155;
   color: $branch-text-light;
   margin-bottom: 1.5rem;
   line-height: 1.3;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark;
   }
-  
+
   @media (max-width: 768px) {
     font-size: 1.75rem;
   }
@@ -1564,10 +1564,10 @@ $branch-border-dark: #334155;
 
 .branch-detail-info-card {
   margin-bottom: 2.5rem;
-  
+
   .q-list {
     background: white;
-    
+
     @include branch-dark-mode {
       background: $branch-bg-dark-alt;
       border-color: $branch-border-dark;
@@ -1583,7 +1583,7 @@ $branch-border-dark: #334155;
   font-weight: 700;
   color: $branch-text-light;
   margin-bottom: 1rem;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark;
   }
@@ -1592,10 +1592,10 @@ $branch-border-dark: #334155;
 .branch-detail-info-item {
   padding: 1.25rem;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: $branch-bg-light-alt;
-    
+
     @include branch-dark-mode {
       background: rgba(255, 255, 255, 0.05);
     }
@@ -1614,7 +1614,7 @@ $branch-border-dark: #334155;
   font-size: 1.1rem;
   font-weight: 700;
   color: $branch-text-light;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark;
   }
@@ -1626,7 +1626,7 @@ $branch-border-dark: #334155;
   border-radius: 20px;
   margin-bottom: 2.5rem;
   border-left: 4px solid $branch-primary;
-  
+
   @include branch-dark-mode {
     background: $branch-bg-dark-alt;
   }
@@ -1640,7 +1640,7 @@ $branch-border-dark: #334155;
   font-weight: 700;
   color: $branch-text-light;
   margin-bottom: 1rem;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark;
   }
@@ -1650,7 +1650,7 @@ $branch-border-dark: #334155;
   font-size: 1.05rem;
   color: $branch-text-light-secondary;
   line-height: 1.8;
-  
+
   @include branch-dark-mode {
     color: $branch-text-dark-secondary;
   }
@@ -1669,12 +1669,12 @@ $branch-border-dark: #334155;
   padding: 14px 28px;
   border-radius: 12px;
   transition: all 0.3s ease;
-  
+
   @media (max-width: 768px) {
     width: 100%;
     flex: auto;
   }
-  
+
   &:hover {
     transform: translateY(-2px);
   }
@@ -1682,7 +1682,7 @@ $branch-border-dark: #334155;
 
 .branch-action-btn-primary {
   box-shadow: 0 4px 14px rgba($branch-primary, 0.3);
-  
+
   &:hover {
     box-shadow: 0 6px 20px rgba($branch-primary, 0.4);
   }
@@ -1713,7 +1713,7 @@ $branch-border-dark: #334155;
 .branch-map-container-full {
   width: 100%;
   height: 600px;
-  
+
   @media (max-width: 768px) {
     height: 400px;
   }
@@ -1727,48 +1727,59 @@ $branch-border-dark: #334155;
 
 // Animations Completadas
 @keyframes branch-float {
-  0%, 100% { 
-    transform: translateY(0) translateX(0); 
+
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
   }
-  50% { 
-    transform: translateY(-20px) translateX(10px); 
+
+  50% {
+    transform: translateY(-20px) translateX(10px);
   }
 }
 
 @keyframes branch-pulse {
-  0%, 100% { 
-    opacity: 0.5; 
+
+  0%,
+  100% {
+    opacity: 0.5;
     transform: translate(-50%, -50%) scale(1);
   }
-  50% { 
-    opacity: 0.8; 
+
+  50% {
+    opacity: 0.8;
     transform: translate(-50%, -50%) scale(1.1);
   }
 }
 
 @keyframes branch-wave {
-  0% { 
-    transform: translateX(-50%); 
+  0% {
+    transform: translateX(-50%);
   }
-  100% { 
-    transform: translateX(0); 
+
+  100% {
+    transform: translateX(0);
   }
 }
 
 @keyframes branch-rotate {
-  from { 
-    transform: translate(-50%, -50%) rotate(0deg); 
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
   }
-  to { 
-    transform: translate(-50%, -50%) rotate(360deg); 
+
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }
 
 @keyframes branch-particle-float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) translateX(0);
     opacity: 0;
   }
+
   50% {
     transform: translateY(-50px) translateX(20px);
     opacity: 1;
@@ -1780,6 +1791,7 @@ $branch-border-dark: #334155;
     opacity: 0;
     transform: translateX(-40px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -1791,6 +1803,7 @@ $branch-border-dark: #334155;
     opacity: 0;
     transform: translateY(-40px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1802,6 +1815,7 @@ $branch-border-dark: #334155;
     opacity: 0;
     transform: translateY(40px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1813,6 +1827,7 @@ $branch-border-dark: #334155;
     opacity: 0;
     transform: scale(0.8);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -1823,6 +1838,7 @@ $branch-border-dark: #334155;
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -1852,4 +1868,402 @@ $branch-border-dark: #334155;
 
 .fadeIn {
   animation-name: branch-fadeIn;
+}
+
+
+/* Diálogo maximizado */
+.new-dialog {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+/* Cabecera */
+.dialog-header {
+  background: #FF6B35;
+  color: white;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.5rem;
+}
+
+.close-btn {
+  color: white;
+  font-size: 1.25rem;
+}
+
+/* Contenido del formulario */
+.dialog-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: #f8f9fa;
+}
+
+/* Mensaje de bienvenida */
+.welcome-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1rem;
+  color: #34495e;
+  text-align: left;
+}
+
+.welcome-message i {
+  color: #FF6B35;
+  font-size: 1.5rem;
+}
+
+/* Grid para las columnas */
+.create-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Columnas */
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Secciones */
+.section-header {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #FF6B35;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 6px;
+  margin-bottom: 16px;
+}
+
+/* Campos del formulario */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-label {
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #34495e;
+}
+
+.required {
+  color: #e74c3c;
+  margin-left: 2px;
+}
+
+.form-input {
+  width: 100%;
+  background: white;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+/* Fila para latitud/longitud */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Vista previa de mapa */
+.map-preview {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-container-small iframe {
+  border-radius: 8px;
+}
+
+/* Placeholder del mapa */
+.map-placeholder-small {
+  text-align: center;
+  color: #7f8c8d;
+}
+
+.map-placeholder-small i {
+  font-size: 3rem;
+  margin-bottom: 8px;
+  color: #bdc3c7;
+}
+
+/* Botones */
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  background: #ffffff;
+  border-top: 1px solid #e0e0e0;
+}
+
+.primary-btn {
+  background: #FF6B35;
+  color: white;
+  border-radius: 6px;
+  padding: 8px 24px;
+  transition: all 0.2s;
+}
+
+.primary-btn:hover {
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+}
+
+.secondary-btn {
+  background: #f0f0f0;
+  color: #6c757d;
+  border-radius: 6px;
+  padding: 8px 24px;
+}
+
+.secondary-btn:hover {
+  background: #e0e0e0;
+}
+
+/* Vista previa de imagen */
+img {
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* Toggle */
+.q-toggle__track {
+  border-radius: 12px;
+}
+
+.q-toggle__thumb {
+  border-radius: 50%;
+}
+
+/* Scroll personalizado */
+.dialog-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dialog-content::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+/* Modo oscuro */
+body[data-theme='dark'] .dialog-content {
+  background: #1e1e1e;
+  color: #f5f5f5;
+}
+
+body[data-theme='dark'] .form-input {
+  background: #2c2c2c;
+  color: #f5f5f5;
+}
+
+body[data-theme='dark'] .secondary-btn {
+  background: #2c2c2c;
+  color: #ccc;
+}
+
+body[data-theme='dark'] .primary-btn {
+  background: #FF6B35;
+}
+
+.edit-dialog {
+  max-width: 900px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.dialog-header {
+  background: #FF6B35;
+  /* Cabecera naranja */
+  color: white;
+  padding: 16px 24px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.close-btn {
+  color: white;
+  font-size: 1.25rem;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.dialog-content {
+  flex: 1;
+  padding: 24px;
+  background: #f8f9fa;
+  transition: background 0.3s;
+}
+
+.edit-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-header {
+  margin: 0 0 16px 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #34495e;
+}
+
+.required {
+  color: #e74c3c;
+  margin-left: 2px;
+}
+
+.form-input {
+  width: 100%;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.map-preview {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-container-small {
+  width: 100%;
+  height: 100%;
+}
+
+.map-placeholder-small {
+  text-align: center;
+  color: #7f8c8d;
+}
+
+.map-placeholder-small i {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  color: #bdc3c7;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  background: white;
+}
+
+.secondary-btn {
+  color: #6c757d;
+  background: #f8f9fa;
+  padding: 8px 24px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.secondary-btn:hover {
+  background: #e2e6ea;
+}
+
+.primary-btn {
+  background: #FF6B35;
+  /* Botón primario naranja */
+  color: white;
+  padding: 8px 24px;
+  border-radius: 6px;
+  transition: opacity 0.2s, box-shadow 0.2s;
+}
+
+.primary-btn:hover {
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+}
+
+/* Modo oscuro */
+body[data-theme='dark'] .dialog-content {
+  background: #1e1e1e;
+  color: #f5f5f5;
+}
+
+body[data-theme='dark'] .secondary-btn {
+  background: #2c2c2c;
+  color: #ccc;
+}
+
+body[data-theme='dark'] .primary-btn {
+  background: #FF6B35;
 }

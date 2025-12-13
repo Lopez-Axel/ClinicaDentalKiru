@@ -1,29 +1,29 @@
-// Variables de color para pagos - Tema financiero
-$purchase-primary: #10B981;
-$purchase-primary-dark: #059669;
-$purchase-secondary: #3B82F6;
-$purchase-accent: #8B5CF6;
+// Variables de color para pagos - Tema naranja financiero
+$purchase-primary: #FF6B35;
+$purchase-primary-dark: #E55A2B;
+$purchase-secondary: #FF9B70;
+$purchase-accent: #FFB896;
 $purchase-success: #10B981;
 $purchase-warning: #F59E0B;
 $purchase-danger: #EF4444;
-$purchase-info: #06B6D4;
+$purchase-info: #F97316;
 
 // Modo claro
 $purchase-bg-light: #ffffff;
-$purchase-bg-light-alt: #F0FDF4;
-$purchase-text-light: #064E3B;
-$purchase-text-light-secondary: #047857;
-$purchase-border-light: #A7F3D0;
+$purchase-bg-light-alt: #FFF5F0;
+$purchase-text-light: #7A2E0B;
+$purchase-text-light-secondary: #B45309;
+$purchase-border-light: #FED7AA;
 $purchase-warning-dark: #cc9a06;
-$purchase-secondary-dark: #565e64;
-$purchase-accent-dark: #117a8b;
+$purchase-secondary-dark: #D15830;
+$purchase-accent-dark: #D9734D;
 
 // Modo oscuro
-$purchase-bg-dark: #022C22;
-$purchase-bg-dark-alt: #064E3B;
-$purchase-text-dark: #D1FAE5;
-$purchase-text-dark-secondary: #6EE7B7;
-$purchase-border-dark: #065F46;
+$purchase-bg-dark: #451A03;
+$purchase-bg-dark-alt: #7C2D12;
+$purchase-text-dark: #FED7AA;
+$purchase-text-dark-secondary: #FDBA74;
+$purchase-border-dark: #EA580C;
 
 // Mixins para dark mode
 @mixin purchase-dark-mode {
@@ -37,11 +37,11 @@ $purchase-border-dark: #065F46;
   min-height: 100vh;
   background: $purchase-bg-light-alt;
   padding: 2rem;
-  
+
   @include purchase-dark-mode {
     background: $purchase-bg-dark;
   }
-  
+
   @media (max-width: 768px) {
     padding: 1rem;
   }
@@ -56,7 +56,7 @@ $purchase-border-dark: #065F46;
   margin-bottom: 2rem;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba($purchase-primary, 0.4);
-  
+
   @media (max-width: 768px) {
     padding: 1.5rem;
     border-radius: 16px;
@@ -95,9 +95,12 @@ $purchase-border-dark: #065F46;
 }
 
 @keyframes purchase-float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-20px);
   }
@@ -110,7 +113,7 @@ $purchase-border-dark: #065F46;
   justify-content: space-between;
   align-items: center;
   gap: 2rem;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
@@ -122,7 +125,7 @@ $purchase-border-dark: #065F46;
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  
+
   @media (max-width: 768px) {
     gap: 1rem;
   }
@@ -138,7 +141,7 @@ $purchase-border-dark: #065F46;
   align-items: center;
   justify-content: center;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  
+
   @media (max-width: 768px) {
     width: 60px;
     height: 60px;
@@ -149,7 +152,7 @@ $purchase-border-dark: #065F46;
 .purchase-header-icon {
   font-size: 2rem;
   color: white;
-  
+
   @media (max-width: 768px) {
     font-size: 1.75rem;
   }
@@ -161,7 +164,7 @@ $purchase-border-dark: #065F46;
   color: white;
   margin: 0 0 0.5rem 0;
   letter-spacing: -0.5px;
-  
+
   @media (max-width: 768px) {
     font-size: 1.75rem;
   }
@@ -171,7 +174,7 @@ $purchase-border-dark: #065F46;
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.95);
   margin: 0;
-  
+
   @media (max-width: 768px) {
     font-size: 0.9rem;
   }
@@ -181,7 +184,7 @@ $purchase-border-dark: #065F46;
   display: flex;
   gap: 1rem;
   align-items: center;
-  
+
   @media (max-width: 768px) {
     width: 100%;
     flex-direction: column;
@@ -193,14 +196,15 @@ $purchase-border-dark: #065F46;
   font-weight: 600;
   font-size: 1rem;
   border-radius: 12px;
+  background: linear-gradient(135deg, $purchase-primary 0%, $purchase-primary-dark 100%);
   box-shadow: 0 4px 14px rgba($purchase-primary-dark, 0.3);
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba($purchase-primary-dark, 0.4);
   }
-  
+
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -212,11 +216,11 @@ $purchase-border-dark: #065F46;
   font-size: 1rem;
   border-radius: 12px;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
   }
-  
+
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -238,21 +242,22 @@ $purchase-border-dark: #065F46;
   box-shadow: 0 4px 16px rgba($purchase-primary, 0.1);
   transition: all 0.3s ease;
   margin-bottom: 1.5rem;
-  
+
   @include purchase-dark-mode {
     background: $purchase-bg-dark-alt;
   }
-  
-  &:hover, &:focus-within {
+
+  &:hover,
+  &:focus-within {
     box-shadow: 0 6px 24px rgba($purchase-primary, 0.2);
   }
-  
+
   :deep(.q-field__control) {
     border-radius: 16px;
     padding: 0 20px;
     height: 56px;
   }
-  
+
   :deep(.q-field__prepend) {
     padding-right: 12px;
   }
@@ -267,7 +272,7 @@ $purchase-border-dark: #065F46;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -285,11 +290,11 @@ $purchase-border-dark: #065F46;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr 1fr;
   }
-  
+
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
   }
@@ -307,12 +312,12 @@ $purchase-border-dark: #065F46;
   border: 1px solid $purchase-border-light;
   transition: all 0.3s ease;
   overflow: hidden;
-  
+
   @include purchase-dark-mode {
     background: $purchase-bg-dark-alt;
     border-color: $purchase-border-dark;
   }
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba($purchase-primary, 0.2);
@@ -327,12 +332,23 @@ $purchase-border-dark: #065F46;
   height: 100%;
   opacity: 0;
   transition: opacity 0.3s ease;
-  
-  &.total { background: radial-gradient(circle, rgba($purchase-primary, 0.1), transparent 70%); }
-  &.pending { background: radial-gradient(circle, rgba($purchase-warning, 0.1), transparent 70%); }
-  &.month { background: radial-gradient(circle, rgba($purchase-secondary, 0.1), transparent 70%); }
-  &.average { background: radial-gradient(circle, rgba($purchase-accent, 0.1), transparent 70%); }
-  
+
+  &.total {
+    background: radial-gradient(circle, rgba($purchase-primary, 0.1), transparent 70%);
+  }
+
+  &.pending {
+    background: radial-gradient(circle, rgba($purchase-warning, 0.1), transparent 70%);
+  }
+
+  &.month {
+    background: radial-gradient(circle, rgba($purchase-secondary, 0.1), transparent 70%);
+  }
+
+  &.average {
+    background: radial-gradient(circle, rgba($purchase-accent, 0.1), transparent 70%);
+  }
+
   .purchase-stat-card:hover & {
     opacity: 1;
   }
@@ -371,7 +387,6 @@ $purchase-border-dark: #065F46;
   }
 }
 
-
 .purchase-stat-content {
   flex: 1;
   position: relative;
@@ -383,16 +398,25 @@ $purchase-border-dark: #065F46;
   font-weight: 800;
   line-height: 1;
   margin-bottom: 0.25rem;
-  
-  .total & { 
+
+  .total & {
     background: linear-gradient(135deg, $purchase-primary, $purchase-primary-dark);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  .pending & { color: $purchase-warning; }
-  .month & { color: $purchase-secondary; }
-  .average & { color: $purchase-accent; }
+
+  .pending & {
+    color: $purchase-warning;
+  }
+
+  .month & {
+    color: $purchase-secondary;
+  }
+
+  .average & {
+    color: $purchase-accent;
+  }
 }
 
 .purchase-stat-label {
@@ -401,7 +425,7 @@ $purchase-border-dark: #065F46;
   color: $purchase-text-light-secondary;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  
+
   @include purchase-dark-mode {
     color: $purchase-text-dark-secondary;
   }
@@ -414,12 +438,12 @@ $purchase-border-dark: #065F46;
   padding: 2rem;
   box-shadow: 0 4px 16px rgba($purchase-primary, 0.1);
   border: 1px solid $purchase-border-light;
-  
+
   @include purchase-dark-mode {
     background: $purchase-bg-dark-alt;
     border-color: $purchase-border-dark;
   }
-  
+
   @media (max-width: 768px) {
     padding: 1.5rem;
     border-radius: 16px;
@@ -444,7 +468,7 @@ $purchase-border-dark: #065F46;
   font-weight: 700;
   color: $purchase-text-light;
   margin: 0 0 0.5rem 0;
-  
+
   @include purchase-dark-mode {
     color: $purchase-text-dark;
   }
@@ -478,7 +502,7 @@ $purchase-border-dark: #065F46;
   border-radius: 50px;
   font-size: 0.875rem;
   font-weight: 600;
-  
+
   @include purchase-dark-mode {
     background: rgba($purchase-primary, 0.2);
     color: $purchase-text-dark-secondary;
@@ -488,7 +512,7 @@ $purchase-border-dark: #065F46;
 .purchase-report-btn {
   border-radius: 10px;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
     background: rgba($purchase-danger, 0.1);
@@ -500,46 +524,46 @@ $purchase-border-dark: #065F46;
   :deep(.q-table__top) {
     padding: 0;
   }
-  
+
   :deep(.q-table__control) {
     min-height: auto;
   }
-  
+
   :deep(.q-table thead tr) {
     background: rgba($purchase-primary, 0.05);
-    
+
     @include purchase-dark-mode {
       background: rgba($purchase-primary, 0.1);
     }
   }
-  
+
   :deep(.q-table th) {
     font-weight: 700;
     color: $purchase-text-light;
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    
+
     @include purchase-dark-mode {
       color: $purchase-text-dark;
     }
   }
-  
+
   :deep(.q-table tbody tr) {
     transition: all 0.3s ease;
-    
+
     &:hover {
       background: rgba($purchase-primary, 0.05) !important;
-      
+
       @include purchase-dark-mode {
         background: rgba($purchase-primary, 0.1) !important;
       }
     }
   }
-  
+
   :deep(.q-table td) {
     border-bottom: 1px solid $purchase-border-light;
-    
+
     @include purchase-dark-mode {
       border-bottom-color: $purchase-border-dark;
     }
@@ -558,7 +582,7 @@ $purchase-border-dark: #065F46;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-1px);
   }
@@ -587,7 +611,7 @@ $purchase-border-dark: #065F46;
   font-weight: 700;
   color: $purchase-primary;
   font-size: 1rem;
-  
+
   @include purchase-dark-mode {
     color: $purchase-text-dark-secondary;
   }
@@ -605,7 +629,7 @@ $purchase-border-dark: #065F46;
   font-size: 0.8rem;
   font-weight: 600;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-1px);
     background: rgba($purchase-secondary, 0.2);
@@ -624,7 +648,7 @@ $purchase-border-dark: #065F46;
   height: 36px;
   border-radius: 10px;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
   }
@@ -663,7 +687,7 @@ $purchase-border-dark: #065F46;
   color: $purchase-text-light-secondary;
   position: relative;
   z-index: 2;
-  
+
   @include purchase-dark-mode {
     color: $purchase-text-dark-secondary;
   }
@@ -692,10 +716,13 @@ $purchase-border-dark: #065F46;
 }
 
 @keyframes purchase-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.6;
   }
+
   50% {
     transform: scale(1.1);
     opacity: 1;
@@ -707,7 +734,7 @@ $purchase-border-dark: #065F46;
   font-weight: 700;
   color: $purchase-text-light;
   margin: 0 0 0.5rem 0;
-  
+
   @include purchase-dark-mode {
     color: $purchase-text-dark;
   }
@@ -717,19 +744,20 @@ $purchase-border-dark: #065F46;
   font-size: 0.95rem;
   color: $purchase-text-light-secondary;
   margin: 0;
-  
+
   @include purchase-dark-mode {
     color: $purchase-text-dark-secondary;
   }
 }
 
 // Dialog Styles
-.purchase-dialog, .purchase-detail-dialog {
+.purchase-dialog,
+.purchase-detail-dialog {
   border-radius: 20px;
   overflow: hidden;
   max-width: 600px;
   width: 90vw;
-  
+
   @include purchase-dark-mode {
     background: $purchase-bg-dark-alt;
   }
@@ -750,7 +778,7 @@ $purchase-border-dark: #065F46;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1rem;
-  
+
   &.success {
     background: linear-gradient(135deg, rgba($purchase-success, 0.15), rgba($purchase-success, 0.3));
   }
@@ -759,7 +787,7 @@ $purchase-border-dark: #065F46;
 .purchase-dialog-icon {
   font-size: 2rem;
   color: $purchase-primary;
-  
+
   .success & {
     color: $purchase-success;
   }
@@ -770,7 +798,7 @@ $purchase-border-dark: #065F46;
   font-weight: 700;
   color: $purchase-text-light;
   margin: 0;
-  
+
   @include purchase-dark-mode {
     color: $purchase-text-dark;
   }
@@ -790,7 +818,7 @@ $purchase-border-dark: #065F46;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -819,7 +847,7 @@ $purchase-border-dark: #065F46;
   font-weight: 600;
   min-width: 120px;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
   }
@@ -827,7 +855,7 @@ $purchase-border-dark: #065F46;
 
 .purchase-dialog-confirm {
   box-shadow: 0 4px 14px rgba($purchase-primary, 0.3);
-  
+
   &:hover {
     box-shadow: 0 6px 20px rgba($purchase-primary, 0.4);
   }
@@ -850,11 +878,11 @@ $purchase-border-dark: #065F46;
   gap: 1rem;
   padding: 0.75rem 0;
   border-bottom: 1px solid $purchase-border-light;
-  
+
   @include purchase-dark-mode {
     border-bottom-color: $purchase-border-dark;
   }
-  
+
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
     gap: 0.5rem;
@@ -865,7 +893,7 @@ $purchase-border-dark: #065F46;
   font-weight: 600;
   color: $purchase-text-light-secondary;
   font-size: 0.9rem;
-  
+
   @include purchase-dark-mode {
     color: $purchase-text-dark-secondary;
   }
@@ -874,7 +902,7 @@ $purchase-border-dark: #065F46;
 .purchase-detail-value {
   color: $purchase-text-light;
   font-weight: 500;
-  
+
   @include purchase-dark-mode {
     color: $purchase-text-dark;
   }
@@ -884,7 +912,7 @@ $purchase-border-dark: #065F46;
   font-weight: 700;
   font-size: 1.1rem;
   color: $purchase-primary;
-  
+
   @include purchase-dark-mode {
     color: $purchase-text-dark-secondary;
   }
@@ -900,7 +928,7 @@ $purchase-border-dark: #065F46;
 
 .purchase-detail-observations {
   grid-template-columns: 1fr;
-  
+
   .purchase-detail-value {
     margin-top: 0.5rem;
     line-height: 1.5;

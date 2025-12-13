@@ -20,7 +20,7 @@ $kiru-bg-light-alt: #FFF8F6;
 $kiru-text-light: #4A3428;
 $kiru-text-light-secondary: #8D6E63;
 $kiru-border-light: #FFCCBC;
-$kiru-primary-darker: #235e3f;
+$kiru-primary-darker: #FF5722;
 
 // Modo oscuro
 $kiru-bg-dark: #2C1810;
@@ -39,7 +39,7 @@ $kiru-border-dark: #8D6E63;
 // Layout principal
 .kiru-dashboard-layout {
   background: $kiru-bg-light-alt;
-  
+
   @include kiru-dark-mode {
     background: $kiru-bg-dark;
   }
@@ -50,7 +50,7 @@ $kiru-border-dark: #8D6E63;
   background: linear-gradient(135deg, $kiru-primary 0%, $kiru-primary-dark 100%);
   box-shadow: 0 4px 20px rgba($kiru-primary, 0.3);
   border-bottom: none;
-  
+
   @include kiru-dark-mode {
     background: linear-gradient(135deg, $kiru-primary-dark 0%, $kiru-primary-darker 100%);
   }
@@ -59,7 +59,7 @@ $kiru-border-dark: #8D6E63;
 .kiru-toolbar {
   min-height: 70px;
   padding: 0 24px;
-  
+
   @media (max-width: 768px) {
     padding: 0 16px;
     min-height: 60px;
@@ -115,7 +115,7 @@ $kiru-border-dark: #8D6E63;
 // Breadcrumbs
 .kiru-breadcrumbs {
   margin-left: 32px;
-  
+
   @media (max-width: 1024px) {
     margin-left: 16px;
   }
@@ -125,11 +125,11 @@ $kiru-border-dark: #8D6E63;
   :deep(.q-breadcrumbs__el) {
     color: rgba(255, 255, 255, 0.8);
     font-weight: 500;
-    
+
     &:hover {
       color: white;
     }
-    
+
     &.q-breadcrumbs__el--active {
       color: white;
       font-weight: 600;
@@ -143,7 +143,7 @@ $kiru-border-dark: #8D6E63;
   margin: 0 8px;
   position: relative;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.1);
     transform: translateY(-1px);
@@ -162,7 +162,7 @@ $kiru-border-dark: #8D6E63;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   border: 1px solid $kiru-border-light;
-  
+
   @include kiru-dark-mode {
     background: $kiru-bg-dark-alt;
     border-color: $kiru-border-dark;
@@ -175,12 +175,12 @@ $kiru-border-dark: #8D6E63;
 
 .kiru-notification-header {
   padding: 12px 16px;
-  
+
   .kiru-notification-title {
     font-weight: 700;
     color: $kiru-text-light;
     font-size: 1.1rem;
-    
+
     @include kiru-dark-mode {
       color: $kiru-text-dark;
     }
@@ -190,7 +190,7 @@ $kiru-border-dark: #8D6E63;
 .kiru-notification-item {
   padding: 12px 16px;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: rgba($kiru-primary, 0.05);
   }
@@ -199,7 +199,7 @@ $kiru-border-dark: #8D6E63;
 .kiru-notification-message {
   font-weight: 600;
   color: $kiru-text-light;
-  
+
   @include kiru-dark-mode {
     color: $kiru-text-dark;
   }
@@ -207,7 +207,7 @@ $kiru-border-dark: #8D6E63;
 
 .kiru-notification-time {
   color: $kiru-text-light-secondary;
-  
+
   @include kiru-dark-mode {
     color: $kiru-text-dark-secondary;
   }
@@ -222,7 +222,7 @@ $kiru-border-dark: #8D6E63;
   color: white;
   margin: 0 8px;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.1);
     transform: rotate(15deg);
@@ -233,7 +233,7 @@ $kiru-border-dark: #8D6E63;
 .kiru-profile-btn {
   margin-left: 8px;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-1px);
   }
@@ -243,7 +243,7 @@ $kiru-border-dark: #8D6E63;
   border: 2px solid rgba(255, 255, 255, 0.3);
   position: relative;
   transition: all 0.3s ease;
-  
+
   &:hover {
     border-color: rgba(255, 255, 255, 0.6);
   }
@@ -257,7 +257,7 @@ $kiru-border-dark: #8D6E63;
   height: 10px;
   border-radius: 50%;
   border: 2px solid white;
-  
+
   &.kiru-status-online {
     background: $kiru-success;
   }
@@ -267,7 +267,7 @@ $kiru-border-dark: #8D6E63;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   border: 1px solid $kiru-border-light;
-  
+
   @include kiru-dark-mode {
     background: $kiru-bg-dark-alt;
     border-color: $kiru-border-dark;
@@ -281,20 +281,20 @@ $kiru-border-dark: #8D6E63;
 
 .kiru-profile-header {
   padding: 20px 16px;
-  
+
   .kiru-profile-name {
     font-size: 1.2rem;
     font-weight: 700;
     color: $kiru-text-light;
-    
+
     @include kiru-dark-mode {
       color: $kiru-text-dark;
     }
   }
-  
+
   .kiru-profile-email {
     color: $kiru-text-light-secondary;
-    
+
     @include kiru-dark-mode {
       color: $kiru-text-dark-secondary;
     }
@@ -309,17 +309,17 @@ $kiru-border-dark: #8D6E63;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  
+
   &.kiru-role-admin {
     background: rgba($kiru-primary, 0.1);
     color: $kiru-primary;
   }
-  
+
   &.kiru-role-dentist {
     background: rgba($kiru-info, 0.1);
     color: $kiru-info;
   }
-  
+
   &.kiru-role-client {
     background: rgba($kiru-success, 0.1);
     color: $kiru-success;
@@ -329,11 +329,11 @@ $kiru-border-dark: #8D6E63;
 .kiru-profile-item {
   padding: 12px 16px;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: rgba($kiru-primary, 0.05);
   }
-  
+
   .kiru-profile-icon {
     color: $kiru-primary;
   }
@@ -342,15 +342,15 @@ $kiru-border-dark: #8D6E63;
 .kiru-logout-item {
   padding: 12px 16px;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: rgba($kiru-danger, 0.05);
   }
-  
+
   .kiru-logout-icon {
     color: $kiru-danger;
   }
-  
+
   .kiru-logout-text {
     color: $kiru-danger;
     font-weight: 600;
@@ -361,7 +361,7 @@ $kiru-border-dark: #8D6E63;
 .kiru-drawer {
   background: $kiru-bg-light;
   border-right: 1px solid $kiru-border-light;
-  
+
   @include kiru-dark-mode {
     background: $kiru-bg-dark-alt;
     border-right-color: $kiru-border-dark;
@@ -403,7 +403,7 @@ $kiru-border-dark: #8D6E63;
   height: 14px;
   border-radius: 50%;
   border: 2px solid white;
-  
+
   &.kiru-status-online {
     background: $kiru-success;
   }
@@ -415,23 +415,23 @@ $kiru-border-dark: #8D6E63;
     font-weight: 700;
     color: $kiru-text-light;
     margin-bottom: 4px;
-    
+
     @include kiru-dark-mode {
       color: $kiru-text-dark;
     }
   }
-  
+
   .kiru-user-role {
     color: $kiru-primary;
     font-weight: 600;
     font-size: 0.9rem;
     margin-bottom: 4px;
   }
-  
+
   .kiru-user-email {
     color: $kiru-text-light-secondary;
     font-size: 0.8rem;
-    
+
     @include kiru-dark-mode {
       color: $kiru-text-dark-secondary;
     }
@@ -441,7 +441,7 @@ $kiru-border-dark: #8D6E63;
 .kiru-drawer-separator {
   margin: 0 20px;
   background: $kiru-border-light;
-  
+
   @include kiru-dark-mode {
     background: $kiru-border-dark;
   }
@@ -456,27 +456,27 @@ $kiru-border-dark: #8D6E63;
   border-radius: 12px;
   margin-bottom: 4px;
   transition: all 0.3s ease;
-  
+
   :deep(.q-item) {
     border-radius: 12px;
     padding: 12px 16px;
-    
+
     .q-item__section--avatar {
       min-width: 40px;
     }
   }
-  
+
   :deep(.q-focus-helper) {
     border-radius: 12px;
   }
-  
+
   &:hover {
     background: rgba($kiru-primary, 0.05);
   }
-  
+
   &.q-item--active {
     background: rgba($kiru-primary, 0.1);
-    
+
     .kiru-menu-icon {
       color: $kiru-primary;
     }
@@ -485,7 +485,7 @@ $kiru-border-dark: #8D6E63;
 
 .kiru-expand-icon {
   color: $kiru-text-light-secondary;
-  
+
   @include kiru-dark-mode {
     color: $kiru-text-dark-secondary;
   }
@@ -494,7 +494,7 @@ $kiru-border-dark: #8D6E63;
 .kiru-menu-icon {
   color: $kiru-text-light-secondary;
   font-size: 20px;
-  
+
   @include kiru-dark-mode {
     color: $kiru-text-dark-secondary;
   }
@@ -509,19 +509,19 @@ $kiru-border-dark: #8D6E63;
   margin: 2px 0;
   padding: 8px 16px;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: rgba($kiru-primary, 0.05);
   }
-  
+
   &.kiru-submenu-item-active {
     background: rgba($kiru-primary, 0.1);
     border-left: 3px solid $kiru-primary;
-    
+
     .kiru-submenu-icon {
       color: $kiru-primary;
     }
-    
+
     .kiru-submenu-label {
       color: $kiru-primary;
       font-weight: 600;
@@ -531,7 +531,7 @@ $kiru-border-dark: #8D6E63;
 
 .kiru-submenu-icon {
   color: $kiru-text-light-secondary;
-  
+
   @include kiru-dark-mode {
     color: $kiru-text-dark-secondary;
   }
@@ -540,7 +540,7 @@ $kiru-border-dark: #8D6E63;
 .kiru-submenu-label {
   color: $kiru-text-light-secondary;
   font-size: 0.9rem;
-  
+
   @include kiru-dark-mode {
     color: $kiru-text-dark-secondary;
   }
@@ -551,20 +551,20 @@ $kiru-border-dark: #8D6E63;
   margin-bottom: 4px;
   padding: 12px 16px;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: rgba($kiru-primary, 0.05);
     transform: translateX(4px);
   }
-  
+
   &.kiru-menu-item-active {
     background: rgba($kiru-primary, 0.1);
     border-left: 3px solid $kiru-primary;
-    
+
     .kiru-menu-icon {
       color: $kiru-primary;
     }
-    
+
     .kiru-menu-label {
       color: $kiru-primary;
       font-weight: 600;
@@ -575,7 +575,7 @@ $kiru-border-dark: #8D6E63;
 .kiru-menu-label {
   color: $kiru-text-light;
   font-weight: 500;
-  
+
   @include kiru-dark-mode {
     color: $kiru-text-dark;
   }
@@ -603,7 +603,7 @@ $kiru-border-dark: #8D6E63;
   color: $kiru-primary;
   font-weight: 600;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: rgba($kiru-primary, 0.1);
     transform: translateY(-1px);
@@ -613,7 +613,7 @@ $kiru-border-dark: #8D6E63;
 // Page Container
 .kiru-page-container {
   background: $kiru-bg-light-alt;
-  
+
   @include kiru-dark-mode {
     background: $kiru-bg-dark;
   }
@@ -624,7 +624,7 @@ $kiru-border-dark: #8D6E63;
   background: $kiru-bg-light;
   border-top: 1px solid $kiru-border-light;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-  
+
   @include kiru-dark-mode {
     background: $kiru-bg-dark-alt;
     border-top-color: $kiru-border-dark;
@@ -640,7 +640,7 @@ $kiru-border-dark: #8D6E63;
   display: flex;
   align-items: center;
   gap: 24px;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 8px;
@@ -651,7 +651,7 @@ $kiru-border-dark: #8D6E63;
 .kiru-footer-copyright {
   color: $kiru-text-light-secondary;
   font-size: 0.8rem;
-  
+
   @include kiru-dark-mode {
     color: $kiru-text-dark-secondary;
   }
@@ -662,7 +662,7 @@ $kiru-border-dark: #8D6E63;
   align-items: center;
   color: $kiru-text-light-secondary;
   font-size: 0.8rem;
-  
+
   @include kiru-dark-mode {
     color: $kiru-text-dark-secondary;
   }
@@ -679,7 +679,7 @@ $kiru-border-dark: #8D6E63;
   align-items: center;
   color: $kiru-text-light-secondary;
   font-size: 0.8rem;
-  
+
   @include kiru-dark-mode {
     color: $kiru-text-dark-secondary;
   }
@@ -696,17 +696,17 @@ $kiru-border-dark: #8D6E63;
   .kiru-toolbar {
     padding: 0 12px;
   }
-  
+
   .kiru-logo-text {
     .kiru-brand-name {
       font-size: 1.3rem;
     }
-    
+
     .kiru-brand-subtitle {
       display: none;
     }
   }
-  
+
   .kiru-footer-stats {
     display: none;
   }
@@ -716,11 +716,11 @@ $kiru-border-dark: #8D6E63;
   .kiru-logo-container {
     gap: 8px;
   }
-  
+
   .kiru-brand-name {
     font-size: 1.2rem;
   }
-  
+
   .kiru-user-info {
     padding: 20px 16px;
   }

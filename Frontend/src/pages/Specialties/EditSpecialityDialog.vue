@@ -33,9 +33,11 @@
                 v-model="form.nombre"
                 filled
                 dense
+                lazy-rules
                 :rules="[
                   val => !!val || 'El nombre de la especialidad es requerido',
-                  val => val && val.length >= 3 || 'Mínimo 3 caracteres'
+                  val => (val && val.length >= 3) || 'Mínimo 3 caracteres',
+                  val => (val && val.length <= 100) || 'Máximo 100 caracteres'
                 ]"
                 class="form-input"
                 placeholder="Ingrese el nombre de la especialidad"
@@ -54,9 +56,11 @@
                 dense
                 type="textarea"
                 rows="6"
+                lazy-rules
                 :rules="[
                   val => !!val || 'La descripción es requerida',
-                  val => val && val.length >= 20 || 'Mínimo 20 caracteres'
+                  val => (val && val.length >= 20) || 'Mínimo 20 caracteres',
+                  val => (val && val.length <= 1000) || 'Máximo 1000 caracteres'
                 ]"
                 class="form-input"
                 placeholder="Ingrese una descripción detallada de la especialidad"
@@ -81,7 +85,7 @@
             icon="fa-solid fa-save"
             :loading="loading"
             class="primary-btn"
-            :disable="!form.nombre || !form.descripcion"
+            :disable="!form.nombre || form.nombre.length < 3 || !form.descripcion || form.descripcion.length < 20"
           />
         </q-card-actions>
       </q-form>

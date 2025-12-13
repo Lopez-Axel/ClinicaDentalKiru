@@ -13,7 +13,7 @@
       </q-card-section>
 
       <q-card-section class="q-pt-lg">
-        <q-form @submit.prevent="updateServicio" class="q-gutter-md">
+        <q-form ref="formRef" @submit.prevent="updateServicio" class="q-gutter-md">
 
           <!-- Título -->
           <q-input
@@ -21,7 +21,12 @@
             label="Título del servicio *"
             outlined
             dense
-            :rules="[val => !!val || 'El título es requerido']"
+            lazy-rules
+            :rules="[
+              val => !!val || 'El título es requerido',
+              val => (val && val.length >= 3) || 'Mínimo 3 caracteres',
+              val => (val && val.length <= 100) || 'Máximo 100 caracteres'
+            ]"
             maxlength="100"
             counter
           />
@@ -33,6 +38,7 @@
             label="Categoría *"
             outlined
             dense
+            lazy-rules
             :rules="[val => !!val || 'La categoría es requerida']"
             emit-value
             map-options
@@ -46,7 +52,12 @@
             rows="3"
             outlined
             dense
-            :rules="[val => !!val || 'La descripción es requerida']"
+            lazy-rules
+            :rules="[
+              val => !!val || 'La descripción es requerida',
+              val => (val && val.length >= 10) || 'Mínimo 10 caracteres',
+              val => (val && val.length <= 500) || 'Máximo 500 caracteres'
+            ]"
             maxlength="500"
             counter
           />
@@ -160,7 +171,6 @@
               :options="estadoOptions"
               color="primary"
               inline
-              :rules="[val => !!val || 'El estado es requerido']"
             />
           </div>
 
@@ -202,6 +212,7 @@ export default {
     const $q = useQuasar()
     const servicioStore = useServicioStore()
     const loading = ref(false)
+    const formRef = ref(null)
 
     // Para manejar archivos
     const newImageFile = ref(null)
@@ -237,7 +248,9 @@ export default {
 
     const isFormValid = computed(() => {
       return formData.value.titulo &&
+             formData.value.titulo.length >= 3 &&
              formData.value.descripcion &&
+             formData.value.descripcion.length >= 10 &&
              formData.value.categoria &&
              formData.value.estado
     })
@@ -261,6 +274,7 @@ export default {
       newImageFile.value = null
       newImagePreview.value = ''
       removeCurrentImageFlag.value = false
+      formRef.value?.resetValidation()
     }
 
     const loadServicioData = () => {
@@ -328,6 +342,17 @@ export default {
     }
 
     const updateServicio = async () => {
+      // Validar formulario
+      const isValid = await formRef.value?.validate()
+      if (!isValid) {
+        $q.notify({
+          type: 'warning',
+          message: 'Por favor, complete todos los campos requeridos correctamente',
+          position: 'top-right'
+        })
+        return
+      }
+      
       if (!isFormValid.value) return
       loading.value = true
       try {
@@ -369,6 +394,7 @@ export default {
       categorias,
       estadoOptions,
       isFormValid,
+      formRef,
       loading,
       currentImageUrl,
       newImagePreview,

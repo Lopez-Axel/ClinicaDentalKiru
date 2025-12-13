@@ -20,7 +20,7 @@
 
       <q-separator />
 
-      <q-form @submit.prevent="saveDentist" class="form-container">
+      <q-form ref="formRef" @submit.prevent="saveDentist" class="form-container">
         <q-card-section class="dialog-content">
           <div class="form-fields">
             <div class="field-group">
@@ -33,7 +33,12 @@
                 v-model="form.nombre"
                 filled
                 dense
-                :rules="[val => !!val || 'El nombre es requerido']"
+                lazy-rules
+                :rules="[
+                  val => !!val || 'El nombre es requerido',
+                  val => (val && val.length >= 2) || 'Mínimo 2 caracteres',
+                  val => (val && val.length <= 50) || 'Máximo 50 caracteres'
+                ]"
                 class="form-input"
                 placeholder="Ingrese el nombre"
               />
@@ -48,8 +53,12 @@
                 v-model="form.segundo_nombre"
                 filled
                 dense
+                lazy-rules
                 class="form-input"
                 placeholder="Ingrese el segundo nombre (opcional)"
+                :rules="[
+                  val => !val || (val && val.length <= 50) || 'Máximo 50 caracteres'
+                ]"
               />
             </div>
 
@@ -63,7 +72,12 @@
                 v-model="form.apellido_paterno"
                 filled
                 dense
-                :rules="[val => !!val || 'El apellido paterno es requerido']"
+                lazy-rules
+                :rules="[
+                  val => !!val || 'El apellido paterno es requerido',
+                  val => (val && val.length >= 2) || 'Mínimo 2 caracteres',
+                  val => (val && val.length <= 50) || 'Máximo 50 caracteres'
+                ]"
                 class="form-input"
                 placeholder="Ingrese el apellido paterno"
               />
@@ -78,8 +92,12 @@
                 v-model="form.apellido_materno"
                 filled
                 dense
+                lazy-rules
                 class="form-input"
                 placeholder="Ingrese el apellido materno (opcional)"
+                :rules="[
+                  val => !val || (val && val.length <= 50) || 'Máximo 50 caracteres'
+                ]"
               />
             </div>
 
@@ -115,6 +133,7 @@
                 v-model="form.estado"
                 filled
                 dense
+                lazy-rules
                 :options="stateOptions"
                 emit-value
                 map-options
@@ -220,6 +239,7 @@ export default {
     const newImageFile = ref(null)
     const imagePreview = ref(null)
     const especialidadesSeleccionadas = ref([])
+    const formRef = ref(null)
     
     const form = ref({
       id: null,
@@ -279,6 +299,7 @@ export default {
       newImageFile.value = null
       imagePreview.value = null
       especialidadesSeleccionadas.value = []
+      formRef.value?.resetValidation()
     }
 
     const closeDialog = () => {
@@ -314,6 +335,13 @@ export default {
       // Prevenir múltiples envíos
       if (loading.value) {
         console.log('Ya hay una operación en curso, ignorando...')
+        return
+      }
+
+      // Validar formulario
+      const isValid = await formRef.value?.validate()
+      if (!isValid) {
+        alert('Por favor, complete todos los campos requeridos correctamente')
         return
       }
 
@@ -406,6 +434,7 @@ export default {
       imagePreview,
       especialidadesSeleccionadas,
       gestionStore,
+      formRef,
       closeDialog,
       saveDentist,
       handleImageSelect,

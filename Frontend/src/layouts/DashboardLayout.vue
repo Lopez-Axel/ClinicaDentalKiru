@@ -261,18 +261,8 @@
             <div class="kiru-footer-copyright">
               © 2025 KIRU Odontología - Panel de Administración
             </div>
-            <div class="kiru-footer-version">
-              <q-icon name="fa-solid fa-code-branch" size="14px" class="q-mr-xs" />
-              Versión 1.0.0
-            </div>
           </div>
         </q-toolbar-title>
-        <div class="kiru-footer-stats">
-          <div class="kiru-footer-stat">
-            <q-icon name="fa-solid fa-users" size="14px" class="q-mr-xs" />
-            <span>24 usuarios activos</span>
-          </div>
-        </div>
       </q-toolbar>
     </q-footer>
   </q-layout>

@@ -20,7 +20,7 @@
 
       <q-separator />
 
-      <q-form @submit.prevent="createDentist" class="form-container">
+      <q-form ref="formRef" @submit.prevent="createDentist" class="form-container">
         <q-card-section class="dialog-content">
           <div class="welcome-message">
             <i class="fa-solid fa-info-circle"></i>
@@ -51,10 +51,11 @@
                   v-model="form.nombre"
                   filled
                   dense
+                  lazy-rules
                   :rules="[
                     val => !!val || 'El nombre es requerido',
-                    val => val.length >= 2 || 'Mínimo 2 caracteres',
-                    val => val.length <= 50 || 'Máximo 50 caracteres'
+                    val => (val && val.length >= 2) || 'Mínimo 2 caracteres',
+                    val => (val && val.length <= 50) || 'Máximo 50 caracteres'
                   ]"
                   class="form-input"
                   placeholder="Carlos"
@@ -71,11 +72,12 @@
                   v-model="form.segundo_nombre"
                   filled
                   dense
+                  lazy-rules
                   class="form-input"
                   placeholder="Andrés (opcional)"
                   :disable="loading"
                   :rules="[
-                    val => !val || val.length <= 50 || 'Máximo 50 caracteres'
+                    val => !val || (val && val.length <= 50) || 'Máximo 50 caracteres'
                   ]"
                 />
               </div>
@@ -92,10 +94,11 @@
                   v-model="form.apellido_paterno"
                   filled
                   dense
+                  lazy-rules
                   :rules="[
                     val => !!val || 'El apellido paterno es requerido',
-                    val => val.length >= 2 || 'Mínimo 2 caracteres',
-                    val => val.length <= 50 || 'Máximo 50 caracteres'
+                    val => (val && val.length >= 2) || 'Mínimo 2 caracteres',
+                    val => (val && val.length <= 50) || 'Máximo 50 caracteres'
                   ]"
                   class="form-input"
                   placeholder="García"
@@ -112,11 +115,12 @@
                   v-model="form.apellido_materno"
                   filled
                   dense
+                  lazy-rules
                   class="form-input"
                   placeholder="López (opcional)"
                   :disable="loading"
                   :rules="[
-                    val => !val || val.length <= 50 || 'Máximo 50 caracteres'
+                    val => !val || (val && val.length <= 50) || 'Máximo 50 caracteres'
                   ]"
                 />
               </div>
@@ -181,6 +185,7 @@
                   v-model="form.estado"
                   filled
                   dense
+                  lazy-rules
                   :options="estadoOptions"
                   :rules="[val => !!val || 'Seleccione un estado']"
                   class="form-input"
@@ -291,6 +296,7 @@ export default {
     const error = ref(null)
     const loading = ref(false)
     const isCreating = ref(false)
+    const formRef = ref(null)
 
     const form = ref({
       nombre: '',
@@ -336,6 +342,7 @@ export default {
       error.value = null
       loading.value = false
       isCreating.value = false
+      formRef.value?.resetValidation()
     }
 
     const closeDialog = () => {
@@ -398,6 +405,13 @@ export default {
       // Prevenir múltiples envíos
       if (isCreating.value || loading.value) {
         console.log('Ya hay una operación en curso, ignorando...')
+        return
+      }
+
+      // Validar formulario
+      const isValid = await formRef.value?.validate()
+      if (!isValid) {
+        error.value = 'Por favor, complete todos los campos requeridos correctamente'
         return
       }
 
@@ -469,6 +483,7 @@ export default {
       error,
       loading,
       formValid,
+      formRef,
       closeDialog,
       createDentist,
       handleImageSelect,

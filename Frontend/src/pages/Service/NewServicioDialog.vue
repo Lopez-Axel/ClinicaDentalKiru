@@ -14,14 +14,19 @@
       </q-card-section>
 
       <q-card-section class="q-pt-lg">
-        <q-form @submit.prevent="createServicio" class="q-gutter-md">
+        <q-form ref="formRef" @submit.prevent="createServicio" class="q-gutter-md">
           <!-- Título -->
           <q-input 
             v-model="formData.titulo" 
             label="Título del servicio *" 
             outlined 
             dense
-            :rules="[val => !!val || 'El título es requerido']"
+            lazy-rules
+            :rules="[
+              val => !!val || 'El título es requerido',
+              val => (val && val.length >= 3) || 'Mínimo 3 caracteres',
+              val => (val && val.length <= 100) || 'Máximo 100 caracteres'
+            ]"
             maxlength="100"
             counter
           />
@@ -33,6 +38,7 @@
             label="Categoría *" 
             outlined 
             dense
+            lazy-rules
             :rules="[val => !!val || 'La categoría es requerida']"
             emit-value
             map-options
@@ -46,7 +52,12 @@
             rows="3" 
             outlined 
             dense
-            :rules="[val => !!val || 'La descripción es requerida']"
+            lazy-rules
+            :rules="[
+              val => !!val || 'La descripción es requerida',
+              val => (val && val.length >= 10) || 'Mínimo 10 caracteres',
+              val => (val && val.length <= 500) || 'Máximo 500 caracteres'
+            ]"
             maxlength="500"
             counter
           />
@@ -125,7 +136,6 @@
               :options="estadoOptions" 
               color="primary" 
               inline
-              :rules="[val => !!val || 'El estado es requerido']"
             />
           </div>
 
@@ -155,6 +165,7 @@ export default {
     const servicioStore = useServicioStore()
     const loading = ref(false)
     const isSubmitting = ref(false)
+    const formRef = ref(null)
 
     const showDialog = computed({
       get: () => props.modelValue,
@@ -186,7 +197,9 @@ export default {
 
     const isFormValid = computed(() => {
       return formData.value.titulo && 
+             formData.value.titulo.length >= 3 &&
              formData.value.descripcion && 
+             formData.value.descripcion.length >= 10 &&
              formData.value.categoria &&
              formData.value.estado
     })
@@ -200,6 +213,7 @@ export default {
         imagenPreview: '',
         estado: 'activo'
       }
+      formRef.value?.resetValidation()
     }
 
     const closeDialog = () => {
@@ -247,7 +261,20 @@ export default {
     }
 
     const createServicio = async () => {
-      if (isSubmitting.value || !isFormValid.value) return
+      if (isSubmitting.value) return
+      
+      // Validar formulario
+      const isValid = await formRef.value?.validate()
+      if (!isValid) {
+        $q.notify({
+          type: 'warning',
+          message: 'Por favor, complete todos los campos requeridos correctamente',
+          position: 'top-right'
+        })
+        return
+      }
+      
+      if (!isFormValid.value) return
       isSubmitting.value = true
       loading.value = true
 
@@ -284,6 +311,7 @@ export default {
       categorias,
       estadoOptions,
       isFormValid,
+      formRef,
       createServicio,
       closeDialog,
       loading,

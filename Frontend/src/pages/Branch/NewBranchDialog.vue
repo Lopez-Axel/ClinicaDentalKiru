@@ -22,7 +22,7 @@
       <q-separator />
 
       <!-- Form -->
-      <q-form @submit.prevent="createBranch" class="form-container">
+      <q-form ref="formRef" @submit.prevent="createBranch" class="form-container">
         <q-card-section class="dialog-content" style="overflow-y: auto;">
           <div class="welcome-message" style="max-width: 800px; margin: 0 auto 30px;">
             <i class="fa-solid fa-info-circle"></i>
@@ -44,7 +44,12 @@
                   v-model="form.nombre"
                   filled
                   dense
-                  :rules="[val => !!val || 'El nombre es requerido', val => val.length >= 3 || 'Mínimo 3 caracteres']"
+                  lazy-rules
+                  :rules="[
+                    val => !!val || 'El nombre es requerido',
+                    val => (val && val.length >= 3) || 'Mínimo 3 caracteres',
+                    val => (val && val.length <= 100) || 'Máximo 100 caracteres'
+                  ]"
                   class="form-input"
                   placeholder="Ej: Sucursal Centro"
                 />
@@ -53,16 +58,20 @@
               <div class="field-group">
                 <label class="field-label">
                   <i class="fa-solid fa-location-dot"></i>
-                  <span>Ubicación (Ciudad)</span>
+                  <span>Departamento</span>
                   <span class="required">*</span>
                 </label>
-                <q-input
+                <q-select
                   v-model="form.ubicacion"
                   filled
                   dense
-                  :rules="[val => !!val || 'La ubicación es requerida']"
+                  lazy-rules
+                  :options="departamentos"
+                  :rules="[val => !!val || 'El departamento es requerido']"
                   class="form-input"
-                  placeholder="Ej: Oruro"
+                  placeholder="Seleccione un departamento"
+                  emit-value
+                  map-options
                 />
               </div>
 
@@ -76,7 +85,12 @@
                   v-model="form.direccion"
                   filled
                   dense
-                  :rules="[val => !!val || 'La dirección es requerida']"
+                  lazy-rules
+                  :rules="[
+                    val => !!val || 'La dirección es requerida',
+                    val => (val && val.length >= 10) || 'Mínimo 10 caracteres',
+                    val => (val && val.length <= 200) || 'Máximo 200 caracteres'
+                  ]"
                   class="form-input"
                   placeholder="Ej: Av. 6 de Agosto #123, Centro, Oruro"
                 />
@@ -94,7 +108,12 @@
                   dense
                   type="textarea"
                   rows="3"
-                  :rules="[val => !!val || 'La descripción es requerida']"
+                  lazy-rules
+                  :rules="[
+                    val => !!val || 'La descripción es requerida',
+                    val => (val && val.length >= 10) || 'Mínimo 10 caracteres',
+                    val => (val && val.length <= 500) || 'Máximo 500 caracteres'
+                  ]"
                   class="form-input"
                   placeholder="Descripción de la sucursal..."
                 />
@@ -251,6 +270,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useQuasar } from 'quasar'
 import { useSucursalStore } from 'src/stores/sucursalStore'
 
 const props = defineProps({
@@ -259,13 +279,28 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'branch-created', 'close'])
 
-// Store
+const $q = useQuasar()
 const sucursalStore = useSucursalStore()
 
 // Estado
 const loading = ref(false)
 const imageFile = ref(null)
 const imagePreview = ref(null)
+const formRef = ref(null)
+
+// Departamentos de Bolivia
+const departamentos = [
+  { label: 'La Paz', value: 'La Paz' },
+  { label: 'Cochabamba', value: 'Cochabamba' },
+  { label: 'Santa Cruz', value: 'Santa Cruz' },
+  { label: 'Potosí', value: 'Potosí' },
+  { label: 'Chuquisaca', value: 'Chuquisaca' },
+  { label: 'Oruro', value: 'Oruro' },
+  { label: 'Tarija', value: 'Tarija' },
+  { label: 'Beni', value: 'Beni' },
+  { label: 'Pando', value: 'Pando' },
+  { label: 'Otro', value: 'Otro' }
+]
 
 const form = ref({
   nombre: '',
@@ -324,9 +359,21 @@ const resetForm = () => {
     activo: true
   }
   removeImage()
+  formRef.value?.resetValidation()
 }
 
 const createBranch = async () => {
+  // Validar formulario
+  const isValid = await formRef.value?.validate()
+  if (!isValid) {
+    $q.notify({
+      type: 'warning',
+      message: 'Por favor, complete todos los campos requeridos correctamente',
+      position: 'top-right'
+    })
+    return
+  }
+  
   loading.value = true
   try {
     const created = await sucursalStore.crear(form.value, imageFile.value)
@@ -334,6 +381,11 @@ const createBranch = async () => {
     closeDialog()
   } catch (err) {
     console.error('Error al crear sucursal:', err)
+    $q.notify({
+      type: 'negative',
+      message: err.response?.data?.message || 'Error al crear la sucursal',
+      position: 'top-right'
+    })
   } finally {
     loading.value = false
   }
